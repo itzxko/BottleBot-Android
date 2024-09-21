@@ -22,11 +22,11 @@ export default function Index() {
   const [hidePass, setHidePass] = useState(true);
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
-  const [modalVisible, setModalVisible] = useState(false); // Correct setter function
+  const [modalVisible, setModalVisible] = useState(false);
   const [message, setMessage] = useState("");
   const route = useRouter();
-  const opacity = useSharedValue(0); // For fade-in effect
-  const translateX = useSharedValue(40); // Start from left off-screen
+  const opacity = useSharedValue(0);
+  const translateX = useSharedValue(40);
 
   const togglePassword = () => {
     setHidePass(!hidePass);
@@ -34,13 +34,11 @@ export default function Index() {
 
   useEffect(() => {
     if (modalVisible) {
-      // Animate to fade in and slide from the left
-      opacity.value = withTiming(1, { duration: 300 }); // Fade in over 300 ms
-      translateX.value = withTiming(0, { duration: 300 }); // Move to the center
+      opacity.value = withTiming(1, { duration: 300 });
+      translateX.value = withTiming(0, { duration: 300 });
     } else {
-      // Fade out and move back to the left
-      opacity.value = withTiming(0, { duration: 300 }); // Fade out
-      translateX.value = withTiming(40, { duration: 300 }); // Move back to the left
+      opacity.value = withTiming(0, { duration: 300 });
+      translateX.value = withTiming(40, { duration: 300 });
     }
   }, [modalVisible]);
 
