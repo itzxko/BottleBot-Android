@@ -10,13 +10,39 @@ import {
 import { Link } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import { useState } from "react";
+import axios from "axios";
+import { useRouter } from "expo-router";
 
 export default function index() {
   const [hidePass, setHidePass] = useState(true);
+  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const route = useRouter();
 
   const togglePassword = () => {
     setHidePass(!hidePass);
   };
+
+  const onLogin = async () => {
+    try {
+      let url = "http://192.168.254.139:3000/api/auth/login";
+
+      let response = await axios.post(url, {
+        email: email,
+        password: password,
+      });
+      if (response) {
+        console.log(response.data.message);
+        if (response.data.message === "Login success!") {
+          route.push("/(tabs)/dashboard");
+        }
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  console.log(password, email);
 
   return (
     <View className="flex-1 w-full bg-black">
@@ -35,6 +61,9 @@ export default function index() {
           <TextInput
             className="bg-white w-full border border-black px-4 py-2 rounded-md text-sm"
             placeholder="Enter your email"
+            onChangeText={setEmail}
+            value={email}
+            spellCheck={false}
           />
         </View>
         <View className="w-full flex items-start justify-center pb-6">
@@ -45,6 +74,9 @@ export default function index() {
               placeholder="Enter your password"
               textContentType={"password"}
               secureTextEntry={hidePass ? true : false}
+              value={password}
+              onChangeText={setPassword}
+              spellCheck={false}
             />
             <Feather
               name={hidePass ? "eye-off" : "eye"}
@@ -61,13 +93,11 @@ export default function index() {
           <TouchableOpacity
             className="bg-black w-full px-4 py-3 rounded-md"
             activeOpacity={0.8}
+            onPress={onLogin}
           >
-            <Link
-              href="/dashboard"
-              className="text-white text-center text-sm font-semibold"
-            >
+            <Text className="text-white text-center text-sm font-semibold">
               Login
-            </Link>
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
