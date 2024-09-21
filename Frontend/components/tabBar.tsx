@@ -5,7 +5,7 @@ import { blue } from "react-native-reanimated/lib/typescript/reanimated2/Colors"
 
 export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   return (
-    <View className="absolute bottom-5 flex-row items-center justify-evenly mx-20 bg-white p-4 rounded-full shadow-xl shadow-black/50">
+    <View className="absolute bottom-5 flex-row items-center justify-evenly mx-20 bg-white p-4 rounded-3xl shadow-xl shadow-black/50">
       {state.routes.map((route, index) => {
         const { options } = descriptors[route.key];
         const label =
