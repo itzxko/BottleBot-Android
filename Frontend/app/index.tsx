@@ -100,7 +100,7 @@ export default function Index() {
               <View className="w-full flex items-start justify-center py-6">
                 <Text className="font-semibold text-sm pb-2">Username:</Text>
                 <TextInput
-                  className="bg-[#E1E1E1]  w-full px-4 py-2 rounded-xl text-sm"
+                  className="bg-[#E1E1E1]  w-full px-6 py-3 rounded-xl text-sm"
                   placeholder="Enter your email"
                   onChangeText={setEmail}
                   value={email}
@@ -110,7 +110,7 @@ export default function Index() {
 
               <View className="w-full flex items-start justify-center pb-6">
                 <Text className="font-semibold text-sm pb-2">Password:</Text>
-                <View className="flex flex-row items-center justify-center w-full bg-[#E1E1E1]  px-6 py-2 rounded-xl">
+                <View className="flex flex-row items-center justify-center w-full bg-[#E1E1E1]  px-8 py-3 rounded-xl">
                   <TextInput
                     className="bg-[#E1E1E1] w-full text-sm"
                     placeholder="Enter your password"
@@ -136,13 +136,13 @@ export default function Index() {
 
               <View className="w-full flex items-center justify-center py-6">
                 <TouchableOpacity
-                  className="w-full"
+                  className="w-full "
                   activeOpacity={0.8}
                   onPress={onLogin}
                 >
                   <LinearGradient
-                    colors={["#CC6316", "#964408"]}
-                    className="w-full px-4 py-3 rounded-xl flex items-center justify-center"
+                    colors={["#00674F", "#06402B"]}
+                    className="w-full px-4 py-4 rounded-xl flex items-center justify-center shadow-xl shadow-[#050301]"
                     start={{ x: 0, y: 1 }}
                     end={{ x: 1, y: 0 }}
                   >
@@ -154,7 +154,10 @@ export default function Index() {
               </View>
             </View>
             {modalVisible && (
-              <View className="h-full w-full absolute top-0 left-0 bg-black/50 z-10 flex items-center justify-center">
+              <Pressable
+                className="h-full w-full absolute top-0 left-0 bg-black/50 z-10 flex items-center justify-center"
+                onPress={() => setModalVisible(false)}
+              >
                 <Animated.View
                   className="bg-white px-6 py-4 rounded-xl flex items-center w-3/5 justify-center animate-bounce"
                   style={{
@@ -178,7 +181,7 @@ export default function Index() {
                   </View>
                   <Text className="text-sm font-semibold pb-2">{message}!</Text>
                 </Animated.View>
-              </View>
+              </Pressable>
             )}
           </LinearGradient>
         </ImageBackground>
