@@ -26,7 +26,7 @@ const dashboard = () => {
               <Text className="text-sm font-semibold text-black pb-2">
                 BottleBot's Location
               </Text>
-              <View className="w-full flex flex-row items-center justify-center px-6 py-2 bg-[#E1E1E1] rounded-xl">
+              <View className="w-full flex flex-row items-center justify-center px-8 py-3 bg-[#E1E1E1] rounded-xl">
                 <TextInput className="w-full" editable={false}>
                   <Text className="text-sm font-bold text-black/50">
                     Sample Text
@@ -40,7 +40,7 @@ const dashboard = () => {
               <Text className="text-sm font-semibold text-black pb-2">
                 Your Location
               </Text>
-              <View className="w-full flex flex-row items-center justify-center px-6 py-2 bg-[#E1E1E1] rounded-xl">
+              <View className="w-full flex flex-row items-center justify-center px-8 py-3 bg-[#E1E1E1] rounded-xl">
                 <TextInput className="w-full" editable={false}>
                   <Text className="text-sm font-bold text-black/50">
                     Sample Text
@@ -52,8 +52,8 @@ const dashboard = () => {
             <View className="w-full flex items-center justify-center py-6">
               <Pressable className="w-full flex items-center justify-center">
                 <LinearGradient
-                  colors={["#CC6316", "#964408"]}
-                  className="w-full px-4 py-3 rounded-xl flex items-center justify-center"
+                  colors={["#00674F", "#06402B"]}
+                  className="w-full px-4 py-4 rounded-xl flex items-center justify-center shadow-xl shadow-[#050301]"
                   start={{ x: 0, y: 1 }}
                   end={{ x: 1, y: 0 }}
                 >
