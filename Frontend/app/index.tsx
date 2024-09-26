@@ -43,35 +43,33 @@ export default function Index() {
   }, [modalVisible]);
 
   const onLogin = async () => {
-    try {
-      let url = "http://192.168.254.139:3000/api/auth/login";
-
-      let response = await axios.post(url, {
-        email: email,
-        password: password,
-      });
-
-      if (response) {
-        console.log(response.data.message);
-
-        if (response.data.message === "Login success!") {
-          route.push("/(tabs)/dashboard");
-        } else {
-          setMessage(response.data.message);
-          setModalVisible(true);
-          setTimeout(() => {
-            setModalVisible(false);
-          }, 5000);
-        }
-      }
-    } catch (err: any) {
-      console.log(err);
-      setMessage(err.response.data.message);
-      setModalVisible(true);
-      setTimeout(() => {
-        setModalVisible(false);
-      }, 5000);
-    }
+    route.push("/(tabs)/dashboard");
+    // try {
+    //   let url = "http://192.168.254.139:3000/api/auth/login";
+    //   let response = await axios.post(url, {
+    //     email: email,
+    //     password: password,
+    //   });
+    //   if (response) {
+    //     console.log(response.data.message);
+    //     if (response.data.message === "Login success!") {
+    //       route.push("/(tabs)/dashboard");
+    //     } else {
+    //       setMessage(response.data.message);
+    //       setModalVisible(true);
+    //       setTimeout(() => {
+    //         setModalVisible(false);
+    //       }, 5000);
+    //     }
+    //   }
+    // } catch (err: any) {
+    //   console.log(err);
+    //   setMessage(err.response.data.message);
+    //   setModalVisible(true);
+    //   setTimeout(() => {
+    //     setModalVisible(false);
+    //   }, 5000);
+    // }
   };
 
   return (
