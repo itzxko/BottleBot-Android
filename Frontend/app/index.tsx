@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Pressable,
   ImageBackground,
+  TouchableHighlight,
 } from "react-native";
 import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useState, useEffect } from "react";
@@ -17,6 +18,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Index() {
   const [hidePass, setHidePass] = useState(true);
@@ -51,10 +53,20 @@ export default function Index() {
         password: password,
       });
 
+      // if (response) {
+      //   route.push("/(tabs)/dashboard");
+      // }
+
       if (response) {
         console.log(response.data.message);
 
         if (response.data.message === "Login success!") {
+          await AsyncStorage.setItem("token", response.data.token);
+          await AsyncStorage.setItem(
+            "user",
+            JSON.stringify(response.data.user)
+          );
+
           route.push("/(tabs)/dashboard");
         } else {
           setMessage(response.data.message);
@@ -105,6 +117,7 @@ export default function Index() {
                   onChangeText={setEmail}
                   value={email}
                   spellCheck={false}
+                  autoCapitalize="none"
                 />
               </View>
 
@@ -119,6 +132,7 @@ export default function Index() {
                     value={password}
                     onChangeText={setPassword}
                     spellCheck={false}
+                    autoCapitalize="none"
                   />
                   <Feather
                     name={hidePass ? "eye-off" : "eye"}
@@ -135,22 +149,22 @@ export default function Index() {
               </View>
 
               <View className="w-full flex items-center justify-center py-6">
-                <TouchableOpacity
-                  className="w-full "
-                  activeOpacity={0.8}
+                <TouchableHighlight
+                  className="w-full flex items-center justify-center rounded-xl"
                   onPress={onLogin}
+                  underlayColor={"#41917F"}
                 >
                   <LinearGradient
                     colors={["#00674F", "#06402B"]}
-                    className="w-full px-4 py-4 rounded-xl flex items-center justify-center shadow-xl shadow-[#050301]"
                     start={{ x: 0, y: 1 }}
                     end={{ x: 1, y: 0 }}
+                    className="w-full  rounded-xl shadow shadow-[#050301]"
                   >
-                    <Text className="text-white text-center text-sm font-semibold">
+                    <Text className="flex py-4 bg-transparent text-center text-sm text-white font-semibold">
                       Login
                     </Text>
                   </LinearGradient>
-                </TouchableOpacity>
+                </TouchableHighlight>
               </View>
             </View>
             {modalVisible && (
