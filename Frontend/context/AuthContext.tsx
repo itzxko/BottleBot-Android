@@ -29,6 +29,7 @@ interface User {
   credentials: {
     email: string;
     password: string;
+    level: string;
   };
 }
 

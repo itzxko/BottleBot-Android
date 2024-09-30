@@ -4,7 +4,7 @@
     "slug": "Bottle-Bot",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/Bottle-Bot.png",
+    "icon": "./assets/images/app-icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "ios": {
