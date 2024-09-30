@@ -104,7 +104,7 @@ const dashboard = () => {
                   </TouchableHighlight>
                 </View>
               </View>
-              <View className="pb-12"></View>
+              <View className="pb-16"></View>
             </View>
           </ImageBackground>
         </View>
