@@ -29,7 +29,7 @@ const dashboard = () => {
         <View className="flex-1 w-full">
           <ImageBackground
             className="w-full flex-1 relative"
-            source={require("../../assets/images/Map.jpg")}
+            source={require("../../assets/images/map.jpg")}
           >
             {/* DO NOT MODIFY UNLESS ESSENTIAL */}
             <View className="absolute flex items-center rounded-t-3xl justify-center w-full left-0 bottom-0 bg-[#F6F6F6] ">
@@ -104,7 +104,7 @@ const dashboard = () => {
                   </TouchableHighlight>
                 </View>
               </View>
-              <View className="pb-16"></View>
+              <View className="pb-12"></View>
             </View>
           </ImageBackground>
         </View>
