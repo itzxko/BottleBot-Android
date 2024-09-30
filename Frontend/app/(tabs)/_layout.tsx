@@ -21,6 +21,13 @@ const _layout = () => {
         }}
       />
       <Tabs.Screen
+        name="history"
+        options={{
+          headerShown: false,
+          title: "History",
+        }}
+      />
+      <Tabs.Screen
         name="profile"
         options={{
           headerShown: false,
