@@ -164,7 +164,7 @@ const Redeem = () => {
                   ? "Loading"
                   : `${user.personalInfo.firstName} ${user.personalInfo.lastName}`}
               </Text>
-              <View className="flex items-center justify-center px-2 py-1 bg-[#E1E1E1] rounded-md">
+              <View className="flex items-center justify-center px-2 py-1 bg-[#E1E1E1]/75 rounded-md">
                 <Text
                   className="text-[10px] font-normal text-black uppercase"
                   numberOfLines={1}

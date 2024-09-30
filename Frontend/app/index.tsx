@@ -12,7 +12,7 @@ const Index = () => {
 
   setTimeout(() => {
     gotoLogin();
-  }, 2500);
+  }, 2000);
 
   return (
     <View className="flex-1 items-center justify-center">

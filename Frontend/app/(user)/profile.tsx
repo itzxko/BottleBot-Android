@@ -212,10 +212,14 @@ const profile = () => {
               <View className="w-full flex flex-row items-center justify-between bg-[#E1E1E1] rounded-xl p-5 mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-2">
-                    <Feather name="user" size={16} />
+                    <Feather
+                      name="user"
+                      size={16}
+                      color={"rgba(0, 0, 0, 0.5)"}
+                    />
                   </View>
                   <Text
-                    className="text-xs font-semibold text-black"
+                    className="text-xs font-semibold text-black/50"
                     numberOfLines={1}
                   >
                     User Name
@@ -235,10 +239,14 @@ const profile = () => {
               <View className="w-full flex flex-row items-center justify-between bg-[#E1E1E1] rounded-xl p-5 mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-2">
-                    <Feather name="mail" size={16} />
+                    <Feather
+                      name="mail"
+                      size={16}
+                      color={"rgba(0, 0, 0, 0.5)"}
+                    />
                   </View>
                   <Text
-                    className="text-xs font-semibold text-black"
+                    className="text-xs font-semibold text-black/50"
                     numberOfLines={1}
                   >
                     E-mail
@@ -256,10 +264,14 @@ const profile = () => {
               <View className="w-full flex flex-row items-center justify-between bg-[#E1E1E1] rounded-xl p-5 mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-2">
-                    <Feather name="calendar" size={16} />
+                    <Feather
+                      name="calendar"
+                      size={16}
+                      color={"rgba(0, 0, 0, 0.5)"}
+                    />
                   </View>
                   <Text
-                    className="text-xs font-semibold text-black"
+                    className="text-xs font-semibold text-black/50"
                     numberOfLines={1}
                   >
                     Birth Date
@@ -284,10 +296,14 @@ const profile = () => {
               <View className="w-full flex flex-row items-center justify-between bg-[#E1E1E1] rounded-xl p-5 mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-2">
-                    <Feather name="map" size={16} />
+                    <Feather
+                      name="map"
+                      size={16}
+                      color={"rgba(0, 0, 0, 0.5)"}
+                    />
                   </View>
                   <Text
-                    className="text-xs font-semibold text-black"
+                    className="text-xs font-semibold text-black/50"
                     numberOfLines={1}
                   >
                     Address
@@ -314,10 +330,14 @@ const profile = () => {
               <View className="w-full flex flex-row items-center justify-between bg-[#E1E1E1] rounded-xl p-5 mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-2">
-                    <Feather name="smartphone" size={16} />
+                    <Feather
+                      name="smartphone"
+                      size={16}
+                      color={"rgba(0, 0, 0, 0.5)"}
+                    />
                   </View>
                   <Text
-                    className="text-xs font-semibold text-black"
+                    className="text-xs font-semibold text-black/50"
                     numberOfLines={1}
                   >
                     Phone Number
@@ -335,10 +355,14 @@ const profile = () => {
               <View className="w-full flex flex-row items-center justify-between bg-[#E1E1E1] rounded-xl p-5 mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-2">
-                    <Feather name="flag" size={16} />
+                    <Feather
+                      name="flag"
+                      size={16}
+                      color={"rgba(0, 0, 0, 0.5)"}
+                    />
                   </View>
                   <Text
-                    className="text-xs font-semibold text-black"
+                    className="text-xs font-semibold text-black/50"
                     numberOfLines={1}
                   >
                     Nationality
@@ -356,10 +380,14 @@ const profile = () => {
               <View className="w-full flex flex-row items-center justify-between bg-[#E1E1E1] rounded-xl p-5 mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-2">
-                    <MaterialIcons name="work-outline" size={16} />
+                    <MaterialIcons
+                      name="work-outline"
+                      size={16}
+                      color={"rgba(0, 0, 0, 0.5)"}
+                    />
                   </View>
                   <Text
-                    className="text-xs font-semibold text-black"
+                    className="text-xs font-semibold text-black/50"
                     numberOfLines={1}
                   >
                     Occupation
@@ -414,10 +442,14 @@ const profile = () => {
               <View className="w-full flex flex-row items-center justify-between bg-[#E1E1E1] rounded-xl p-5 mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-2">
-                    <Feather name="key" size={16} />
+                    <Feather
+                      name="key"
+                      size={16}
+                      color={"rgba(0, 0, 0, 0.5)"}
+                    />
                   </View>
                   <Text
-                    className="text-xs font-semibold text-black"
+                    className="text-xs font-semibold text-black/50"
                     numberOfLines={1}
                   >
                     Password

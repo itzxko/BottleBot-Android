@@ -31,6 +31,7 @@ export default function Login() {
   const [message, setMessage] = useState("");
   const route = useRouter();
   const { setToken, setUser } = useAuth();
+  const [userLevel, setUserLevel] = useState(null);
 
   const togglePassword = () => {
     setHidePass(!hidePass);
@@ -56,7 +57,11 @@ export default function Login() {
           setToken(response.data.token);
           setUser(response.data.user);
 
-          route.push("/(tabs)/dashboard");
+          if (response.data.user.credentials.level === "citizen") {
+            route.push("/(user)/dashboard");
+          } else {
+            route.push("/(admin)/dashboard");
+          }
         } else {
           setMessage(response.data.message);
           setVisibleModal(true);
