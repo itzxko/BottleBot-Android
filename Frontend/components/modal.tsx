@@ -47,7 +47,7 @@ const Modal = ({
               />
             </LinearGradient>
           </View>
-          <Text className="text-sm font-normal text-black text-center">
+          <Text className="text-xs font-normal text-black text-center">
             {message}
           </Text>
         </View>

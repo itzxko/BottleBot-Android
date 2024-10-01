@@ -5,7 +5,7 @@ import { blue } from "react-native-reanimated/lib/typescript/reanimated2/Colors"
 
 export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   return (
-    <View className="absolute bottom-5 flex-row items-center justify-evenly mx-12 bg-white p-4 rounded-3xl shadow-xl shadow-black/50">
+    <View className="absolute bottom-5 flex-row items-center justify-evenly mx-[70px] bg-white p-4 rounded-2xl shadow-xl shadow-black/50">
       {state.routes.map((route, index) => {
         const { options } = descriptors[route.key];
         const label =
@@ -47,28 +47,27 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
             onLongPress={onLongPress}
             key={route.name}
           >
-            <Feather
-              name={
-                route.name === "dashboard"
-                  ? "home"
-                  : route.name === "rewards"
-                  ? "shopping-bag"
-                  : route.name === "history"
-                  ? "calendar"
-                  : route.name === "users"
-                  ? "users"
-                  : "user"
-              }
-              size={20}
-              color={isFocused ? "#000000" : "#00000040"}
-            />
-            <Text
-              className={`${
-                isFocused ? "text-black" : "text-black/25"
-              } text-[10px] font-semibold`}
-            >
-              {typeof label === "string" ? label : options.title}
-            </Text>
+            {isFocused ? (
+              <Text className="text-[10px] font-semibold text-[#00674F]">
+                {typeof label === "string" ? label : options.title}
+              </Text>
+            ) : (
+              <Feather
+                name={
+                  route.name === "dashboard"
+                    ? "home"
+                    : route.name === "rewards"
+                    ? "shopping-bag"
+                    : route.name === "history"
+                    ? "calendar"
+                    : route.name === "users"
+                    ? "users"
+                    : "user"
+                }
+                size={20}
+                color={"rgba(0, 0, 0, 0.2)"}
+              />
+            )}
           </TouchableOpacity>
         );
       })}
