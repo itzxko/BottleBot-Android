@@ -31,17 +31,18 @@ export const UsersProvider = ({ children }: any) => {
 
   const filterUsers = async (role: string) => {
     try {
-      let url =
-        role === "All"
-          ? "http://192.168.254.139:8080/api/users"
-          : `http://192.168.254.139:8080/api/users?level=${role}`;
-
-      let response = await axios.get(url);
-
-      if (response.status === 200) {
-        setUsers(response.data.users); // Update users after filtering
+      if (role === "All") {
+        getUsers();
       } else {
-        console.log(response.data.message);
+        let url = `http://192.168.254.139:8080/api/users?level=${role}`;
+
+        let response = await axios.get(url);
+
+        if (response.status === 200) {
+          setUsers(response.data.users);
+        } else {
+          console.log(response.data.message);
+        }
       }
     } catch (error) {
       console.log(error);

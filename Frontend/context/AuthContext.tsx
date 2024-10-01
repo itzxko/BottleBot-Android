@@ -1,7 +1,6 @@
 import React, { createContext, useState, useContext, ReactNode } from "react";
 import { useRouter } from "expo-router";
 
-// Define a type for the user (update based on your actual user object structure)
 interface User {
   _id: string;
   personalInfo: {
@@ -33,7 +32,6 @@ interface User {
   };
 }
 
-// Define a type for the context value
 interface AuthContextType {
   token: string | null;
   setToken: React.Dispatch<React.SetStateAction<string | null>>;
@@ -43,26 +41,22 @@ interface AuthContextType {
   logout: () => void;
 }
 
-// Create an AuthContext with an initial value of undefined
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Define the type for the children prop
 interface AuthProviderProps {
   children: ReactNode;
 }
 
-// AuthProvider will wrap your entire app and provide the context
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [token, setToken] = useState<string | null>(null); // JWT token
-  const [user, setUser] = useState<User | null>(null); // User details
+  const [token, setToken] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
-  // Function to update the user
   const updateUser = (updatedUser: User) => {
     setUser(updatedUser);
   };
   const logout = () => {
-    setToken(null); // Clear the token
-    setUser(null); // Clear user details
+    setToken(null);
+    setUser(null);
   };
 
   return (
@@ -74,7 +68,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   );
 };
 
-// Custom hook to access the AuthContext in other components
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (!context) {
