@@ -14,7 +14,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import axios from "axios";
 import Loader from "@/components/loader";
 import Modal from "@/components/modal";
-import Usermodal from "@/components/admin/usermodal";
+import Usermodal from "@/components/admin/userModal";
 import { useUsers } from "@/context/UsersProvider";
 import { StatusBar } from "expo-status-bar";
 import EditModal from "@/components/admin/editModal";
@@ -63,9 +63,11 @@ const Users = () => {
   const handleFilter = async (role: string) => {
     if (role === filter) {
       setFilter("All");
+
       await filterUsers("All");
     } else {
       setFilter(role);
+
       await filterUsers(role);
     }
     setOpenFilter(false);

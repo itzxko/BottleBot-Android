@@ -19,16 +19,18 @@ import { Image } from "expo-image";
 import Modal from "../../components/modal";
 import { useAuth } from "@/context/AuthContext";
 import Loader from "@/components/loader";
+import { useRewards } from "@/context/RewardsProvider";
 
 const Redeem = () => {
   const [redeemables, setRedeemables] = useState<Item[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
   const { user } = useAuth();
   const [filter, setFilter] = useState("All");
   const [visibleModal, setVisibleModal] = useState(false);
   const [message, setMessage] = useState("");
   const [totalPoints, setTotalPoints] = useState(0);
   const [loading, setLoading] = useState(false);
+  const { fetchRewards, rewards, categories, filterRewards } = useRewards();
+  const [filtered, setFiltered] = useState(false);
 
   interface Item {
     _id: string;
@@ -49,21 +51,27 @@ const Redeem = () => {
   }
 
   useEffect(() => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-    }, 2000);
+    const fetchData = async () => {
+      setLoading(true);
+      await fetchRewards();
+      setTimeout(() => {
+        setLoading(false);
+      }, 2000);
+    };
+
+    fetchData();
   }, []);
 
   const redeemItem = async ({
     itemId,
     pointsSpent,
+    itemCategory,
   }: {
     itemId: string;
     pointsSpent: number;
+    itemCategory: string;
   }) => {
     if (user) {
-      setLoading(true);
       try {
         const response = await axios.post(
           "http://192.168.254.139:8080/api/history/claim",
@@ -76,14 +84,16 @@ const Redeem = () => {
 
         if (response.status === 200) {
           setMessage(response.data.message);
-          setLoading(false);
+          await fetchRewards();
+          if (filtered) {
+            handleFilter(itemCategory);
+          }
         } else {
           setMessage(response.data.message);
-          setLoading(false);
         }
       } catch (error) {
         console.log(error);
-        setLoading(false);
+
         setMessage("An error occurred!");
       }
     }
@@ -107,36 +117,16 @@ const Redeem = () => {
     fetchUserPoints();
   }, [redeemItem]);
 
-  useEffect(() => {
-    const fetchRewards = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get(
-          "http://192.168.254.139:8080/api/rewards"
-        );
-        setRedeemables(response.data.rewards);
-        setCategories(
-          Array.from(
-            new Set(response.data.rewards.map((item: Item) => item.category))
-          )
-        );
-        setLoading(false);
-      } catch (err) {
-        console.log(err);
-        setLoading(false);
-      }
-    };
-    fetchRewards();
-  }, []);
-
-  const filteredRedeemables = useMemo(() => {
-    return redeemables.filter(
-      (item: Item) => filter === "All" || item.category === filter
-    );
-  }, [redeemables, filter]);
-
-  const toggleFilter = (category: string) => {
-    category !== filter ? setFilter(category) : setFilter("All");
+  const handleFilter = async (category: string) => {
+    if (category === filter) {
+      setFilter("All");
+      setFiltered(false);
+      await filterRewards("All");
+    } else {
+      setFilter(category);
+      setFiltered(true);
+      await filterRewards(category);
+    }
   };
 
   return (
@@ -193,11 +183,11 @@ const Redeem = () => {
 
         <View className="w-full flex flex-row py-3 mb-1">
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {categories.map((category, index) => (
+            {categories.map((category: string) => (
               <Pressable
                 className="mr-2 rounded-xl"
-                key={index}
-                onPress={() => toggleFilter(category)}
+                key={category}
+                onPress={() => handleFilter(category)}
               >
                 <LinearGradient
                   colors={
@@ -233,7 +223,7 @@ const Redeem = () => {
             </Text>
           </View>
           <View className="w-full flex flex-row flex-wrap items-center justify-between">
-            {filteredRedeemables.map((item: Item) => (
+            {rewards.map((item: Item) => (
               <View
                 className="w-[48%] h-[200px] overflow-hidden mb-3"
                 key={item._id}
@@ -268,6 +258,7 @@ const Redeem = () => {
                     onPress={() => {
                       setVisibleModal(true);
                       redeemItem({
+                        itemCategory: item.category,
                         itemId: item._id,
                         pointsSpent: item.pointsRequired,
                       });
