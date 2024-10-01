@@ -106,7 +106,7 @@ const Users = () => {
 
   return (
     <>
-      <SafeAreaView className="flex-1 px-6">
+      <SafeAreaView className="flex-1 px-6 bg-[#F0F0F0]">
         {/* TitleBar */}
         <View className="relative w-full flex flex-row items-center justify-center py-4">
           <TouchableHighlight

@@ -153,7 +153,7 @@ const EditModal = ({
 
   return (
     <>
-      <SafeAreaView className="flex-1 px-6 absolute top-0 left-0 bottom-0 right-0 bg-white">
+      <SafeAreaView className="flex-1 px-6 absolute top-0 left-0 bottom-0 right-0 bg-[#F0F0F0]">
         {/* TitleBar */}
         <View className="relative w-full flex flex-row items-center justify-center py-4">
           <TouchableHighlight
@@ -193,7 +193,7 @@ const EditModal = ({
                 </Text>
               </View>
               {/* First Name */}
-              <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#EDEDED] rounded-xl mb-2">
+              <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl mb-2">
                 <Text className="text-xs font-semibold">First Name</Text>
                 <TextInput
                   className="text-xs font-normal max-w-[50%] text-right"
@@ -204,7 +204,7 @@ const EditModal = ({
                 ></TextInput>
               </View>
               {/* Middle Name */}
-              <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#EDEDED] rounded-xl mb-2">
+              <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl mb-2">
                 <Text className="text-xs font-semibold">Middle Name</Text>
                 <TextInput
                   className="text-xs font-normal max-w-[50%] text-right"
@@ -215,7 +215,7 @@ const EditModal = ({
                 ></TextInput>
               </View>
               {/* Last Name */}
-              <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#EDEDED] rounded-xl mb-2">
+              <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl mb-2">
                 <Text className="text-xs font-semibold">Last Name</Text>
                 <TextInput
                   className="text-xs font-normal max-w-[50%] text-right"
@@ -226,7 +226,7 @@ const EditModal = ({
                 ></TextInput>
               </View>
               {/* Birth Date */}
-              <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#EDEDED] rounded-xl mb-2">
+              <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl mb-2">
                 <Text className="text-xs font-semibold">Birth Date</Text>
                 <TextInput
                   className="text-xs font-normal max-w-[50%] text-right"
@@ -237,7 +237,7 @@ const EditModal = ({
                 ></TextInput>
               </View>
               {/* Gender */}
-              <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#EDEDED] rounded-xl mb-2">
+              <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl mb-2">
                 <Text className="text-xs font-semibold">Gender</Text>
                 <TextInput
                   className="text-xs font-normal max-w-[50%] text-right"
@@ -248,7 +248,7 @@ const EditModal = ({
                 ></TextInput>
               </View>
               {/* Civil Status */}
-              <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#EDEDED] rounded-xl mb-2">
+              <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl mb-2">
                 <Text className="text-xs font-semibold">Civil Status</Text>
                 <TextInput
                   className="text-xs font-normal max-w-[50%] text-right"
@@ -259,7 +259,7 @@ const EditModal = ({
                 ></TextInput>
               </View>
               {/* Nationality */}
-              <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#EDEDED] rounded-xl mb-2">
+              <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl mb-2">
                 <Text className="text-xs font-semibold">Nationality</Text>
                 <TextInput
                   className="text-xs font-normal max-w-[50%] text-right"
@@ -282,7 +282,7 @@ const EditModal = ({
                 </Text>
               </View>
               {/* House Number */}
-              <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#EDEDED] rounded-xl mb-2">
+              <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl mb-2">
                 <Text className="text-xs font-semibold">House Number</Text>
                 <TextInput
                   className="text-xs font-normal max-w-[50%] text-right"
@@ -293,7 +293,7 @@ const EditModal = ({
                 ></TextInput>
               </View>
               {/* Street */}
-              <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#EDEDED] rounded-xl mb-2">
+              <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl mb-2">
                 <Text className="text-xs font-semibold">Street</Text>
                 <TextInput
                   className="text-xs font-normal max-w-[50%] text-right"
@@ -304,7 +304,7 @@ const EditModal = ({
                 ></TextInput>
               </View>
               {/* Barangay */}
-              <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#EDEDED] rounded-xl mb-2">
+              <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl mb-2">
                 <Text className="text-xs font-semibold">Barangay</Text>
                 <TextInput
                   className="text-xs font-normal max-w-[50%] text-right"
@@ -315,7 +315,7 @@ const EditModal = ({
                 ></TextInput>
               </View>
               {/* City */}
-              <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#EDEDED] rounded-xl mb-2">
+              <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl mb-2">
                 <Text className="text-xs font-semibold">City</Text>
                 <TextInput
                   className="text-xs font-normal max-w-[50%] text-right"
@@ -326,7 +326,7 @@ const EditModal = ({
                 ></TextInput>
               </View>
               {/* Phone Number */}
-              <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#EDEDED] rounded-xl mb-2">
+              <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl mb-2">
                 <Text className="text-xs font-semibold">Phone Number</Text>
                 <TextInput
                   className="text-xs font-normal max-w-[50%] text-right"
@@ -349,7 +349,7 @@ const EditModal = ({
                 </Text>
               </View>
               {/* Employment Status */}
-              <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#EDEDED] rounded-xl mb-2">
+              <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl mb-2">
                 <Text className="text-xs font-semibold">Employment Status</Text>
                 <TextInput
                   className="text-xs font-normal max-w-[50%] text-right"
@@ -359,7 +359,7 @@ const EditModal = ({
                   onChangeText={setEmploymentStatus}
                 ></TextInput>
               </View>
-              <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#EDEDED] rounded-xl mb-2">
+              <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl mb-2">
                 <Text className="text-xs font-semibold">Occupation</Text>
                 <TextInput
                   className="text-xs font-normal max-w-[50%] text-right"
@@ -380,7 +380,7 @@ const EditModal = ({
                 </Text>
               </View>
               {/* First Name */}
-              <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#EDEDED] rounded-xl mb-2">
+              <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl mb-2">
                 <Text className="text-xs font-semibold">Email</Text>
                 <TextInput
                   className="text-xs font-normal max-w-[50%] text-right"
@@ -390,7 +390,7 @@ const EditModal = ({
                   onChangeText={setEmail}
                 ></TextInput>
               </View>
-              <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#EDEDED] rounded-xl mb-2">
+              <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl mb-2">
                 <Text className="text-xs font-semibold">Password</Text>
                 <TextInput
                   className="text-xs font-normal max-w-[50%] text-right"
@@ -400,7 +400,7 @@ const EditModal = ({
                   onChangeText={setPassword}
                 ></TextInput>
               </View>
-              <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#EDEDED] rounded-xl mb-2">
+              <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl mb-2">
                 <Text className="text-xs font-semibold">Role</Text>
                 <TextInput
                   className="text-xs font-normal max-w-[50%]"

@@ -20,6 +20,7 @@ import Modal from "../../components/modal";
 import { useAuth } from "@/context/AuthContext";
 import Loader from "@/components/loader";
 import { useRewards } from "@/context/RewardsProvider";
+import { useHistory } from "@/context/UserHistoryProvider";
 
 const Redeem = () => {
   const [redeemables, setRedeemables] = useState<Item[]>([]);
@@ -31,6 +32,7 @@ const Redeem = () => {
   const [loading, setLoading] = useState(false);
   const { fetchRewards, rewards, categories, filterRewards } = useRewards();
   const [filtered, setFiltered] = useState(false);
+  const { fetchRewardsHistory } = useHistory();
 
   interface Item {
     _id: string;
@@ -84,6 +86,7 @@ const Redeem = () => {
 
         if (response.status === 200) {
           setMessage(response.data.message);
+          fetchRewardsHistory(user);
           await fetchRewards();
           if (filtered) {
             handleFilter(itemCategory);
@@ -131,7 +134,7 @@ const Redeem = () => {
 
   return (
     <>
-      <SafeAreaView className="flex-1 px-6 pt-4">
+      <SafeAreaView className="flex-1 px-6 pt-4 bg-[#F0F0F0]">
         <LinearGradient
           colors={["#050301", "#757575"]}
           start={{ x: 0, y: 1 }}
@@ -200,8 +203,8 @@ const Redeem = () => {
                   <Text
                     className={
                       filter === category
-                        ? "text-sm font-normal text-white"
-                        : "text-sm font-normal text-black"
+                        ? "text-xs font-normal text-white"
+                        : "text-xs font-normal text-black"
                     }
                   >
                     {category}
@@ -225,16 +228,15 @@ const Redeem = () => {
           <View className="w-full flex flex-row flex-wrap items-center justify-between">
             {rewards.map((item: Item) => (
               <View
-                className="w-[48%] h-[200px] overflow-hidden mb-3"
+                className="w-[47%] h-[150px] overflow-hidden mb-4"
                 key={item._id}
               >
-                <View className="w-full h-[70%] flex items-center justify-center bg-gray-400 rounded-xl overflow-hidden">
+                <View className="w-full h-[60%] flex items-center justify-center bg-gray-400 rounded-xl overflow-hidden">
                   <Image
                     className="w-full flex-1"
                     source={{
                       uri: `http://192.168.254.139:8080/api/images/${item.image}`,
                     }}
-                    contentFit="cover"
                   />
                 </View>
                 <View className="w-full px-1 py-3 flex flex-row items-center justify-between ">
@@ -270,7 +272,7 @@ const Redeem = () => {
                     >
                       <Ionicons
                         name="return-down-forward"
-                        size={20}
+                        size={16}
                         color="white"
                       />
                     </LinearGradient>

@@ -15,16 +15,23 @@ import { useNavigation } from "expo-router";
 import { useAuth } from "@/context/AuthContext";
 import Loader from "@/components/loader";
 import { LinearGradient } from "expo-linear-gradient";
+import { useHistory } from "@/context/UserHistoryProvider";
 
 const History = () => {
-  const [rewardsHistory, setRewardsHistory] = useState([]);
-  const [pointsHistory, setPointsHistory] = useState([]);
+  // const [rewardsHistory, setRewardsHistory] = useState([]);
+  // const [pointsHistory, setPointsHistory] = useState([]);
   const { user } = useAuth();
   const [pointsPage, setPointsPage] = useState(false);
   const navigation = useNavigation();
   const [message, setMessage] = useState("");
   const [redeemables, setRedeemables] = useState([]);
   const [loading, setLoading] = useState(false);
+  const {
+    pointsHistory,
+    rewardsHistory,
+    fetchPointsHistory,
+    fetchRewardsHistory,
+  } = useHistory();
 
   interface user {
     _id: string;
@@ -81,50 +88,15 @@ const History = () => {
   }, []);
 
   useEffect(() => {
-    const fetchPointsHistory = async () => {
-      if (user) {
-        try {
-          let url = `http://192.168.254.139:8080/api/history/dispose/${user._id}`;
-          let response = await axios.get(url);
-          if (response.status === 200) {
-            setPointsHistory(response.data.userdisposalhistory);
-          } else {
-            console.log(response.data.message);
-          }
-        } catch (error) {
-          console.log(error);
-        }
-      } else {
-      }
+    const fetchData = async () => {
+      await fetchRewardsHistory(user);
+      await fetchPointsHistory(user);
     };
-
-    fetchPointsHistory();
-  }, [pointsHistory]);
-
-  useEffect(() => {
-    const fetchRewardsHistory = async () => {
-      if (user) {
-        try {
-          let url = `http://192.168.254.139:8080/api/history/claim/${user._id}`;
-          let response = await axios.get(url);
-          if (response.status === 200) {
-            setRewardsHistory(response.data.userrewardclaimhistory);
-          } else {
-            console.log(response.data.message);
-          }
-        } catch (error) {
-          console.log(error);
-          setMessage("Failed to fetch rewards history.");
-        }
-      } else {
-        console.log("not user");
-      }
-    };
-    fetchRewardsHistory();
-  }, [rewardsHistory]);
+    fetchData();
+  }, []);
 
   return (
-    <SafeAreaView className="flex-1 px-6">
+    <SafeAreaView className="flex-1 px-6 bg-[#F0F0F0]">
       <>
         {/* Titlebar */}
         <View className="relative w-full flex flex-row items-center justify-center py-4">
@@ -141,10 +113,10 @@ const History = () => {
         </View>
         {/* ToggleBar */}
         <View className="w-full flex items-center justify-center my-4">
-          <View className="flex flex-row items-center justify-center p-2 bg-[#E1E1E1] rounded-2xl">
+          <View className="flex flex-row items-center justify-center p-2 bg-[#E6E6E6] rounded-2xl">
             <Pressable
               className={`${
-                !pointsPage ? "bg-[#F6F6F6]" : "bg-[#E1E1E1]"
+                !pointsPage ? "bg-[#F6F6F6]" : "bg-[#E6E6E6]"
               } flex px-6 py-3 rounded-xl`}
               onPress={toggleHistoryPage}
             >
@@ -152,7 +124,7 @@ const History = () => {
             </Pressable>
             <Pressable
               className={`${
-                pointsPage ? "bg-[#F6F6F6]" : "bg-[#E1E1E1]"
+                pointsPage ? "bg-[#F6F6F6]" : "bg-[#E6E6E6]"
               } flex px-6 py-3 rounded-xl`}
               onPress={toggleHistoryPage}
             >
@@ -166,16 +138,16 @@ const History = () => {
         >
           {!pointsPage ? (
             <>
-              <View className="w-full flex items-center justify-center py-2 ">
+              <View className="w-full flex items-center justify-center py-2">
                 {/* Title Section */}
                 <View className="w-full flex items-start justify-center py-2">
                   <Text className="text-xl font-semibold">Rewards History</Text>
                   <Text className="text-xs font-normal text-black/50">
-                    Your record of rewards redeemed
+                    Your record of redeemed rewards
                   </Text>
                 </View>
                 {/* Reward Cards */}
-                <View className="w-full flex h-3/4 items-center justify-center py-2">
+                <View className="w-full flex items-center justify-center py-2">
                   {rewardsHistory.length === 0 ? (
                     <View className="w-full flex justify-center items-center">
                       <LinearGradient
@@ -193,49 +165,45 @@ const History = () => {
                       </Text>
                     </View>
                   ) : (
-                    rewardsHistory.map(
-                      (rewardHistory: RewardsHistory, index) => {
-                        // Find the redeemable item that matches the rewardId from rewardsHistory
-                        const redeemableItem = redeemables.find(
-                          (item: Item) => item._id === rewardHistory.rewardId
-                        ) as RedeemableItem | undefined;
-                        const rewardName = redeemableItem
-                          ? redeemableItem.rewardName
-                          : "Not Found";
+                    rewardsHistory.map((rewardsHistory: RewardsHistory) => {
+                      const redeemableItem = redeemables.find(
+                        (item: Item) => item._id === rewardsHistory.rewardId
+                      ) as RedeemableItem | undefined;
+                      const rewardName = redeemableItem
+                        ? redeemableItem.rewardName
+                        : "Not Found";
 
-                        return (
-                          <View
-                            className="w-full bg-[#E1E1E1] p-6 rounded-xl mb-4"
-                            key={index}
-                          >
-                            <View className="w-full flex flex-row justify-between items-center pb-3">
-                              <Text className="text-xs font-normal text-black/50">
-                                {(() => {
-                                  const date = new Date(
-                                    rewardHistory.dateClaimed
-                                  );
-                                  return isNaN(date.getTime())
-                                    ? "Invalid Date"
-                                    : date.toLocaleDateString("en-US"); // Format the date as needed
-                                })()}
-                              </Text>
-                              <Text className="text-xs font-normal text-black/50 uppercase">
-                                {rewardHistory._id}
-                              </Text>
-                            </View>
-                            <View className="w-full flex flex-row items-end justify-between pt-3">
-                              <Text className="text-lg text-[#00674F] font-semibold">
-                                {rewardName}{" "}
-                                {/* Display the reward name here */}
-                              </Text>
-                              <Text className="text-sm font-normal">
-                                {rewardHistory.pointsSpent} pt.
-                              </Text>
-                            </View>
+                      return (
+                        <View
+                          className="w-full bg-[#E6E6E6] p-6 rounded-xl mb-4"
+                          key={rewardsHistory._id}
+                        >
+                          <View className="w-full flex flex-row justify-between items-center pb-3">
+                            <Text className="text-xs font-normal text-black/50">
+                              {(() => {
+                                const date = new Date(
+                                  rewardsHistory.dateClaimed
+                                );
+                                return isNaN(date.getTime())
+                                  ? "Invalid Date"
+                                  : date.toLocaleDateString("en-US"); // Format the date as needed
+                              })()}
+                            </Text>
+                            <Text className="text-xs font-normal text-black/50 uppercase">
+                              #{rewardsHistory._id}
+                            </Text>
                           </View>
-                        );
-                      }
-                    )
+                          <View className="w-full flex flex-row items-end justify-between pt-3">
+                            <Text className="text-lg text-[#00674F] font-semibold">
+                              {rewardName} {/* Display the reward name here */}
+                            </Text>
+                            <Text className="text-sm font-normal">
+                              {rewardsHistory.pointsSpent} pt.
+                            </Text>
+                          </View>
+                        </View>
+                      );
+                    })
                   )}
                 </View>
               </View>
@@ -269,9 +237,9 @@ const History = () => {
                       </Text>
                     </View>
                   ) : (
-                    pointsHistory.map((pointsHistory: PointsHistory, index) => (
+                    pointsHistory.map((pointsHistory: PointsHistory) => (
                       <View
-                        className="w-full bg-[#E1E1E1] p-6 rounded-xl mb-4"
+                        className="w-full bg-[#E6E6E6] p-6 rounded-xl mb-4"
                         key={pointsHistory._id}
                       >
                         <View className="w-full flex flex-row justify-between items-center pb-3">
@@ -289,7 +257,10 @@ const History = () => {
                         </View>
                         <View className="w-full flex flex-row items-end justify-start pt-3">
                           <Text className="text-lg text-[#00674F] font-semibold">
-                            {pointsHistory.pointsAccumulated}
+                            {pointsHistory.pointsAccumulated}{" "}
+                            {pointsHistory.pointsAccumulated > 1
+                              ? "pts."
+                              : "pt."}
                           </Text>
                         </View>
                       </View>

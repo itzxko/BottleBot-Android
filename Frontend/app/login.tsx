@@ -98,7 +98,7 @@ export default function Login() {
                 <Text className="text-xl font-semibold tracking-wider">
                   Account Login.
                 </Text>
-                <Text className="text-xs font-normal text-gray-500">
+                <Text className="text-xs font-normal text-black/50">
                   Log in to your account to continue using the app
                 </Text>
               </View>
@@ -106,7 +106,7 @@ export default function Login() {
               <View className="w-full flex items-start justify-center py-6">
                 <Text className="font-semibold text-sm pb-2">Username:</Text>
                 <TextInput
-                  className="bg-[#E1E1E1]  w-full px-6 py-3 rounded-xl text-sm"
+                  className="bg-[#E6E6E6]  w-full px-6 py-3 rounded-xl text-sm"
                   placeholder="Enter your email"
                   onChangeText={setEmail}
                   value={email}
@@ -117,9 +117,9 @@ export default function Login() {
 
               <View className="w-full flex items-start justify-center pb-6">
                 <Text className="font-semibold text-sm pb-2">Password:</Text>
-                <View className="flex flex-row items-center justify-center w-full bg-[#E1E1E1]  px-8 py-3 rounded-xl">
+                <View className="flex flex-row items-center justify-center w-full bg-[#E6E6E6]  px-8 py-3 rounded-xl">
                   <TextInput
-                    className="bg-[#E1E1E1] w-full text-sm"
+                    className="bg-[#E6E6E6] w-full text-sm"
                     placeholder="Enter your password"
                     textContentType={"password"}
                     secureTextEntry={hidePass ? true : false}
