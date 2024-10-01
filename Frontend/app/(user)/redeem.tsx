@@ -281,7 +281,7 @@ const Redeem = () => {
               </View>
             ))}
           </View>
-          <View className="w-full pb-32"></View>
+          <View className="w-full pb-24"></View>
         </ScrollView>
       </SafeAreaView>
 
