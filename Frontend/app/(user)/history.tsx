@@ -270,7 +270,7 @@ const History = () => {
               </View>
             </>
           )}
-          <View className="w-full pb-32"></View>
+          <View className="w-full pb-24"></View>
         </ScrollView>
       </>
       {loading && <Loader />}

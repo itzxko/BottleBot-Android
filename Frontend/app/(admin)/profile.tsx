@@ -469,7 +469,7 @@ const profile = () => {
               </View>
             </View>
           </View>
-          <View className="pb-32"></View>
+          <View className="pb-24"></View>
 
           <StatusBar style="auto" />
         </ScrollView>
