@@ -6,6 +6,8 @@ import { useRouter } from "expo-router";
 const Index = () => {
   const route = useRouter();
 
+  // sample commit ni ivan
+
   const gotoLogin = () => {
     route.push("/login");
   };
