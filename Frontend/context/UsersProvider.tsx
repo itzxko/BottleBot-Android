@@ -9,7 +9,7 @@ export const UsersProvider = ({ children }: any) => {
 
   const getUsers = async () => {
     try {
-      let url = "http://192.168.1.104:8080/api/users/";
+      let url = `http://192.168.254.139:8080/api/users/`;
       let response = await axios.get(url);
 
       if (response.status === 200) {

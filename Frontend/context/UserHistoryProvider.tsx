@@ -15,7 +15,7 @@ export const UserHistoryProvider = ({ children }: any) => {
   const fetchPointsHistory = async (user: user) => {
     if (user) {
       try {
-        let url = `http://192.168.1.104:8080/api/history/dispose/${user._id}`;
+        let url = `http://192.168.254.139:8080/api/history/dispose/${user._id}`;
         let response = await axios.get(url);
         if (response.status === 200) {
           setPointsHistory(response.data.userdisposalhistory);

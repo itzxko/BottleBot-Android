@@ -72,13 +72,6 @@ const History = () => {
   };
 
   useEffect(() => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-    }, 2000);
-  }, []);
-
-  useEffect(() => {
     const fetchRewards = async () => {
       try {
         let url = "http://192.168.254.139:8080/api/rewards";
@@ -93,10 +86,18 @@ const History = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      await fetchAllPointsHistory();
-      await fetchAllRewardsHistory();
-      await getUsers();
+      setLoading(true);
+      try {
+        await fetchAllPointsHistory();
+        await fetchAllRewardsHistory();
+        await getUsers();
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+      } finally {
+        setLoading(false); // Ensure loading is set to false in both success and error cases
+      }
     };
+
     fetchData();
   }, []);
 

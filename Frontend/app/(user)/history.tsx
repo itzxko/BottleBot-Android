@@ -71,13 +71,6 @@ const History = () => {
   };
 
   useEffect(() => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-    }, 2000);
-  }, []);
-
-  useEffect(() => {
     const fetchRewards = async () => {
       try {
         let url = "http://192.168.254.139:8080/api/rewards";
@@ -92,8 +85,10 @@ const History = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       await fetchRewardsHistory(user);
       await fetchPointsHistory(user);
+      setLoading(false);
     };
     fetchData();
   }, []);

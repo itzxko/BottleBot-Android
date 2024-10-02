@@ -26,23 +26,23 @@ const Dashboard = () => {
   const userLocation = async () => {
     // Request location permission
     const { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== 'granted') {
-      alert('Permission to access location was denied');
+    if (status !== "granted") {
+      alert("Permission to access location was denied");
       return;
     }
-    
+
     // Get current location
     try {
       const location = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.High, // Use high accuracy
       });
-      
+
       // Set the map region to the user's current location
       setMapRegion({
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
         latitudeDelta: 0.01, // Adjust this for zoom level
-        longitudeDelta: 0.01  // Adjust this for zoom level
+        longitudeDelta: 0.01, // Adjust this for zoom level
       });
       console.log(location.coords.latitude, location.coords.longitude);
     } catch (error) {
@@ -52,24 +52,40 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    userLocation(); // Fetch user location on component mount
+    const getUserLocation = async () => {
+      setLoading(true);
+      await userLocation();
+      setLoading(false);
+    };
+
+    getUserLocation();
   }, []);
 
   return (
     <>
       <View className="flex-1 w-full flex items-center justify-center">
         <View className="flex-1 w-full">
-
           <View className="w-full flex-1 relative">
             {/* Map Background */}
-            <MapView style={{ width: "100%", height: "100%" }} region={mapRegion}>
+            <MapView
+              style={{ width: "100%", height: "100%" }}
+              region={mapRegion}
+            >
               <Marker coordinate={mapRegion} title="Marker" />
             </MapView>
 
-            <View className="absolute flex items-center rounded-t-2xl justify-center w-full left-0 bottom-0 bg-[#F0F0F0] ">
-              <View className="w-full flex items-center justify-center px-6 py-10">
-                <View className="w-full flex items-start justify-center pb-6">
+            <View className="w-full h-full absolute top-0 left-0">
+              <LinearGradient
+                colors={["rgba(0, 0, 0, 0.1)", "rgba(0, 0, 0, 1)"]}
+                start={{ x: 0, y: 0.5 }}
+                end={{ x: 0, y: 1 }}
+                className="flex-1"
+              />
+            </View>
 
+            <View className="absolute flex items-center rounded-t-3xl justify-center w-full left-0 bottom-0 bg-[#F0F0F0] ">
+              <View className="w-full flex items-center justify-center px-4 py-8">
+                <View className="w-full flex items-center justify-center pb-4">
                   <Text className="font-bold text-lg">Dashboard</Text>
                   <Text className="font-normal text-xs text-black/50">
                     Allow location access to provide accurate data
@@ -93,7 +109,7 @@ const Dashboard = () => {
                       className="text-xs font-normal text-black/50"
                       numberOfLines={1}
                     >
-                      #00 Sample St. 0ave., Sample City
+                      {`Lat: ${mapRegion.latitude}, Long: ${mapRegion.longitude}`}
                     </Text>
                   </View>
                 </View>
@@ -112,10 +128,10 @@ const Dashboard = () => {
                   </View>
                   <View className="w-2/3 flex items-end justify-center">
                     <Text
-                      className="text-xs font-normal text-black/50"
+                      className="text-xs font-normal uppercase text-black/50"
                       numberOfLines={1}
                     >
-                      #00 Sample St. 0ave., Sample City
+                      {`Lat: ${mapRegion.latitude}, Long: ${mapRegion.longitude}`}
                     </Text>
                   </View>
                 </View>
