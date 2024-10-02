@@ -15,7 +15,7 @@ export const RewardsProvider = ({ children }: any) => {
   const fetchRewards = async () => {
     try {
       const response = await axios.get(
-        "http://192.168.254.139:8080/api/rewards"
+        "http://192.168.1.104:8080/api/rewards"
       );
       setRewards(response.data.rewards);
       setCategories(
