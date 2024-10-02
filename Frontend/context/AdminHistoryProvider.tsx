@@ -10,7 +10,7 @@ export const AdminHistoryProvider = ({ children }: any) => {
 
   const fetchAllRewardsHistory = async () => {
     try {
-      let url = "http://192.168.254.139:8080/api/history/claim";
+      let url = "http://192.168.1.104:8080/api/history/claim";
 
       let response = await axios.get(url);
 
