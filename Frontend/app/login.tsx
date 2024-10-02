@@ -39,7 +39,7 @@ export default function Login() {
 
   const onLogin = async () => {
     try {
-      let url = "http://192.168.1.104:8080/api/auth/login";
+      let url = "http://192.168.254.139:8080/api/auth/login";
 
       let response = await axios.post(url, {
         email: email,

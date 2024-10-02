@@ -55,13 +55,6 @@ const profile = () => {
     };
   }
 
-  useEffect(() => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-    }, 2000);
-  }, []);
-
   const [edit, setEdit] = useState(false);
   const { user, updateUser, logout } = useAuth();
   const navigation = useNavigation();

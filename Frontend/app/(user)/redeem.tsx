@@ -56,9 +56,7 @@ const Redeem = () => {
     const fetchData = async () => {
       setLoading(true);
       await fetchRewards();
-      setTimeout(() => {
-        setLoading(false);
-      }, 2000);
+      setLoading(false);
     };
 
     fetchData();

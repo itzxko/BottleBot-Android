@@ -34,9 +34,7 @@ const Users = () => {
     const fetchData = async () => {
       setLoading(true);
       await getUsers();
-      setTimeout(() => {
-        setLoading(false);
-      }, 2000);
+      setLoading(false);
     };
 
     fetchData();
