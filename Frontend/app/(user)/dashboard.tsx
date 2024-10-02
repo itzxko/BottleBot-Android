@@ -59,6 +59,7 @@ const Dashboard = () => {
     <>
       <View className="flex-1 w-full flex items-center justify-center">
         <View className="flex-1 w-full">
+
           <View className="w-full flex-1 relative">
             {/* Map Background */}
             <MapView style={{ width: "100%", height: "100%" }} region={mapRegion}>
@@ -68,13 +69,14 @@ const Dashboard = () => {
             <View className="absolute flex items-center rounded-t-2xl justify-center w-full left-0 bottom-0 bg-[#F0F0F0] ">
               <View className="w-full flex items-center justify-center px-6 py-10">
                 <View className="w-full flex items-start justify-center pb-6">
+
                   <Text className="font-bold text-lg">Dashboard</Text>
                   <Text className="font-normal text-xs text-black/50">
                     Allow location access to provide accurate data
                   </Text>
                 </View>
 
-                <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl p-5 mt-2">
+                <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-3xl p-5">
                   <View className="w-1/3 flex flex-row items-center justify-start">
                     <View className="pr-2">
                       <Octicons name="location" size={14} />
@@ -96,7 +98,7 @@ const Dashboard = () => {
                   </View>
                 </View>
 
-                <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl p-5 mt-2">
+                <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-3xl p-5 mt-2">
                   <View className="w-1/3 flex flex-row items-center justify-start">
                     <View className="pr-2">
                       <MaterialIcons name="location-history" size={16} />
@@ -120,7 +122,7 @@ const Dashboard = () => {
 
                 <View className="w-full flex items-center justify-center py-4">
                   <TouchableHighlight
-                    className="w-full flex items-center justify-center rounded-xl"
+                    className="w-full flex items-center justify-center rounded-3xl"
                     underlayColor={"#41917F"}
                     onPress={startNavigation}
                   >
@@ -128,9 +130,9 @@ const Dashboard = () => {
                       colors={["#00674F", "#06402B"]}
                       start={{ x: 0, y: 1 }}
                       end={{ x: 1, y: 0 }}
-                      className="w-full  rounded-xl shadow shadow-[#050301]"
+                      className="w-full  rounded-3xl shadow shadow-[#050301]"
                     >
-                      <Text className="flex py-4 bg-transparent text-center text-sm text-white font-semibold">
+                      <Text className="flex py-[17px] bg-transparent text-center text-sm text-white font-semibold">
                         Start Navigation
                       </Text>
                     </LinearGradient>

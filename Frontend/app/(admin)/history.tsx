@@ -101,7 +101,7 @@ const History = () => {
   }, []);
 
   return (
-    <SafeAreaView className="flex-1 px-6 bg-[#F0F0F0]">
+    <SafeAreaView className="flex-1 px-4 bg-[#F0F0F0]">
       <>
         {/* Titlebar */}
         <View className="relative w-full flex flex-row items-center justify-center py-4">
@@ -118,22 +118,38 @@ const History = () => {
         </View>
         {/* ToggleBar */}
         <View className="w-full flex items-center justify-center my-4">
-          <View className="flex flex-row items-center justify-center p-2 bg-[#E6E6E6] rounded-2xl">
+          <View className="flex flex-row items-center justify-center p-2 bg-[#E6E6E6] rounded-full">
             <Pressable
               className={`${
                 !pointsPage ? "bg-[#F6F6F6]" : "bg-[#E6E6E6]"
-              } flex px-6 py-3 rounded-xl`}
+              } flex px-6 py-3 rounded-full`}
               onPress={toggleHistoryPage}
             >
-              <Text>Rewards</Text>
+              <Text
+                className={`${
+                  !pointsPage
+                    ? "text-sm font-semibold text-black"
+                    : "text-xs font-normal text-black/50"
+                }`}
+              >
+                Rewards
+              </Text>
             </Pressable>
             <Pressable
               className={`${
                 pointsPage ? "bg-[#F6F6F6]" : "bg-[#E6E6E6]"
-              } flex px-6 py-3 rounded-xl`}
+              } flex px-6 py-3 rounded-full`}
               onPress={toggleHistoryPage}
             >
-              <Text>Points</Text>
+              <Text
+                className={`${
+                  pointsPage
+                    ? "text-sm font-semibold text-black"
+                    : "text-xs font-normal text-black/50"
+                }`}
+              >
+                Points
+              </Text>
             </Pressable>
           </View>
         </View>
@@ -186,16 +202,19 @@ const History = () => {
                             ? ["#00674F", "#06402B"]
                             : ["#D2AF26", "#BE8400"];
 
+                        const titleColor =
+                          index % 2 === 0 ? "#00674F" : "#cca918";
+
                         return (
                           <View
-                            className="w-full flex-row items-center justify-center bg-[#E6E6E6] mb-4 rounded-xl overflow-hidden"
+                            className="w-full flex-row items-center justify-center bg-[#e8e8e8] mb-4 rounded-3xl overflow-hidden"
                             key={rewardsHistory._id}
                           >
                             <LinearGradient
                               colors={backgroundColor}
-                              className="w-[3%] h-full"
+                              className="w-[5%] h-full"
                             ></LinearGradient>
-                            <View className="w-[97%] flex items-start justify-center px-6 py-4">
+                            <View className="w-[95%] flex items-start justify-center p-4">
                               <View className="w-full flex flex-row justify-between items-start">
                                 <View className="w-1/2 flex items-start justify-center">
                                   {user ? (
@@ -208,11 +227,15 @@ const History = () => {
                                     </Text>
                                   )}
                                   {reward ? (
-                                    <Text className="text-lg font-semibold capitalize text-[#00674F]">
+                                    <Text
+                                      className={`text-sm font-semibold uppercase text-[${titleColor}]`}
+                                    >
                                       {reward.rewardName}
                                     </Text>
                                   ) : (
-                                    <Text className="text-lg font-semibold capitalize text-[#00674F]">
+                                    <Text
+                                      className={`text-sm font-semibold uppercase text-[${titleColor}]`}
+                                    >
                                       Reward Item Not Found
                                     </Text>
                                   )}
@@ -304,6 +327,9 @@ const History = () => {
                           (user: user) => user._id === pointsHistory.userId
                         );
 
+                        const titleColor =
+                          index % 2 === 0 ? "#00674F" : "#cca918";
+
                         const backgroundColor =
                           index % 2 === 0
                             ? ["#00674F", "#06402B"]
@@ -311,14 +337,14 @@ const History = () => {
 
                         return (
                           <View
-                            className="w-full flex-row items-center justify-center bg-[#E6E6E6] mb-4 rounded-xl overflow-hidden"
+                            className="w-full flex-row items-center justify-center bg-[#e8e8e8] mb-4 rounded-3xl overflow-hidden"
                             key={pointsHistory._id}
                           >
                             <LinearGradient
                               colors={backgroundColor}
-                              className={`h-full w-[3%]`}
+                              className={`h-full w-[5%]`}
                             ></LinearGradient>
-                            <View className="w-[97%] flex items-start justify-center px-6 py-4">
+                            <View className="w-[95%] flex items-start justify-center p-4">
                               <View className="w-full flex flex-row justify-between items-start">
                                 <View className="w-3/4 flex items-start justify-center">
                                   <Text
@@ -329,11 +355,15 @@ const History = () => {
                                   </Text>
 
                                   {user ? (
-                                    <Text className="text-lg font-semibold capitalize text-[#00674F]">
+                                    <Text
+                                      className={`text-sm font-semibold uppercase text-[${titleColor}]`}
+                                    >
                                       {`${user.personalInfo.firstName} ${user.personalInfo.lastName}`}
                                     </Text>
                                   ) : (
-                                    <Text className="text-lg font-semibold capitalize text-[#00674F]">
+                                    <Text
+                                      className={`text-sm font-semibold uppercase text-[${titleColor}]`}
+                                    >
                                       User not Found
                                     </Text>
                                   )}

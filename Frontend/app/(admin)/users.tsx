@@ -106,7 +106,7 @@ const Users = () => {
 
   return (
     <>
-      <SafeAreaView className="flex-1 px-6 bg-[#F0F0F0]">
+      <SafeAreaView className="flex-1 px-4 bg-[#F0F0F0]">
         {/* TitleBar */}
         <View className="relative w-full flex flex-row items-center justify-center py-4">
           <TouchableHighlight
@@ -145,17 +145,17 @@ const Users = () => {
           {/* Filter */}
           <View className="relative flex items-end justify-end">
             <Pressable
-              className="flex flex-row items-center justify-center px-3 py-2 bg-[#050301] rounded-lg"
+              className="flex flex-row items-center justify-center px-3 py-2 border border-black rounded-full"
               onPress={() => setOpenFilter(!openFilter)}
             >
-              <Feather name="filter" size={14} color={"white"} />
-              <Text className="text-sm font-normal text-white pl-1">
+              <Feather name="filter" size={14} color={"black"} />
+              <Text className="text-sm font-normal text-black pl-1">
                 Filter
               </Text>
             </Pressable>
 
             {openFilter ? (
-              <View className="absolute top-[100%] z-10 bg-white w-full flex items-center justify-center  rounded-lg shadow-xl shadow-black">
+              <View className="absolute top-[100%] z-10 bg-white w-full flex items-center justify-center  rounded-2xl shadow-xl shadow-black">
                 {roles.map((role: string) => (
                   <Pressable
                     className="w-full px-3 py-2 flex items-center justify-center"
@@ -181,7 +181,7 @@ const Users = () => {
         >
           {users.map((user: user) => (
             <View
-              className="w-full flex-wrap items-center justify-center rounded-xl overflow-hidden mb-4"
+              className="w-full flex-wrap items-center justify-center rounded-3xl overflow-hidden mb-4"
               key={user._id}
             >
               <View className="w-full flex flex-row items-center justify-between bg-white py-3 px-4 shadow shadow-black">
@@ -190,7 +190,7 @@ const Users = () => {
                 </Text>
                 <View className="flex flex-row items-center justify-center">
                   <Pressable
-                    className="flex items-center justify-center p-1.5 rounded-md bg-[#00674F] mr-1"
+                    className="flex items-center justify-center p-1.5 rounded-full bg-[#00674F] mr-1"
                     onPress={() => {
                       setEditModal(true);
                       setSelectedUser(user);
@@ -199,7 +199,7 @@ const Users = () => {
                     <Feather name="edit-2" size={12} color={"white"} />
                   </Pressable>
                   <Pressable
-                    className="flex items-center justify-center p-1.5 rounded-md bg-[#B32624]"
+                    className="flex items-center justify-center p-1.5 rounded-full bg-[#B32624]"
                     onPress={() => deleteUser(user._id)}
                   >
                     <Feather name="trash" size={12} color={"white"} />
@@ -234,17 +234,19 @@ const Users = () => {
                   </View>
                 </View>
                 <View className="w-full flex items-end justify-center pb-2">
-                  <LinearGradient
+                  {/* <LinearGradient
                     colors={["#050301", "#474747"]}
                     start={{ x: 0, y: 1 }}
                     end={{ x: 1, y: 0 }}
                     className="flex flex-row items-center justify-center px-3 py-1.5 rounded-md"
-                  >
-                    <Feather name="hash" size={12} color={"white"} />
-                    <Text className="text-xs font-normal pl-0.5 text-white">
+                  > */}
+                  <View className="flex-row px-3 items-center justify-center py-1.5 rounded-full border border-black">
+                    <Feather name="hash" size={12} color={"black"} />
+                    <Text className="text-xs font-normal pl-0.5 text-black">
                       {user.credentials.level}
                     </Text>
-                  </LinearGradient>
+                  </View>
+                  {/* </LinearGradient> */}
                 </View>
               </View>
             </View>

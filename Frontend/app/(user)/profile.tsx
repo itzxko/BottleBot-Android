@@ -134,7 +134,7 @@ const profile = () => {
 
   return (
     <>
-      <SafeAreaView className="flex-1 px-6 bg-[#F0F0F0]">
+      <SafeAreaView className="flex-1 px-4 bg-[#F0F0F0]">
         {/* TitleBar */}
         <View className="relative w-full flex flex-row items-center justify-center py-4">
           <TouchableHighlight
@@ -177,10 +177,10 @@ const profile = () => {
                     : `${user.personalInfo.firstName} ${user.personalInfo.lastName}`}
                 </Text>
                 <View className="w-full flex flex-row justify-start items-center">
-                  <View className="rounded-xl  mr-2">
+                  <View className="rounded-full  mr-1">
                     <LinearGradient
                       colors={["#00674F", "#06402B"]}
-                      className="flex items-center justify-center px-4 py-2 rounded-xl"
+                      className="flex items-center justify-center px-4 py-2 rounded-full"
                     >
                       <Text className="text-xs text-white font-normal uppercase">
                         {!user ? "loading..." : `#${user._id}`}
@@ -190,7 +190,7 @@ const profile = () => {
                   <View className="bg-[#E1E1E1] rounded-xl mr-2">
                     <LinearGradient
                       colors={["#00674F", "#06402B"]}
-                      className="flex items-center justify-center px-4 py-2 rounded-xl"
+                      className="flex items-center justify-center px-4 py-2 rounded-full"
                     >
                       <Text className="text-xs text-white font-normal">
                         {!user ? "loading..." : `${user.personalInfo.gender}`}
@@ -212,7 +212,7 @@ const profile = () => {
                 name, birthday, nationality etc.
               </Text>
               {/* Cards */}
-              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl p-5 mt-2">
+              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-3xl p-5 mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-1">
                     <Feather name="user" size={14} color={"rgba(0, 0, 0, 1)"} />
@@ -235,7 +235,7 @@ const profile = () => {
                   </Text>
                 </View>
               </View>
-              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl p-5 mt-2">
+              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-3xl p-5 mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-1">
                     <Feather name="mail" size={14} color={"rgba(0, 0, 0, 1)"} />
@@ -256,7 +256,7 @@ const profile = () => {
                   </Text>
                 </View>
               </View>
-              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl p-5 mt-2">
+              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-3xl p-5 mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-1">
                     <Feather
@@ -288,7 +288,7 @@ const profile = () => {
                   </Text>
                 </View>
               </View>
-              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl p-5 mt-2">
+              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-3xl p-5 mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-1">
                     <Feather name="map" size={14} color={"rgba(0, 0, 0, 1)"} />
@@ -321,7 +321,7 @@ const profile = () => {
                 phone number, address etc.
               </Text>
               {/* Cards */}
-              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl p-5 mt-2">
+              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-3xl p-5 mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-1">
                     <Feather
@@ -346,7 +346,7 @@ const profile = () => {
                   </Text>
                 </View>
               </View>
-              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl p-5 mt-2">
+              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-3xl p-5 mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-1">
                     <Feather name="flag" size={14} color={"rgba(0, 0, 0, 1)"} />
@@ -367,7 +367,7 @@ const profile = () => {
                   </Text>
                 </View>
               </View>
-              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl p-5 mt-2">
+              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-3xl p-5 mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-1">
                     <MaterialIcons
@@ -406,14 +406,14 @@ const profile = () => {
                 </View>
                 {edit ? (
                   <TouchableHighlight
-                    className="flex rounded-lg"
+                    className="flex rounded-full"
                     underlayColor={"#41917F"}
                     onPress={() => {
                       setEdit(false);
                       updatePassword();
                     }}
                   >
-                    <View className="px-3 py-1.5 bg-[#00674F] rounded-lg">
+                    <View className="px-4 py-2 bg-[#00674F] rounded-full">
                       <Text className="text-xs font-semibold text-white">
                         Save
                       </Text>
@@ -421,11 +421,11 @@ const profile = () => {
                   </TouchableHighlight>
                 ) : (
                   <TouchableHighlight
-                    className="flex rounded-lg"
+                    className="flex rounded-full"
                     underlayColor={"#41917F"}
                     onPress={() => setEdit(true)}
                   >
-                    <View className="px-3 py-1.5 bg-[#00674F] rounded-lg">
+                    <View className="px-4 py-2 bg-[#00674F] rounded-full">
                       <Text className="text-xs font-semibold text-white">
                         Edit
                       </Text>
@@ -434,7 +434,7 @@ const profile = () => {
                 )}
               </View>
               {/* Cards */}
-              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl p-5 mt-2">
+              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-3xl p-5 mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-1">
                     <Feather name="key" size={14} color={"rgba(0, 0, 0, 1)"} />

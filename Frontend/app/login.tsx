@@ -47,7 +47,7 @@ export default function Login() {
       });
 
       // if (response) {
-      //   route.push("/(tabs)/dashboard");
+      //   route.push("/(user)/dashboard");
       // }
 
       if (response) {
@@ -93,7 +93,7 @@ export default function Login() {
             start={{ x: 1, y: 1 }} // Top-left corner
             end={{ x: 1, y: 0 }} // Bottom-right corner
           >
-            <View className="w-full h-[80vh] bg-[#F6F6F6] rounded-b-3xl items-center justify-center px-8">
+            <View className="w-full h-[80vh] bg-[#F6F6F6] rounded-b-3xl items-center justify-center px-6">
               <View className="w-full flex items-center justify-center pb-6">
                 <Text className="text-xl font-semibold tracking-wider">
                   Account Login.
@@ -106,7 +106,7 @@ export default function Login() {
               <View className="w-full flex items-start justify-center py-6">
                 <Text className="font-semibold text-sm pb-2">Username:</Text>
                 <TextInput
-                  className="bg-[#E6E6E6]  w-full px-6 py-3 rounded-xl text-sm"
+                  className="bg-[#E6E6E6]  w-full px-6 py-3 rounded-3xl text-sm"
                   placeholder="Enter your email"
                   onChangeText={setEmail}
                   value={email}
@@ -117,7 +117,7 @@ export default function Login() {
 
               <View className="w-full flex items-start justify-center pb-6">
                 <Text className="font-semibold text-sm pb-2">Password:</Text>
-                <View className="flex flex-row items-center justify-center w-full bg-[#E6E6E6]  px-8 py-3 rounded-xl">
+                <View className="flex flex-row items-center justify-center w-full bg-[#E6E6E6]  px-8 py-3 rounded-3xl">
                   <TextInput
                     className="bg-[#E6E6E6] w-full text-sm"
                     placeholder="Enter your password"
@@ -144,7 +144,7 @@ export default function Login() {
 
               <View className="w-full flex items-center justify-center py-6">
                 <TouchableHighlight
-                  className="w-full flex items-center justify-center rounded-xl"
+                  className="w-full flex items-center justify-center rounded-3xl"
                   onPress={onLogin}
                   underlayColor={"#41917F"}
                 >
@@ -152,9 +152,9 @@ export default function Login() {
                     colors={["#00674F", "#06402B"]}
                     start={{ x: 0, y: 1 }}
                     end={{ x: 1, y: 0 }}
-                    className="w-full  rounded-xl shadow shadow-[#050301]"
+                    className="w-full  rounded-3xl shadow shadow-[#050301]"
                   >
-                    <Text className="flex py-4 bg-transparent text-center text-sm text-white font-semibold">
+                    <Text className="flex py-[16px] bg-transparent text-center text-sm text-white font-semibold">
                       Login
                     </Text>
                   </LinearGradient>
