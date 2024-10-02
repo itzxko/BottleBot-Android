@@ -134,12 +134,12 @@ const Redeem = () => {
 
   return (
     <>
-      <SafeAreaView className="flex-1 px-6 pt-4 bg-[#F0F0F0]">
+      <SafeAreaView className="flex-1 px-4 pt-4 bg-[#F0F0F0]">
         <LinearGradient
           colors={["#050301", "#757575"]}
           start={{ x: 0, y: 1 }}
           end={{ x: 1, y: 0 }}
-          className="w-full p-6 rounded-xl flex items-center justify-center mb-1"
+          className="w-full p-6 rounded-3xl flex items-center justify-center mb-1"
         >
           <View className="w-full flex flex-row items-center justify-start">
             <View className="w-[50px] h-[50px] rounded-full bg-white overflow-hidden mr-2">
@@ -157,7 +157,7 @@ const Redeem = () => {
                   ? "Loading"
                   : `${user.personalInfo.firstName} ${user.personalInfo.lastName}`}
               </Text>
-              <View className="flex items-center justify-center px-2 py-1 bg-[#E1E1E1]/75 rounded-md">
+              <View className="flex items-center justify-center px-2 py-1 bg-[#E1E1E1]/75 rounded-full">
                 <Text
                   className="text-[10px] font-normal text-black uppercase"
                   numberOfLines={1}
@@ -184,7 +184,7 @@ const Redeem = () => {
           </View>
         </LinearGradient>
 
-        <View className="w-full flex flex-row py-3 mb-1">
+        <View className="w-full flex flex-row py-1.5 mb-1">
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             {categories.map((category: string) => (
               <Pressable
@@ -195,15 +195,15 @@ const Redeem = () => {
                 <LinearGradient
                   colors={
                     filter !== category
-                      ? ["#E1E1E1", "#C9C9C9"]
+                      ? ["#E1E1E1", "#d9d9d9"]
                       : ["#00674F", "#06402B"]
                   }
-                  className="px-6 py-3 flex items-center justify-center rounded-xl"
+                  className="px-6 py-3 flex items-center justify-center rounded-full"
                 >
                   <Text
                     className={
                       filter === category
-                        ? "text-xs font-normal text-white"
+                        ? "text-xs font-semibold text-white"
                         : "text-xs font-normal text-black"
                     }
                   >
@@ -219,7 +219,7 @@ const Redeem = () => {
           className="flex-1 w-full"
           showsVerticalScrollIndicator={false}
         >
-          <View className="w-full flex items-start justify-start pt-4 pb-2">
+          <View className="w-full flex items-start justify-start pb-2">
             <Text className="text-xl font-semibold">Redeemable Items</Text>
             <Text className="text-sm font-normal text-black/50">
               Choose a Reward of your choice
@@ -228,10 +228,10 @@ const Redeem = () => {
           <View className="w-full flex flex-row flex-wrap items-center justify-between">
             {rewards.map((item: Item) => (
               <View
-                className="w-[47%] h-[150px] overflow-hidden mb-4"
+                className="w-[48%] h-[200px] overflow-hidden mb-4"
                 key={item._id}
               >
-                <View className="w-full h-[60%] flex items-center justify-center bg-gray-400 rounded-xl overflow-hidden">
+                <View className="w-full h-[70%] flex items-center justify-center bg-gray-400 rounded-3xl overflow-hidden">
                   <Image
                     className="w-full flex-1"
                     source={{
@@ -255,7 +255,7 @@ const Redeem = () => {
                     </Text>
                   </View>
                   <TouchableHighlight
-                    className="flex items-center justify-center rounded-xl"
+                    className="flex items-center justify-center rounded-full"
                     underlayColor={"#41917F"}
                     onPress={() => {
                       setVisibleModal(true);
@@ -268,7 +268,7 @@ const Redeem = () => {
                   >
                     <LinearGradient
                       colors={["#00674F", "#06402B"]}
-                      className="p-2 rounded-xl shadow shadow-black"
+                      className="p-2 rounded-full shadow shadow-black"
                     >
                       <Ionicons
                         name="return-down-forward"

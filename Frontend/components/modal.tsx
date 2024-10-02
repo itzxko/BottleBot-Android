@@ -18,8 +18,8 @@ const Modal = ({
   onClose: () => void;
 }) => {
   return (
-    <SafeAreaView className="w-full flex flex-1 items-center justify-center absolute left-0 top-0 bottom-0 right-0 bg-black/75">
-      <View className="flex items-center justify-center rounded-xl shadow-xl bg-[#F0F0F0] shadow-black min-w-[20vw] max-w-[70vw] overflow-hidden">
+    <SafeAreaView className="w-full flex flex-1 items-center justify-center absolute left-0 top-0 bottom-0 right-0 bg-black/50">
+      <View className="flex items-center justify-center rounded-3xl shadow-xl bg-[#F0F0F0] shadow-black min-w-[20vw] max-w-[60vw] overflow-hidden">
         <View className="w-full flex flex-row items-center justify-between bg-white px-6 py-3">
           <Text className="text-xs font-semibold text-black">{header}</Text>
           <Pressable onPress={onClose}>
