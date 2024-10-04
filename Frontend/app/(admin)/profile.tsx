@@ -19,6 +19,7 @@ import Loader from "@/components/loader";
 import axios from "axios";
 import Modal from "@/components/modal";
 import { useRouter } from "expo-router";
+import { useUrl } from "@/context/UrlProvider";
 
 const profile = () => {
   const [loading, setLoading] = useState(false);
@@ -26,6 +27,7 @@ const profile = () => {
   const [message, setMessage] = useState("");
   const [visibleModal, setVisibleModal] = useState(false);
   const route = useRouter();
+  const { ipAddress, port } = useUrl();
 
   interface user {
     _id: string;
@@ -67,7 +69,7 @@ const profile = () => {
   const updatePassword = async () => {
     if (user) {
       try {
-        let url = `http://192.168.254.139:8080/api/users/${user._id}`;
+        let url = `http://${ipAddress}:${port}/api/users/${user._id}`;
 
         const response = await axios.put(url, {
           personalInfo: {

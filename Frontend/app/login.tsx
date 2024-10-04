@@ -22,6 +22,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Modal from "../components/modal";
 import { useAuth } from "@/context/AuthContext";
+import { useUrl } from "@/context/UrlProvider";
 
 export default function Login() {
   const [hidePass, setHidePass] = useState(true);
@@ -32,6 +33,7 @@ export default function Login() {
   const route = useRouter();
   const { setToken, setUser } = useAuth();
   const [userLevel, setUserLevel] = useState(null);
+  const { ipAddress, port } = useUrl();
 
   const togglePassword = () => {
     setHidePass(!hidePass);
@@ -39,7 +41,7 @@ export default function Login() {
 
   const onLogin = async () => {
     try {
-      let url = "http://192.168.254.139:8080/api/auth/login";
+      let url = `http://${ipAddress}:${port}/api/auth/login`;
 
       let response = await axios.post(url, {
         email: email,

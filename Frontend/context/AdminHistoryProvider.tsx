@@ -1,16 +1,18 @@
 import { View, Text } from "react-native";
 import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
+import { useUrl } from "./UrlProvider";
 
 const AdminHistoryContext = createContext<any>(null);
 
 export const AdminHistoryProvider = ({ children }: any) => {
   const [rewardsHistory, setRewardsHistory] = useState([]);
   const [pointsHistory, setPointsHistory] = useState([]);
+  const { ipAddress, port } = useUrl();
 
   const fetchAllRewardsHistory = async () => {
     try {
-      let url = "http://192.168.254.139:8080/api/history/claim";
+      let url = `http://${ipAddress}:${port}/api/history/claim`;
 
       let response = await axios.get(url);
 
@@ -25,7 +27,7 @@ export const AdminHistoryProvider = ({ children }: any) => {
   };
   const fetchAllPointsHistory = async () => {
     try {
-      let url = "http://192.168.254.139:8080/api/history/dispose";
+      let url = `http://${ipAddress}:${port}/api/history/dispose`;
 
       let response = await axios.get(url);
 
