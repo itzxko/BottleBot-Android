@@ -12,6 +12,7 @@ import { Feather, Ionicons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import axios from "axios";
 import Modal from "../modal";
+import { useUrl } from "@/context/UrlProvider";
 
 interface user {
   _id: string;
@@ -70,6 +71,7 @@ const EditModal = ({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [level, setLevel] = useState("");
+  const { ipAddress, port } = useUrl();
 
   useEffect(() => {
     if (user && user._id) {
@@ -107,7 +109,7 @@ const EditModal = ({
   const updateUser = async () => {
     Keyboard.dismiss();
     try {
-      let url = `http://192.168.254.139:8080/api/users/${user?._id}`;
+      let url = `http://${ipAddress}:${port}/api/users/${user?._id}`;
 
       let response = await axios.put(url, {
         personalInfo: {

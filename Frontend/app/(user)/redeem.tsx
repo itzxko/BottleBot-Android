@@ -21,6 +21,7 @@ import { useAuth } from "@/context/AuthContext";
 import Loader from "@/components/loader";
 import { useRewards } from "@/context/RewardsProvider";
 import { useHistory } from "@/context/UserHistoryProvider";
+import { useUrl } from "@/context/UrlProvider";
 
 const Redeem = () => {
   const [redeemables, setRedeemables] = useState<Item[]>([]);
@@ -33,6 +34,7 @@ const Redeem = () => {
   const { fetchRewards, rewards, categories, filterRewards } = useRewards();
   const [filtered, setFiltered] = useState(false);
   const { fetchRewardsHistory } = useHistory();
+  const { ipAddress, port } = useUrl();
 
   interface Item {
     _id: string;
@@ -74,7 +76,7 @@ const Redeem = () => {
     if (user) {
       try {
         const response = await axios.post(
-          "http://192.168.254.139:8080/api/history/claim",
+          `http://${ipAddress}:${port}/api/history/claim`,
           {
             userId: user._id,
             rewardId: itemId,
@@ -105,7 +107,7 @@ const Redeem = () => {
       if (user) {
         try {
           const response = await axios.get(
-            `http://192.168.254.139:8080/api/history/claim/points/${user._id}`
+            `http://${ipAddress}:${port}/api/history/claim/points/${user._id}`
           );
           setTotalPoints(response.data.availablePoints.availablePoints);
         } catch (error) {
@@ -132,7 +134,7 @@ const Redeem = () => {
 
   return (
     <>
-      <SafeAreaView className="flex-1 px-4 pt-4 bg-[#F0F0F0]">
+      <SafeAreaView className="flex-1 px-4 pt-2 bg-[#F0F0F0]">
         <LinearGradient
           colors={["#050301", "#757575"]}
           start={{ x: 0, y: 1 }}

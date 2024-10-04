@@ -1,12 +1,14 @@
 import { View, Text } from "react-native";
 import React, { useContext, createContext, useState, useEffect } from "react";
 import axios from "axios";
+import { useUrl } from "./UrlProvider";
 
 const RewardsContext = createContext<any>(null);
 
 export const RewardsProvider = ({ children }: any) => {
   const [rewards, setRewards] = useState([]);
   const [categories, setCategories] = useState([]);
+  const { ipAddress, port } = useUrl();
 
   interface reward {
     category: string;
@@ -15,7 +17,7 @@ export const RewardsProvider = ({ children }: any) => {
   const fetchRewards = async () => {
     try {
       const response = await axios.get(
-        "http://192.168.254.139:8080/api/rewards"
+        `http://${ipAddress}:${port}/api/rewards`
       );
       setRewards(response.data.rewards);
       setCategories(
@@ -37,7 +39,7 @@ export const RewardsProvider = ({ children }: any) => {
       if (category === "All") {
         fetchRewards();
       } else {
-        let url = `http://192.168.254.139:8080/api/rewards?category=${category}`;
+        let url = `http://${ipAddress}:${port}/api/rewards?category=${category}`;
 
         let response = await axios.get(url);
 

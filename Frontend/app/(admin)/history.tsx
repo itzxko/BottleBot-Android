@@ -17,7 +17,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useAdminHistory } from "@/context/AdminHistoryProvider";
 import { useUsers } from "@/context/UsersProvider";
 import { red } from "react-native-reanimated/lib/typescript/reanimated2/Colors";
-import { Image } from "expo-image";
+import { Image, ImageBackground } from "expo-image";
+import { useUrl } from "@/context/UrlProvider";
 
 const History = () => {
   const { user } = useAuth();
@@ -33,6 +34,7 @@ const History = () => {
     fetchAllRewardsHistory,
   } = useAdminHistory();
   const { users, getUsers } = useUsers();
+  const { ipAddress, port } = useUrl();
 
   interface user {
     _id: string;
@@ -48,6 +50,12 @@ const History = () => {
     pointsSpent: number;
     userId: string;
     rewardId: string;
+    userInfo: {
+      personalInfo: {
+        firstName: string;
+        lastName: string;
+      };
+    };
   }
 
   interface PointsHistory {
@@ -55,6 +63,13 @@ const History = () => {
     userId: string;
     dateDisposed: Date;
     pointsAccumulated: number;
+    bottleCount: number;
+    userInfo: {
+      personalInfo: {
+        firstName: string;
+        lastName: string;
+      };
+    };
   }
 
   interface RedeemableItem {
@@ -74,7 +89,7 @@ const History = () => {
   useEffect(() => {
     const fetchRewards = async () => {
       try {
-        let url = "http://192.168.254.139:8080/api/rewards";
+        let url = `http://${ipAddress}:${port}/api/rewards`;
         let response = await axios.get(url);
         setRedeemables(response.data.rewards);
       } catch (err) {
@@ -117,304 +132,227 @@ const History = () => {
           </TouchableHighlight>
           <Text className="text-xl font-semibold">History</Text>
         </View>
-        {/* ToggleBar */}
-        <View className="w-full flex items-center justify-center my-4">
-          <View className="flex flex-row items-center justify-center p-2 bg-[#E6E6E6] rounded-full">
-            <Pressable
-              className={`${
-                !pointsPage ? "bg-[#F6F6F6]" : "bg-[#E6E6E6]"
-              } flex px-6 py-3 rounded-full`}
-              onPress={toggleHistoryPage}
-            >
-              <Text
-                className={`${
-                  !pointsPage
-                    ? "text-sm font-semibold text-black"
-                    : "text-xs font-normal text-black/50"
-                }`}
-              >
-                Rewards
-              </Text>
-            </Pressable>
-            <Pressable
-              className={`${
-                pointsPage ? "bg-[#F6F6F6]" : "bg-[#E6E6E6]"
-              } flex px-6 py-3 rounded-full`}
-              onPress={toggleHistoryPage}
-            >
-              <Text
-                className={`${
-                  pointsPage
-                    ? "text-sm font-semibold text-black"
-                    : "text-xs font-normal text-black/50"
-                }`}
-              >
-                Points
-              </Text>
-            </Pressable>
+        <View className="w-full flex items-center justify-center pt-6">
+          <View className="w-full flex items-start justify-center pb-4">
+            <Text className="text-xl font-semibold">Rewards History</Text>
+            <Text className="text-xs font-normal text-black/50">
+              all records of redeemed rewards
+            </Text>
           </View>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            className="flex"
+          >
+            {rewardsHistory.map((rewardHistory: RewardsHistory) => {
+              const reward = redeemables.find(
+                (reward: RedeemableItem) =>
+                  reward._id === rewardHistory.rewardId
+              );
+
+              return (
+                <View
+                  className=" bg-slate-500 rounded-[32px] w-[320px] h-[240px] overflow-hidden mr-4"
+                  key={rewardHistory._id}
+                >
+                  <ImageBackground
+                    className="w-full h-full "
+                    source={
+                      reward
+                        ? {
+                            uri: `http://192.168.254.139:8080/api/images/${reward.image}`,
+                          }
+                        : require("../../assets/images/borgar.jpg")
+                    }
+                  >
+                    <LinearGradient
+                      className="w-full h-full p-5"
+                      colors={[
+                        "rgba(18, 18, 18, 0.2)",
+                        "rgba(18, 18, 18, 0.8)",
+                      ]}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 0, y: 1 }}
+                    >
+                      <View className="flex flex-col h-full justify-between">
+                        <View className="w-full flex flex-row items-start justify-between">
+                          <Text
+                            className="text-xs font-normal text-white uppercase max-w-[60%]"
+                            numberOfLines={1}
+                          >
+                            #{rewardHistory._id}
+                          </Text>
+                          <Text
+                            className="text-xs font-normal text-white uppercase max-w-[20%]"
+                            numberOfLines={1}
+                          >
+                            {`${rewardHistory.pointsSpent} ${
+                              rewardHistory.pointsSpent > 1 ? "pts." : "pt."
+                            }`}
+                          </Text>
+                        </View>
+                        <View className="w-full flex items-start justify-center">
+                          <View className="w-full flex items-start justify-center pb-4">
+                            <Text
+                              className="text-xl font-semibold text-white capitalize"
+                              numberOfLines={1}
+                            >
+                              {reward?.rewardName}
+                            </Text>
+                          </View>
+                          <View className="w-full overflow-hidden flex flex-row justify-start items-center">
+                            <LinearGradient
+                              className="flex items-center justify-center px-4 py-2 rounded-full mr-1 max-w-[60%]"
+                              colors={["#D2AF26", "#BE8400"]}
+                            >
+                              <Text
+                                className="text-xs font-normal text-white"
+                                numberOfLines={1}
+                              >
+                                {`${rewardHistory.userInfo.personalInfo.firstName} ${rewardHistory.userInfo.personalInfo.lastName}`}
+                              </Text>
+                            </LinearGradient>
+                            <LinearGradient
+                              className="flex items-center justify-center px-4 py-2 rounded-full max-w-[40%]"
+                              colors={["#00674F", "#06402B"]}
+                            >
+                              <Text
+                                className="text-xs font-normal text-white"
+                                numberOfLines={1}
+                              >
+                                {(() => {
+                                  const date = new Date(
+                                    rewardHistory.dateClaimed
+                                  );
+                                  return isNaN(date.getTime())
+                                    ? "Invalid Date"
+                                    : date.toLocaleDateString("en-US");
+                                })()}
+                              </Text>
+                            </LinearGradient>
+                          </View>
+                        </View>
+                      </View>
+                    </LinearGradient>
+                  </ImageBackground>
+                </View>
+              );
+            })}
+          </ScrollView>
         </View>
-        <ScrollView
-          className="flex-1 w-full"
-          showsVerticalScrollIndicator={false}
-        >
-          {!pointsPage ? (
-            <>
-              <View className="w-full flex items-center justify-center py-2">
-                {/* Title Section */}
-                <View className="w-full flex items-start justify-center py-2">
-                  <Text className="text-xl font-semibold">Rewards History</Text>
-                  <Text className="text-xs font-normal text-black/50">
-                    Your record of redeemed rewards
-                  </Text>
-                </View>
-                {/* Reward Cards */}
-                <View className="w-full flex items-center justify-center py-2">
-                  {rewardsHistory.length === 0 ? (
-                    <View className="w-full flex justify-center items-center">
-                      <LinearGradient
-                        className="p-3 rounded-full"
-                        colors={["#00674F", "#06402B"]}
-                      >
-                        <MaterialCommunityIcons
-                          name="timer-sand-empty"
-                          size={40}
-                          color={"white"}
-                        />
-                      </LinearGradient>
-                      <Text className="text-sm font-normal text-black/50 pt-4">
-                        No Rewards History Available
-                      </Text>
-                    </View>
-                  ) : (
-                    rewardsHistory.map(
-                      (rewardsHistory: RewardsHistory, index: any) => {
-                        const user = users.find(
-                          (user: user) => user._id === rewardsHistory.userId
-                        );
+        <View className="w-full flex items-center justify-center pt-6">
+          <View className="w-full flex items-start justify-center pb-4">
+            <Text className="text-xl font-semibold">Points History</Text>
+            <Text className="text-xs font-normal text-black/50">
+              all records of collected points
+            </Text>
+          </View>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            className="flex"
+          >
+            {pointsHistory.map((pointHistory: PointsHistory) => {
+              const reward = redeemables.find(
+                (reward: RedeemableItem) => reward._id === "hehe"
+              );
 
-                        const reward = redeemables.find(
-                          (reward: RedeemableItem) =>
-                            reward._id === rewardsHistory.rewardId
-                        );
-
-                        const backgroundColor =
-                          index % 2 === 0
-                            ? ["#00674F", "#06402B"]
-                            : ["#D2AF26", "#BE8400"];
-
-                        const titleColor =
-                          index % 2 === 0 ? "#00674F" : "#cca918";
-
-                        return (
-                          <View
-                            className="w-full flex-row items-center justify-center bg-[#e8e8e8] mb-4 rounded-3xl overflow-hidden"
-                            key={rewardsHistory._id}
+              return (
+                <View
+                  className=" bg-slate-500 rounded-[32px] w-[320px] h-[240px] overflow-hidden mr-4"
+                  key={pointHistory._id}
+                >
+                  <ImageBackground
+                    className="w-full h-full "
+                    source={
+                      reward
+                        ? {
+                            uri: `http://192.168.254.139:8080/api/images/${reward.image}`,
+                          }
+                        : require("../../assets/images/Man.jpg")
+                    }
+                  >
+                    <LinearGradient
+                      className="w-full h-full p-5"
+                      colors={[
+                        "rgba(18, 18, 18, 0.2)",
+                        "rgba(18, 18, 18, 0.8)",
+                      ]}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 0, y: 1 }}
+                    >
+                      <View className="flex flex-col h-full justify-between">
+                        <View className="w-full flex flex-row items-start justify-between">
+                          <Text
+                            className="text-xs font-normal text-white uppercase max-w-[60%]"
+                            numberOfLines={1}
                           >
-                            <LinearGradient
-                              colors={backgroundColor}
-                              className="w-[5%] h-full"
-                            ></LinearGradient>
-                            <View className="w-[95%] flex items-start justify-center p-4">
-                              <View className="w-full flex flex-row justify-between items-start">
-                                <View className="w-1/2 flex items-start justify-center">
-                                  {user ? (
-                                    <Text className="text-xs font-normal text-black/50 ">
-                                      {`${user.personalInfo.firstName} ${user.personalInfo.lastName}`}
-                                    </Text>
-                                  ) : (
-                                    <Text className="text-xs font-normal text-black/50">
-                                      User not Found
-                                    </Text>
-                                  )}
-                                  {reward ? (
-                                    <Text
-                                      className={`text-sm font-semibold uppercase text-[${titleColor}]`}
-                                    >
-                                      {reward.rewardName}
-                                    </Text>
-                                  ) : (
-                                    <Text
-                                      className={`text-sm font-semibold uppercase text-[${titleColor}]`}
-                                    >
-                                      Reward Item Not Found
-                                    </Text>
-                                  )}
-                                </View>
-                                <Text
-                                  className="w-1/2 text-right text-xs font-normal text-black/50 uppercase"
-                                  numberOfLines={1}
-                                >
-                                  {rewardsHistory._id}
-                                </Text>
-                              </View>
-                              <View className="w-full flex flex-row justify-between items-end pt-4">
-                                <Text
-                                  className="w-1/3 text-left text-xs font-normal text-black/50"
-                                  numberOfLines={1}
-                                >
-                                  {(() => {
-                                    const date = new Date(
-                                      rewardsHistory.dateClaimed
-                                    );
-                                    return isNaN(date.getTime())
-                                      ? "Invalid Date"
-                                      : date.toLocaleDateString("en-US"); // Format the date as needed
-                                  })()}
-                                </Text>
-
-                                <View className="w-2/3 flex flex-row-reverse items-center justify-start">
-                                  <Text className="text-xs font-semibold text-black pl-1">
-                                    {rewardsHistory.pointsSpent}
-                                    {rewardsHistory.pointsSpent > 1
-                                      ? "pts."
-                                      : "pt."}
-                                  </Text>
-                                  {reward ? (
-                                    <View className="w-[40px] h-[40px] flex items-center justify-center rounded-full bg-black overflow-hidden">
-                                      <Image
-                                        className="w-full flex-1"
-                                        source={{
-                                          uri: `http://192.168.254.139:8080/api/images/${reward.image}`,
-                                        }}
-                                      />
-                                    </View>
-                                  ) : (
-                                    <Text>Not reward</Text>
-                                  )}
-                                </View>
-                              </View>
-                            </View>
-                          </View>
-                        );
-                      }
-                    )
-                  )}
-                </View>
-              </View>
-            </>
-          ) : (
-            <>
-              <View className="w-full flex items-center justify-center py-2">
-                {/* Title Section */}
-                <View className="w-full flex items-start justify-center py-2">
-                  <Text className="text-xl font-semibold">Points History</Text>
-                  <Text className="text-xs font-normal text-black/50">
-                    Your record of accumulated points
-                  </Text>
-                </View>
-                {/* Reward Cards */}
-                <View className="w-full flex items-center justify-center py-2">
-                  {pointsHistory.length === 0 ? (
-                    <View className="w-full flex justify-center items-center">
-                      <LinearGradient
-                        className="p-3 rounded-full"
-                        colors={["#00674F", "#06402B"]}
-                      >
-                        <MaterialCommunityIcons
-                          name="timer-sand-empty"
-                          size={40}
-                          color={"white"}
-                        />
-                      </LinearGradient>
-                      <Text className="text-sm font-normal text-black/50 pt-4">
-                        No Points History Available
-                      </Text>
-                    </View>
-                  ) : (
-                    pointsHistory.map(
-                      (pointsHistory: PointsHistory, index: any) => {
-                        const user = users.find(
-                          (user: user) => user._id === pointsHistory.userId
-                        );
-
-                        const titleColor =
-                          index % 2 === 0 ? "#00674F" : "#cca918";
-
-                        const backgroundColor =
-                          index % 2 === 0
-                            ? ["#00674F", "#06402B"]
-                            : ["#D2AF26", "#BE8400"];
-
-                        return (
-                          <View
-                            className="w-full flex-row items-center justify-center bg-[#e8e8e8] mb-4 rounded-3xl overflow-hidden"
-                            key={pointsHistory._id}
+                            #{pointHistory._id}
+                          </Text>
+                          <Text
+                            className="text-xs font-normal text-white uppercase max-w-[20%]"
+                            numberOfLines={1}
                           >
-                            <LinearGradient
-                              colors={backgroundColor}
-                              className={`h-full w-[5%]`}
-                            ></LinearGradient>
-                            <View className="w-[95%] flex items-start justify-center p-4">
-                              <View className="w-full flex flex-row justify-between items-start">
-                                <View className="w-3/4 flex items-start justify-center">
-                                  <Text
-                                    className="text-xs font-normal text-black/50 uppercase"
-                                    numberOfLines={1}
-                                  >
-                                    {pointsHistory._id}
-                                  </Text>
-
-                                  {user ? (
-                                    <Text
-                                      className={`text-sm font-semibold uppercase text-[${titleColor}]`}
-                                    >
-                                      {`${user.personalInfo.firstName} ${user.personalInfo.lastName}`}
-                                    </Text>
-                                  ) : (
-                                    <Text
-                                      className={`text-sm font-semibold uppercase text-[${titleColor}]`}
-                                    >
-                                      User not Found
-                                    </Text>
-                                  )}
-                                </View>
-                              </View>
-                              <View className="w-full flex flex-row justify-between items-end pt-4">
-                                <Text
-                                  className="w-1/3 text-left text-xs font-normal text-black/50"
-                                  numberOfLines={1}
-                                >
-                                  {(() => {
-                                    const date = new Date(
-                                      pointsHistory.dateDisposed
-                                    );
-                                    return isNaN(date.getTime())
-                                      ? "Invalid Date"
-                                      : date.toLocaleDateString("en-US"); // Format the date as needed
-                                  })()}
-                                </Text>
-                                <View className="w-1/2 flex flex-row items-center justify-end">
-                                  <View className="w-[40px] h-[40px] flex items-center justify-center rounded-full bg-black overflow-hidden">
-                                    <Image
-                                      className="w-full flex-1"
-                                      source={require("../../assets/images/Man.jpg")}
-                                    />
-                                  </View>
-                                  <Text
-                                    className="pl-1 text-xs font-semibold text-black"
-                                    numberOfLines={1}
-                                  >
-                                    {`${pointsHistory.pointsAccumulated}${
-                                      pointsHistory.pointsAccumulated > 1
-                                        ? "pts."
-                                        : "pt."
-                                    }`}
-                                  </Text>
-                                </View>
-                              </View>
-                            </View>
+                            {`${pointHistory.pointsAccumulated} ${
+                              pointHistory.pointsAccumulated > 1
+                                ? "pts."
+                                : "pt."
+                            }`}
+                          </Text>
+                        </View>
+                        <View className="w-full flex items-start justify-center">
+                          <View className="w-full flex items-start justify-center pb-4">
+                            <Text
+                              className="text-xl font-semibold text-white capitalize"
+                              numberOfLines={1}
+                            >
+                              {`${pointHistory.userInfo.personalInfo.firstName} ${pointHistory.userInfo.personalInfo.lastName}`}
+                            </Text>
                           </View>
-                        );
-                      }
-                    )
-                  )}
+                          <View className="w-full overflow-hidden flex flex-row justify-start items-center">
+                            <LinearGradient
+                              className="flex items-center justify-center px-4 py-2 rounded-full mr-1 max-w-[60%]"
+                              colors={["#D2AF26", "#BE8400"]}
+                            >
+                              <Text
+                                className="text-xs font-normal text-white"
+                                numberOfLines={1}
+                              >
+                                {`${pointHistory.bottleCount} ${
+                                  pointHistory.bottleCount > 1
+                                    ? "bottles"
+                                    : "bottle"
+                                }`}
+                              </Text>
+                            </LinearGradient>
+                            <LinearGradient
+                              className="flex items-center justify-center px-4 py-2 rounded-full max-w-[40%]"
+                              colors={["#00674F", "#06402B"]}
+                            >
+                              <Text
+                                className="text-xs font-normal text-white"
+                                numberOfLines={1}
+                              >
+                                {(() => {
+                                  const date = new Date(
+                                    pointHistory.dateDisposed
+                                  );
+                                  return isNaN(date.getTime())
+                                    ? "Invalid Date"
+                                    : date.toLocaleDateString("en-US");
+                                })()}
+                              </Text>
+                            </LinearGradient>
+                          </View>
+                        </View>
+                      </View>
+                    </LinearGradient>
+                  </ImageBackground>
                 </View>
-              </View>
-            </>
-          )}
-          <View className="w-full pb-24"></View>
-        </ScrollView>
+              );
+            })}
+          </ScrollView>
+        </View>
       </>
       {loading && <Loader />}
       <StatusBar style="auto" />

@@ -1,13 +1,14 @@
 import { View, Text } from "react-native";
 import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
+import { useUrl } from "./UrlProvider";
 
 const HistoryContext = createContext<any>(null);
 
 export const UserHistoryProvider = ({ children }: any) => {
   const [pointsHistory, setPointsHistory] = useState([]);
   const [rewardsHistory, setRewardsHistory] = useState([]);
-
+  const { ipAddress, port } = useUrl();
   interface user {
     _id: string;
   }
@@ -15,7 +16,7 @@ export const UserHistoryProvider = ({ children }: any) => {
   const fetchPointsHistory = async (user: user) => {
     if (user) {
       try {
-        let url = `http://192.168.254.139:8080/api/history/dispose/${user._id}`;
+        let url = `http://${ipAddress}:${port}/api/history/dispose/${user._id}`;
         let response = await axios.get(url);
         if (response.status === 200) {
           setPointsHistory(response.data.userdisposalhistory);
@@ -33,7 +34,7 @@ export const UserHistoryProvider = ({ children }: any) => {
   const fetchRewardsHistory = async (user: user) => {
     if (user) {
       try {
-        let url = `http://192.168.254.139:8080/api/history/claim/${user._id}`;
+        let url = `http://${ipAddress}:${port}/api/history/claim/${user._id}`;
         let response = await axios.get(url);
         if (response.status === 200) {
           setRewardsHistory(response.data.userrewardclaimhistory);

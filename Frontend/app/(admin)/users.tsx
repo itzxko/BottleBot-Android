@@ -3,12 +3,11 @@ import {
   Text,
   TouchableHighlight,
   ScrollView,
-  ImageBackground,
   Pressable,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Ionicons, Feather } from "@expo/vector-icons";
+import { Ionicons, Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import axios from "axios";
@@ -18,6 +17,8 @@ import Usermodal from "@/components/admin/userModal";
 import { useUsers } from "@/context/UsersProvider";
 import { StatusBar } from "expo-status-bar";
 import EditModal from "@/components/admin/editModal";
+import { useUrl } from "@/context/UrlProvider";
+import { ImageBackground } from "expo-image";
 
 const Users = () => {
   const [loading, setLoading] = useState(false);
@@ -29,6 +30,7 @@ const Users = () => {
   const { getUsers, users, roles, filterUsers } = useUsers();
   const [editModal, setEditModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState<user | null>(null);
+  const { ipAddress, port } = useUrl();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -42,7 +44,7 @@ const Users = () => {
 
   const deleteUser = async (userId: string) => {
     try {
-      let url = `http://192.168.254.139:8080/api/users/${userId}`;
+      let url = `http://${ipAddress}:${port}/api/users/${userId}`;
       let response = await axios.delete(url);
 
       if (response.status === 200) {
@@ -143,17 +145,28 @@ const Users = () => {
           {/* Filter */}
           <View className="relative flex items-end justify-end">
             <Pressable
-              className="flex flex-row items-center justify-center px-3 py-2 border border-black rounded-full"
+              className="flex  rounded-full"
               onPress={() => setOpenFilter(!openFilter)}
             >
-              <Feather name="filter" size={14} color={"black"} />
-              <Text className="text-sm font-normal text-black pl-1">
-                Filter
-              </Text>
+              <LinearGradient
+                className="flex-row-reverse items-center justify-center p-2 rounded-full"
+                colors={["#757575", "#050301"]}
+              >
+                <View className="flex items-center justify-center p-2 rounded-full bg-white">
+                  <MaterialCommunityIcons
+                    name="arrow-right-top"
+                    size={14}
+                    color={"black"}
+                  />
+                </View>
+                <Text className="text-sm font-semibold text-white px-2">
+                  Filter
+                </Text>
+              </LinearGradient>
             </Pressable>
 
             {openFilter ? (
-              <View className="absolute top-[100%] z-10 bg-white w-full flex items-center justify-center  rounded-2xl shadow-xl shadow-black">
+              <View className="absolute top-[120%] z-10 bg-white w-full flex items-center justify-center  rounded-2xl shadow-xl shadow-black">
                 {roles.map((role: string) => (
                   <Pressable
                     className="w-full px-3 py-2 flex items-center justify-center"
@@ -179,74 +192,83 @@ const Users = () => {
         >
           {users.map((user: user) => (
             <View
-              className="w-full flex-wrap items-center justify-center rounded-3xl overflow-hidden mb-4"
+              className="w-full h-[240px] flex items-center rounded-[32px] overflow-hidden justify-center mb-4"
               key={user._id}
             >
-              <View className="w-full flex flex-row items-center justify-between bg-white py-3 px-4 shadow shadow-black">
-                <Text className="text-xs font-semibold text-black/50 uppercase">
-                  #{user._id}
-                </Text>
-                <View className="flex flex-row items-center justify-center">
-                  <Pressable
-                    className="flex items-center justify-center p-1.5 rounded-full bg-[#00674F] mr-1"
-                    onPress={() => {
-                      setEditModal(true);
-                      setSelectedUser(user);
-                    }}
-                  >
-                    <Feather name="edit-2" size={12} color={"white"} />
-                  </Pressable>
-                  <Pressable
-                    className="flex items-center justify-center p-1.5 rounded-full bg-[#B32624]"
-                    onPress={() => deleteUser(user._id)}
-                  >
-                    <Feather name="trash" size={12} color={"white"} />
-                  </Pressable>
-                </View>
-              </View>
-              <View className="w-full flex items-center justify-center bg-[#F7F7F7] px-4 py-3">
-                <View className="w-full flex flex-row items-center justify-start py-2">
-                  {/* Image */}
-                  <View className=" flex items-center justify-center h-[50px] w-[50px] rounded-full overflow-hidden">
-                    <ImageBackground
-                      className="w-full h-full"
-                      source={require("../../assets/images/Man.jpg")}
-                    ></ImageBackground>
-                  </View>
-                  {/* Username */}
-                  <View className="w-3/4 flex items-start justify-center pl-3">
-                    <Text
-                      className="text-sm font-semibold pb-0.5 capitalize"
-                      numberOfLines={1}
-                    >
-                      {`${user.personalInfo.firstName} ${user.personalInfo.lastName}`}
-                    </Text>
-                    <View className="px-2 py-1 bg-[#E1E1E1] rounded-md">
-                      <Text
-                        className="text-xs font-normal text-black/50"
-                        numberOfLines={1}
-                      >
-                        {user.credentials.email}
+              <ImageBackground
+                className="w-full h-full"
+                source={require("../../assets/images/Man.jpg")}
+              >
+                <LinearGradient
+                  className="w-full h-full p-6"
+                  colors={[
+                    "rgba(18, 18, 18, 0.2)",
+                    "rgba(18, 18, 18, 0.6)",
+                    "rgba(18, 18, 18, 1)",
+                  ]}
+                  start={{ x: 1, y: 0 }} // Start from the upper right corner
+                  end={{ x: 0, y: 1 }}
+                >
+                  <View className="w-full h-full flex flex-col justify-between items-center">
+                    <View className="w-full flex flex-row items-start justify-between">
+                      <Text className="text-xs font-normal text-white/50 uppercase">
+                        {user.credentials.level}
                       </Text>
+                      <Pressable onPress={() => deleteUser(user._id)}>
+                        <LinearGradient
+                          colors={["#FF0000", "#780606"]}
+                          className="p-2 rounded-full"
+                        >
+                          <Text className="hidden text-sm font-semibold text-white pr-1">
+                            Delete
+                          </Text>
+                          <Feather name="trash" size={16} color={"white"} />
+                        </LinearGradient>
+                      </Pressable>
+                    </View>
+                    <View className="w-full flex items-start justify-center">
+                      <View className="w-full pb-4">
+                        <Text
+                          className="text-xl font-semibold text-white"
+                          numberOfLines={1}
+                        >
+                          {`${user.personalInfo.firstName} ${user.personalInfo.lastName}`}
+                        </Text>
+
+                        <Text
+                          className="text-xs font-normal text-white/50 uppercase max-w-[60%]"
+                          numberOfLines={1}
+                        >
+                          #{user._id}
+                        </Text>
+                      </View>
+                      <View className="w-full flex items-start justify-center">
+                        <Pressable
+                          className=""
+                          onPress={() => {
+                            setEditModal(true);
+                            setSelectedUser(user);
+                          }}
+                        >
+                          <LinearGradient
+                            colors={["#D2AF26", "#BE8400"]}
+                            className="flex flex-row justify-center items-center px-4 py-2 rounded-full"
+                          >
+                            <Text className="text-sm font-semibold text-white pr-1">
+                              Edit
+                            </Text>
+                            <MaterialCommunityIcons
+                              name="arrow-up-right"
+                              color={"white"}
+                              size={16}
+                            />
+                          </LinearGradient>
+                        </Pressable>
+                      </View>
                     </View>
                   </View>
-                </View>
-                <View className="w-full flex items-end justify-center pb-2">
-                  {/* <LinearGradient
-                    colors={["#050301", "#474747"]}
-                    start={{ x: 0, y: 1 }}
-                    end={{ x: 1, y: 0 }}
-                    className="flex flex-row items-center justify-center px-3 py-1.5 rounded-md"
-                  > */}
-                  <View className="flex-row px-3 items-center justify-center py-1.5 rounded-full border border-black">
-                    <Feather name="hash" size={12} color={"black"} />
-                    <Text className="text-xs font-normal pl-0.5 text-black">
-                      {user.credentials.level}
-                    </Text>
-                  </View>
-                  {/* </LinearGradient> */}
-                </View>
-              </View>
+                </LinearGradient>
+              </ImageBackground>
             </View>
           ))}
           <View className="w-full pb-24"></View>
