@@ -1,4 +1,3 @@
-import { View, Text } from "react-native";
 import React, { useContext, createContext } from "react";
 
 const UrlContext = createContext<any>(null);

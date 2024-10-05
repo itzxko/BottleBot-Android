@@ -4,6 +4,7 @@ import {
   TouchableHighlight,
   ScrollView,
   Pressable,
+  TextInput,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -31,6 +32,8 @@ const Users = () => {
   const [editModal, setEditModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState<user | null>(null);
   const { ipAddress, port } = useUrl();
+  const [searchType, setSearchType] = useState("All");
+  const [userSearch, setUserSearch] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -104,6 +107,20 @@ const Users = () => {
     };
   }
 
+  const handleSearchType = () => {
+    const newType =
+      searchType === "All"
+        ? "admin"
+        : searchType === "admin"
+        ? "staff"
+        : searchType === "staff"
+        ? "citizen"
+        : "All";
+    setSearchType(newType);
+
+    filterUsers(newType, userSearch);
+  };
+
   return (
     <>
       <SafeAreaView className="flex-1 px-4 bg-[#F0F0F0]">
@@ -129,9 +146,45 @@ const Users = () => {
           </TouchableHighlight>
           <Text className="text-xl font-semibold">Users</Text>
         </View>
+        {/* Search and Filter */}
+        <View className="w-full flex flex-row items-center justify-between pt-4">
+          <View className="w-full flex flex-row items-center justify-between pl-6 pr-4 py-3 rounded-full bg-[#E6E6E6]">
+            <View className="w-6/12 flex-row items-center justify-start">
+              <Feather name="search" size={16} color={"rgba(0, 0, 0, 0.5)"} />
+              <TextInput
+                className="w-full bg-[#E6E6E6] text-xs font-normal pl-2"
+                placeholder={"search users via username"}
+                onChangeText={(text) => {
+                  setUserSearch(text);
+                  {
+                    if (text.trim() === "") {
+                      getUsers();
+                      setSearchType("All");
+                    } else {
+                      filterUsers(searchType, text);
+                    }
+                  }
+                }}
+                numberOfLines={1}
+              />
+            </View>
+            <Pressable
+              className="w-4/12 flex flex-row items-center justify-between px-4 py-2 bg-[#050301] rounded-full"
+              onPress={handleSearchType}
+            >
+              <Text
+                className="w-2/3 text-xs font-normal text-white"
+                numberOfLines={1}
+              >
+                {searchType}
+              </Text>
+              <Feather name="rotate-cw" size={16} color={"white"} />
+            </Pressable>
+          </View>
+        </View>
         {/* Header */}
-        <View className="w-full flex flex-row items-center justify-between py-4">
-          <View className="w-1/2 flex items-start justify-center">
+        <View className="w-full flex items-center justify-center py-4">
+          <View className="w-full flex items-start justify-center">
             <Text
               className="text-lg font-semibold text-black"
               numberOfLines={1}
@@ -142,135 +195,104 @@ const Users = () => {
               Create, Update or Delete Users
             </Text>
           </View>
-          {/* Filter */}
-          <View className="relative flex items-end justify-end">
-            <Pressable
-              className="flex  rounded-full"
-              onPress={() => setOpenFilter(!openFilter)}
-            >
-              <LinearGradient
-                className="flex-row-reverse items-center justify-center p-2 rounded-full"
-                colors={["#757575", "#050301"]}
-              >
-                <View className="flex items-center justify-center p-2 rounded-full bg-white">
-                  <MaterialCommunityIcons
-                    name="arrow-right-top"
-                    size={14}
-                    color={"black"}
-                  />
-                </View>
-                <Text className="text-sm font-semibold text-white px-2">
-                  Filter
-                </Text>
-              </LinearGradient>
-            </Pressable>
-
-            {openFilter ? (
-              <View className="absolute top-[120%] z-10 bg-white w-full flex items-center justify-center  rounded-2xl shadow-xl shadow-black">
-                {roles.map((role: string) => (
-                  <Pressable
-                    className="w-full px-3 py-2 flex items-center justify-center"
-                    onPress={() => handleFilter(role)}
-                    key={role}
-                  >
-                    <Text
-                      className="text-xs font-normal text-black"
-                      numberOfLines={1}
-                    >
-                      {role}
-                    </Text>
-                  </Pressable>
-                ))}
-              </View>
-            ) : null}
-          </View>
         </View>
         {/* Content */}
         <ScrollView
           className="flex-1 w-full py-2"
           showsVerticalScrollIndicator={false}
         >
-          {users.map((user: user) => (
-            <View
-              className="w-full h-[240px] flex items-center rounded-[32px] overflow-hidden justify-center mb-4"
-              key={user._id}
-            >
-              <ImageBackground
-                className="w-full h-full"
-                source={require("../../assets/images/Man.jpg")}
+          {users.length > 0 ? (
+            users.map((user: user) => (
+              <View
+                className="w-full h-[240px] flex items-center rounded-[32px] overflow-hidden justify-center mb-4"
+                key={user._id}
               >
-                <LinearGradient
-                  className="w-full h-full p-6"
-                  colors={[
-                    "rgba(18, 18, 18, 0.2)",
-                    "rgba(18, 18, 18, 0.6)",
-                    "rgba(18, 18, 18, 1)",
-                  ]}
-                  start={{ x: 1, y: 0 }} // Start from the upper right corner
-                  end={{ x: 0, y: 1 }}
+                <ImageBackground
+                  className="w-full h-full"
+                  source={require("../../assets/images/Man.jpg")}
                 >
-                  <View className="w-full h-full flex flex-col justify-between items-center">
-                    <View className="w-full flex flex-row items-start justify-between">
-                      <Text className="text-xs font-normal text-white/50 uppercase">
-                        {user.credentials.level}
-                      </Text>
-                      <Pressable onPress={() => deleteUser(user._id)}>
-                        <LinearGradient
-                          colors={["#FF0000", "#780606"]}
-                          className="p-2 rounded-full"
-                        >
-                          <Text className="hidden text-sm font-semibold text-white pr-1">
-                            Delete
-                          </Text>
-                          <Feather name="trash" size={16} color={"white"} />
-                        </LinearGradient>
-                      </Pressable>
-                    </View>
-                    <View className="w-full flex items-start justify-center">
-                      <View className="w-full pb-4">
-                        <Text
-                          className="text-xl font-semibold text-white"
-                          numberOfLines={1}
-                        >
-                          {`${user.personalInfo.firstName} ${user.personalInfo.lastName}`}
+                  <LinearGradient
+                    className="w-full h-full p-6"
+                    colors={[
+                      "rgba(18, 18, 18, 0.2)",
+                      "rgba(18, 18, 18, 0.6)",
+                      "rgba(18, 18, 18, 1)",
+                    ]}
+                    start={{ x: 1, y: 0 }} // Start from the upper right corner
+                    end={{ x: 0, y: 1 }}
+                  >
+                    <View className="w-full h-full flex flex-col justify-between items-center">
+                      <View className="w-full flex flex-row items-start justify-between">
+                        <Text className="text-xs font-normal text-white/50 uppercase">
+                          {user.credentials.level}
                         </Text>
-
-                        <Text
-                          className="text-xs font-normal text-white/50 uppercase max-w-[60%]"
-                          numberOfLines={1}
-                        >
-                          #{user._id}
-                        </Text>
-                      </View>
-                      <View className="w-full flex items-start justify-center">
-                        <Pressable
-                          className=""
-                          onPress={() => {
-                            setEditModal(true);
-                            setSelectedUser(user);
-                          }}
-                        >
+                        <Pressable onPress={() => deleteUser(user._id)}>
                           <LinearGradient
-                            colors={["#D2AF26", "#BE8400"]}
-                            className="flex flex-row justify-center items-center px-4 py-2 rounded-full"
+                            colors={["#FF0000", "#780606"]}
+                            className="p-2 rounded-full"
                           >
-                            <Text className="text-sm font-semibold text-white pr-1">
-                              Edit
+                            <Text className="hidden text-sm font-semibold text-white pr-1">
+                              Delete
                             </Text>
-                            <MaterialCommunityIcons
-                              name="arrow-up-right"
-                              color={"white"}
-                              size={16}
-                            />
+                            <Feather name="trash" size={16} color={"white"} />
                           </LinearGradient>
                         </Pressable>
                       </View>
+                      <View className="w-full flex items-start justify-center">
+                        <View className="w-full pb-4">
+                          <Text
+                            className="text-xl font-semibold text-white"
+                            numberOfLines={1}
+                          >
+                            {`${user.personalInfo.firstName} ${user.personalInfo.lastName}`}
+                          </Text>
+
+                          <Text
+                            className="text-xs font-normal text-white/50 uppercase max-w-[60%]"
+                            numberOfLines={1}
+                          >
+                            #{user._id}
+                          </Text>
+                        </View>
+                        <View className="w-full flex items-start justify-center">
+                          <Pressable
+                            className=""
+                            onPress={() => {
+                              setEditModal(true);
+                              setSelectedUser(user);
+                            }}
+                          >
+                            <LinearGradient
+                              colors={["#D2AF26", "#BE8400"]}
+                              className="flex flex-row justify-center items-center px-4 py-2 rounded-full"
+                            >
+                              <Text className="text-sm font-semibold text-white pr-1">
+                                Edit
+                              </Text>
+                              <MaterialCommunityIcons
+                                name="arrow-up-right"
+                                color={"white"}
+                                size={16}
+                              />
+                            </LinearGradient>
+                          </Pressable>
+                        </View>
+                      </View>
                     </View>
-                  </View>
-                </LinearGradient>
-              </ImageBackground>
+                  </LinearGradient>
+                </ImageBackground>
+              </View>
+            ))
+          ) : (
+            <View className="w-full h-[240px] items-center justify-center">
+              <View className="p-3 mb-2 rounded-full bg-black">
+                <Feather name="cloud-off" size={20} color={"white"} />
+              </View>
+              <Text className="text-xs font-normal text-black/50">
+                User not Found
+              </Text>
             </View>
-          ))}
+          )}
           <View className="w-full pb-24"></View>
         </ScrollView>
       </SafeAreaView>

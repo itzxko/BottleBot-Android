@@ -31,20 +31,24 @@ export const UsersProvider = ({ children }: any) => {
     }
   };
 
-  const filterUsers = async (role: string) => {
+  const filterUsers = async (role: string, user: string) => {
     try {
-      if (role === "All") {
-        getUsers();
+      let url = `http://${ipAddress}:${port}/api/users?`;
+
+      if (role !== "All") {
+        url += `level=${role}`;
+      }
+
+      if (user !== "") {
+        url += `${role !== "All" ? "&" : ""}userName=${user}`;
+      }
+
+      let response = await axios.get(url);
+
+      if (response.status === 200) {
+        setUsers(response.data.users);
       } else {
-        let url = `http://${ipAddress}:${port}/api/users?level=${role}`;
-
-        let response = await axios.get(url);
-
-        if (response.status === 200) {
-          setUsers(response.data.users);
-        } else {
-          console.log(response.data.message);
-        }
+        console.log(response.data.message);
       }
     } catch (error) {
       console.log(error);
