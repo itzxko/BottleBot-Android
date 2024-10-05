@@ -154,6 +154,7 @@ const Users = () => {
               <TextInput
                 className="w-full bg-[#E6E6E6] text-xs font-normal pl-2"
                 placeholder={"search users via username"}
+                value={userSearch}
                 onChangeText={(text) => {
                   setUserSearch(text);
                   {
@@ -312,6 +313,8 @@ const Users = () => {
           onClose={() => {
             setUserModal(false);
             getUsers();
+            setUserSearch("");
+            setSearchType("All");
           }}
         />
       )}
@@ -321,6 +324,8 @@ const Users = () => {
           onClose={() => {
             setEditModal(false);
             getUsers();
+            setUserSearch("");
+            setSearchType("All");
           }}
         />
       )}
