@@ -41,6 +41,38 @@ export const AdminHistoryProvider = ({ children }: any) => {
     }
   };
 
+  const searchRewardHistory = async (user: string) => {
+    try {
+      let url = `http://${ipAddress}:${port}/api/history/claim?userName=${user}`;
+
+      let response = await axios.get(url);
+
+      if (response.status === 200) {
+        setRewardsHistory(response.data.allusersrewardclaimhistory);
+      } else {
+        console.log(response.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const searchPointHistory = async (user: string) => {
+    try {
+      let url = `http://${ipAddress}:${port}/api/history/dispose?userName=${user}`;
+
+      let response = await axios.get(url);
+
+      if (response.status === 200) {
+        setPointsHistory(response.data.allusersdisposalhistory);
+      } else {
+        console.log(response.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <AdminHistoryContext.Provider
       value={{
@@ -48,6 +80,8 @@ export const AdminHistoryProvider = ({ children }: any) => {
         fetchAllPointsHistory,
         rewardsHistory,
         pointsHistory,
+        searchRewardHistory,
+        searchPointHistory,
       }}
     >
       {children}

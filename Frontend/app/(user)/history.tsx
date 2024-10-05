@@ -82,236 +82,264 @@ const History: React.FC = () => {
   }, []);
 
   return (
-    <SafeAreaView className="flex-1 px-4 bg-[#F0F0F0]">
-      {/* Titlebar */}
-      <View className="relative w-full flex flex-row items-center justify-center py-4">
-        <TouchableHighlight
-          underlayColor={"#C9C9C9"}
-          className="absolute left-0 rounded-full"
-          onPress={() => navigation.goBack()}
-        >
-          <View className="p-2 bg-[#E1E1E1] rounded-full flex items-center justify-center">
-            <Ionicons name="chevron-back" size={18} />
+    <SafeAreaView className="flex-1 bg-[#F0F0F0]">
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        className="w-full flex-1"
+      >
+        {/* Titlebar */}
+        <View className="relative w-full flex flex-row items-center justify-center p-4">
+          <TouchableHighlight
+            underlayColor={"#C9C9C9"}
+            className="absolute left-4 rounded-full"
+            onPress={() => navigation.goBack()}
+          >
+            <View className="p-2 bg-[#E1E1E1] rounded-full flex items-center justify-center">
+              <Ionicons name="chevron-back" size={18} />
+            </View>
+          </TouchableHighlight>
+          <Text className="text-xl font-semibold">History</Text>
+        </View>
+
+        {/* Rewards History */}
+        <View className="w-full flex items-center justify-center pt-6 ">
+          <View className="w-full flex items-start justify-center pb-4 px-4">
+            <Text className="text-xl font-semibold">Rewards History</Text>
+            <Text className="text-xs font-normal text-black/50">
+              all records of redeemed rewards
+            </Text>
           </View>
-        </TouchableHighlight>
-        <Text className="text-xl font-semibold">History</Text>
-      </View>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            className="flex"
+          >
+            {rewardsHistory.map(
+              (rewardHistory: RewardHistory, index: number) => {
+                const reward = redeemables.find(
+                  (reward: Reward) => reward._id === rewardHistory.rewardId
+                );
 
-      {/* Rewards History */}
-      <View className="w-full flex items-center justify-center pt-6">
-        <View className="w-full flex items-start justify-center pb-4">
-          <Text className="text-xl font-semibold">Rewards History</Text>
-          <Text className="text-xs font-normal text-black/50">
-            all records of redeemed rewards
-          </Text>
-        </View>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          className="flex"
-        >
-          {rewardsHistory.map((rewardHistory: RewardHistory) => {
-            const reward = redeemables.find(
-              (reward: Reward) => reward._id === rewardHistory.rewardId
-            );
+                const firstItem = index === 0;
+                const lastItem = index === pointsHistory.length - 1;
 
-            return (
-              <View
-                className="bg-slate-500 rounded-3xl w-[320px] h-[240px] overflow-hidden mr-4"
-                key={rewardHistory._id}
-              >
-                <ImageBackground
-                  className="w-full h-full"
-                  source={
-                    reward
-                      ? {
-                          uri: `http://${ipAddress}:${port}/api/images/${reward.image}`,
-                        }
-                      : require("../../assets/images/borgar.jpg")
-                  }
-                >
-                  <LinearGradient
-                    className="w-full h-full p-5"
-                    colors={["rgba(18, 18, 18, 0.2)", "rgba(18, 18, 18, 0.8)"]}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 0, y: 1 }}
+                const margin = firstItem ? "mx-4" : lastItem ? "mr-4" : "mr-4";
+
+                return (
+                  <View
+                    className={`bg-slate-500 rounded-3xl w-[320px] h-[240px] overflow-hidden ${margin}`}
+                    key={rewardHistory._id}
                   >
-                    <View className="flex flex-col h-full justify-between">
-                      <View className="w-full flex flex-row items-start justify-between">
-                        <Text
-                          className="text-xs font-normal text-white uppercase max-w-[60%]"
-                          numberOfLines={1}
-                        >
-                          #{rewardHistory._id}
-                        </Text>
-                        <Text
-                          className="text-xs font-normal text-white uppercase max-w-[20%]"
-                          numberOfLines={1}
-                        >
-                          {`${rewardHistory.pointsSpent} ${
-                            rewardHistory.pointsSpent > 1 ? "pts." : "pt."
-                          }`}
-                        </Text>
-                      </View>
-                      <View className="w-full flex items-start justify-center">
-                        <View className="w-full flex items-start justify-center pb-4">
+                    <ImageBackground
+                      className="w-full h-full"
+                      source={
+                        reward
+                          ? {
+                              uri: `http://${ipAddress}:${port}/api/images/${reward.image}`,
+                            }
+                          : require("../../assets/images/borgar.jpg")
+                      }
+                    >
+                      <LinearGradient
+                        className="w-full h-full p-5"
+                        colors={[
+                          "rgba(18, 18, 18, 0.2)",
+                          "rgba(18, 18, 18, 0.8)",
+                        ]}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 0, y: 1 }}
+                      >
+                        <View className="flex flex-col h-full justify-between">
+                          <View className="w-full flex flex-row items-start justify-between">
+                            <Text
+                              className="text-xs font-normal text-white uppercase max-w-[60%]"
+                              numberOfLines={1}
+                            >
+                              #{rewardHistory._id}
+                            </Text>
+                            <Text
+                              className="text-xs font-normal text-white uppercase max-w-[20%]"
+                              numberOfLines={1}
+                            >
+                              {`${rewardHistory.pointsSpent} ${
+                                rewardHistory.pointsSpent > 1 ? "pts." : "pt."
+                              }`}
+                            </Text>
+                          </View>
+                          <View className="w-full flex items-start justify-center">
+                            <View className="w-full flex items-start justify-center pb-4">
+                              <Text
+                                className="text-xl font-semibold text-white capitalize"
+                                numberOfLines={1}
+                              >
+                                {reward?.rewardName}
+                              </Text>
+                            </View>
+                            <View className="w-full overflow-hidden flex flex-row justify-start items-center">
+                              <LinearGradient
+                                className="flex items-center justify-center px-4 py-2 rounded-full mr-1 max-w-[60%]"
+                                colors={["#D2AF26", "#BE8400"]}
+                              >
+                                <Text
+                                  className="text-xs font-normal text-white"
+                                  numberOfLines={1}
+                                >
+                                  {user?.personalInfo
+                                    ? `${user.personalInfo.firstName} ${user.personalInfo.lastName}`
+                                    : "Unknown User"}
+                                </Text>
+                              </LinearGradient>
+                              <LinearGradient
+                                className="flex items-center justify-center px-4 py-2 rounded-full max-w-[40%]"
+                                colors={["#00674F", "#06402B"]}
+                              >
+                                <Text
+                                  className="text-xs font-normal text-white"
+                                  numberOfLines={1}
+                                >
+                                  {(() => {
+                                    const date = new Date(
+                                      rewardHistory.dateClaimed
+                                    );
+                                    return isNaN(date.getTime())
+                                      ? "Invalid Date"
+                                      : date.toLocaleDateString("en-US");
+                                  })()}
+                                </Text>
+                              </LinearGradient>
+                            </View>
+                          </View>
+                        </View>
+                      </LinearGradient>
+                    </ImageBackground>
+                  </View>
+                );
+              }
+            )}
+          </ScrollView>
+        </View>
+
+        {/* Points History */}
+        <View className="w-full flex items-center justify-center pt-6">
+          <View className="w-full flex items-start justify-center pb-4 px-4">
+            <Text className="text-xl font-semibold">Points History</Text>
+            <Text className="text-xs font-normal text-black/50">
+              all records of collected points
+            </Text>
+          </View>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            className="flex"
+          >
+            {pointsHistory.map((pointHistory: PointHistory, index: number) => {
+              const reward = redeemables.find(
+                (reward) => reward._id === "hehe"
+              );
+
+              const firstItem = index === 0;
+              const lastItem = index === pointsHistory.length - 1;
+
+              const margin = firstItem ? "mx-4" : lastItem ? "mr-4" : "mr-4";
+
+              return (
+                <View
+                  className={`bg-slate-500 rounded-3xl w-[320px] h-[240px] overflow-hidden mr-4 ${margin}`}
+                  key={pointHistory._id}
+                >
+                  <ImageBackground
+                    className="w-full h-full"
+                    source={
+                      reward
+                        ? {
+                            uri: `http://${ipAddress}:${port}/api/images/${reward.image}`,
+                          }
+                        : require("../../assets/images/Man.jpg")
+                    }
+                  >
+                    <LinearGradient
+                      className="w-full h-full p-5"
+                      colors={[
+                        "rgba(18, 18, 18, 0.2)",
+                        "rgba(18, 18, 18, 0.8)",
+                      ]}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 0, y: 1 }}
+                    >
+                      <View className="flex flex-col h-full justify-between">
+                        <View className="w-full flex flex-row items-start justify-between">
                           <Text
-                            className="text-xl font-semibold text-white capitalize"
+                            className="text-xs font-normal text-white uppercase max-w-[60%]"
                             numberOfLines={1}
                           >
-                            {reward?.rewardName}
+                            #{pointHistory._id}
                           </Text>
-                        </View>
-                        <View className="w-full overflow-hidden flex flex-row justify-start items-center">
-                          <LinearGradient
-                            className="flex items-center justify-center px-4 py-2 rounded-full mr-1 max-w-[60%]"
-                            colors={["#D2AF26", "#BE8400"]}
-                          >
-                            <Text
-                              className="text-xs font-normal text-white"
-                              numberOfLines={1}
-                            >
-                              {user?.personalInfo
-                                ? `${user.personalInfo.firstName} ${user.personalInfo.lastName}`
-                                : "Unknown User"}
-                            </Text>
-                          </LinearGradient>
-                          <LinearGradient
-                            className="flex items-center justify-center px-4 py-2 rounded-full max-w-[40%]"
-                            colors={["#00674F", "#06402B"]}
-                          >
-                            <Text
-                              className="text-xs font-normal text-white"
-                              numberOfLines={1}
-                            >
-                              {(() => {
-                                const date = new Date(
-                                  rewardHistory.dateClaimed
-                                );
-                                return isNaN(date.getTime())
-                                  ? "Invalid Date"
-                                  : date.toLocaleDateString("en-US");
-                              })()}
-                            </Text>
-                          </LinearGradient>
-                        </View>
-                      </View>
-                    </View>
-                  </LinearGradient>
-                </ImageBackground>
-              </View>
-            );
-          })}
-        </ScrollView>
-      </View>
-
-      {/* Points History */}
-      <View className="w-full flex items-center justify-center pt-6">
-        <View className="w-full flex items-start justify-center pb-4">
-          <Text className="text-xl font-semibold">Points History</Text>
-          <Text className="text-xs font-normal text-black/50">
-            all records of collected points
-          </Text>
-        </View>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          className="flex"
-        >
-          {pointsHistory.map((pointHistory: PointHistory) => {
-            const reward = redeemables.find((reward) => reward._id === "hehe");
-
-            return (
-              <View
-                className="bg-slate-500 rounded-3xl w-[320px] h-[240px] overflow-hidden mr-4"
-                key={pointHistory._id}
-              >
-                <ImageBackground
-                  className="w-full h-full"
-                  source={
-                    reward
-                      ? {
-                          uri: `http://${ipAddress}:${port}/api/images/${reward.image}`,
-                        }
-                      : require("../../assets/images/Man.jpg")
-                  }
-                >
-                  <LinearGradient
-                    className="w-full h-full p-5"
-                    colors={["rgba(18, 18, 18, 0.2)", "rgba(18, 18, 18, 0.8)"]}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 0, y: 1 }}
-                  >
-                    <View className="flex flex-col h-full justify-between">
-                      <View className="w-full flex flex-row items-start justify-between">
-                        <Text
-                          className="text-xs font-normal text-white uppercase max-w-[60%]"
-                          numberOfLines={1}
-                        >
-                          #{pointHistory._id}
-                        </Text>
-                        <Text
-                          className="text-xs font-normal text-white uppercase max-w-[20%]"
-                          numberOfLines={1}
-                        >
-                          {`${pointHistory.pointsAccumulated} ${
-                            pointHistory.pointsAccumulated > 1 ? "pts." : "pt."
-                          }`}
-                        </Text>
-                      </View>
-                      <View className="w-full flex items-start justify-center">
-                        <View className="w-full flex items-start justify-center pb-4">
                           <Text
-                            className="text-xl font-semibold text-white capitalize"
+                            className="text-xs font-normal text-white uppercase max-w-[20%]"
                             numberOfLines={1}
                           >
-                            {`${pointHistory.bottleCount} bottle${
-                              pointHistory.bottleCount > 1 ? "s" : ""
-                            } recycled`}
+                            {`${pointHistory.pointsAccumulated} ${
+                              pointHistory.pointsAccumulated > 1
+                                ? "pts."
+                                : "pt."
+                            }`}
                           </Text>
                         </View>
-                        <View className="w-full overflow-hidden flex flex-row justify-start items-center">
-                          <LinearGradient
-                            className="flex items-center justify-center px-4 py-2 rounded-full mr-1 max-w-[60%]"
-                            colors={["#D2AF26", "#BE8400"]}
-                          >
+                        <View className="w-full flex items-start justify-center">
+                          <View className="w-full flex items-start justify-center pb-4">
                             <Text
-                              className="text-xs font-normal text-white"
+                              className="text-xl font-semibold text-white capitalize"
                               numberOfLines={1}
                             >
-                              {user?.personalInfo
-                                ? `${user.personalInfo.firstName} ${user.personalInfo.lastName}`
-                                : "Unknown User"}
+                              {`${pointHistory.bottleCount} bottle${
+                                pointHistory.bottleCount > 1 ? "s" : ""
+                              } recycled`}
                             </Text>
-                          </LinearGradient>
-                          <LinearGradient
-                            className="flex items-center justify-center px-4 py-2 rounded-full max-w-[40%]"
-                            colors={["#00674F", "#06402B"]}
-                          >
-                            <Text
-                              className="text-xs font-normal text-white"
-                              numberOfLines={1}
+                          </View>
+                          <View className="w-full overflow-hidden flex flex-row justify-start items-center">
+                            <LinearGradient
+                              className="flex items-center justify-center px-4 py-2 rounded-full mr-1 max-w-[60%]"
+                              colors={["#D2AF26", "#BE8400"]}
                             >
-                              {(() => {
-                                const date = new Date(
-                                  pointHistory.dateDisposed
-                                );
-                                return isNaN(date.getTime())
-                                  ? "Invalid Date"
-                                  : date.toLocaleDateString("en-US");
-                              })()}
-                            </Text>
-                          </LinearGradient>
+                              <Text
+                                className="text-xs font-normal text-white"
+                                numberOfLines={1}
+                              >
+                                {user?.personalInfo
+                                  ? `${user.personalInfo.firstName} ${user.personalInfo.lastName}`
+                                  : "Unknown User"}
+                              </Text>
+                            </LinearGradient>
+                            <LinearGradient
+                              className="flex items-center justify-center px-4 py-2 rounded-full max-w-[40%]"
+                              colors={["#00674F", "#06402B"]}
+                            >
+                              <Text
+                                className="text-xs font-normal text-white"
+                                numberOfLines={1}
+                              >
+                                {(() => {
+                                  const date = new Date(
+                                    pointHistory.dateDisposed
+                                  );
+                                  return isNaN(date.getTime())
+                                    ? "Invalid Date"
+                                    : date.toLocaleDateString("en-US");
+                                })()}
+                              </Text>
+                            </LinearGradient>
+                          </View>
                         </View>
                       </View>
-                    </View>
-                  </LinearGradient>
-                </ImageBackground>
-              </View>
-            );
-          })}
-        </ScrollView>
-      </View>
+                    </LinearGradient>
+                  </ImageBackground>
+                </View>
+              );
+            })}
+          </ScrollView>
+        </View>
+        <View className="w-full pb-32 "></View>
+      </ScrollView>
 
       <StatusBar style="auto" />
       {loading && <Loader />}
