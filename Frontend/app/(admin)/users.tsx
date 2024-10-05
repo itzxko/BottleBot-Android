@@ -53,7 +53,7 @@ const Users = () => {
       if (response.status === 200) {
         setMessage(response.data.message);
         setVisibleModal(true);
-        getUsers();
+        clearSearchFilter();
       } else {
         setMessage(response.data.message);
         setVisibleModal(true);
@@ -63,17 +63,10 @@ const Users = () => {
     }
   };
 
-  const handleFilter = async (role: string) => {
-    if (role === filter) {
-      setFilter("All");
-
-      await filterUsers("All");
-    } else {
-      setFilter(role);
-
-      await filterUsers(role);
-    }
-    setOpenFilter(false);
+  const clearSearchFilter = () => {
+    setUserSearch("");
+    setSearchType("All");
+    getUsers();
   };
 
   interface user {
@@ -159,8 +152,7 @@ const Users = () => {
                   setUserSearch(text);
                   {
                     if (text.trim() === "") {
-                      getUsers();
-                      setSearchType("All");
+                      clearSearchFilter();
                     } else {
                       filterUsers(searchType, text);
                     }
@@ -312,9 +304,7 @@ const Users = () => {
         <Usermodal
           onClose={() => {
             setUserModal(false);
-            getUsers();
-            setUserSearch("");
-            setSearchType("All");
+            clearSearchFilter();
           }}
         />
       )}
@@ -323,9 +313,7 @@ const Users = () => {
           user={selectedUser}
           onClose={() => {
             setEditModal(false);
-            getUsers();
-            setUserSearch("");
-            setSearchType("All");
+            clearSearchFilter();
           }}
         />
       )}
