@@ -5,16 +5,18 @@ import {
   ScrollView,
   Pressable,
 } from "react-native";
-import React, { useState, useEffect } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Feather, Ionicons } from "@expo/vector-icons";
+import React, { useEffect, useState } from "react";
 import { useUsers } from "@/context/UsersProvider";
-import { Image } from "expo-image";
-import { LinearGradient } from "expo-linear-gradient";
-import Loader from "../loader";
-import Modal from "../modal";
 import { useUrl } from "@/context/UrlProvider";
 import axios from "axios";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Loader from "@/components/loader";
+import Modal from "@/components/modal";
+import { Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image";
+import { LinearGradient } from "expo-linear-gradient";
+import FieldsEdit from "./FieldsEdit";
+import { useAdminHistory } from "@/context/AdminHistoryProvider";
 
 interface Item {
   _id: string;
@@ -57,21 +59,21 @@ interface user {
   };
 }
 
-const CheckoutModal = ({
+const PointsHistoryEdit = ({
   onClose,
-  reward,
+  historyId,
 }: {
   onClose: () => void;
-  reward: Item | null;
+  historyId: string;
 }) => {
   const { getUsers, users } = useUsers();
   const [loading, setLoading] = useState(false);
   const { ipAddress, port } = useUrl();
   const [userPoints, setUserPoints] = useState<{ [key: string]: number }>({});
-  const [message, setMessage] = useState("");
   const [selectedUser, setSelectedUser] = useState<user | null>(null);
   const [isError, setIsError] = useState(false);
-  const [visibleModal, setVisibleModal] = useState(false);
+  const [fieldsModal, setFieldsModal] = useState(false);
+  const { fetchAllPointsHistory } = useAdminHistory();
 
   const fetchData = async () => {
     setLoading(true);
@@ -127,31 +129,6 @@ const CheckoutModal = ({
     }
   }, [users]);
 
-  const redeemItem = async (userId: string, rewardId: string) => {
-    if (userId) {
-      try {
-        const response = await axios.post(
-          `http://${ipAddress}:${port}/api/history/claim`,
-          {
-            userId: userId,
-            rewardId: rewardId,
-          }
-        );
-
-        if (response.status === 200) {
-          setMessage(response.data.message);
-          setVisibleModal(true);
-        } else {
-          setMessage(response.data.message);
-        }
-      } catch (error) {
-        console.log(error);
-        setIsError(true);
-        setMessage("An error occurred!");
-      }
-    }
-  };
-
   const getUserPoints = (userId: string) => {
     return userPoints[userId] !== undefined ? userPoints[userId] : 0;
   };
@@ -170,7 +147,7 @@ const CheckoutModal = ({
               <Ionicons name="chevron-back" size={18} />
             </View>
           </TouchableHighlight>
-          <Text className="text-xl font-semibold">Checkout</Text>
+          <Text className="text-xl font-semibold">Choose User</Text>
         </View>
         {/* Header */}
         <View className="w-full flex items-start justify-center py-4">
@@ -178,7 +155,7 @@ const CheckoutModal = ({
             Select User
           </Text>
           <Text className="text-xs font-normal text-black/50" numberOfLines={1}>
-            please select a user to continue the checkout
+            please select a user to continue
           </Text>
         </View>
         <ScrollView
@@ -194,7 +171,7 @@ const CheckoutModal = ({
                 {/* Image */}
                 <View className="h-[60px] w-[60px] rounded-3xl bg-black overflow-hidden">
                   <Image
-                    source={require("../../assets/images/Man.jpg")}
+                    source={require("../../../../assets/images/Man.jpg")}
                     className="w-full h-full"
                   />
                 </View>
@@ -225,7 +202,7 @@ const CheckoutModal = ({
                 <Pressable
                   onPress={() => {
                     setSelectedUser(user);
-                    redeemItem(user._id, reward?._id || "");
+                    setFieldsModal(true);
                   }}
                 >
                   <LinearGradient
@@ -246,22 +223,19 @@ const CheckoutModal = ({
         </ScrollView>
       </SafeAreaView>
       {loading && <Loader />}
-      {visibleModal && (
-        <Modal
-          icon="redeem"
-          header="redeem"
-          isVisible={visibleModal}
-          message={message}
+      {fieldsModal && (
+        <FieldsEdit
           onClose={() => {
-            setVisibleModal(false);
-            if (!isError) {
-              onClose();
-            }
+            setFieldsModal(false);
+            onClose();
+            fetchAllPointsHistory();
           }}
+          historyId={historyId}
+          user={selectedUser}
         />
       )}
     </>
   );
 };
 
-export default CheckoutModal;
+export default PointsHistoryEdit;

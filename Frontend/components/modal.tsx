@@ -22,7 +22,7 @@ const Modal = ({
       <View className="flex items-center justify-center rounded-3xl shadow-xl bg-[#F0F0F0] shadow-black min-w-[20vw] max-w-[60vw] overflow-hidden">
         <View className="w-full flex flex-row items-center justify-between bg-white px-6 py-3">
           <Text className="text-xs font-semibold text-black">{header}</Text>
-          <Pressable onPress={onClose}>
+          <Pressable onPress={onClose} className="p-1">
             <Ionicons name="close-outline" size={16} />
           </Pressable>
         </View>
@@ -40,6 +40,8 @@ const Modal = ({
                     ? "account-alert-outline"
                     : icon === "profile"
                     ? "account-sync"
+                    : icon === "history"
+                    ? "clock-time-two-outline"
                     : "crosshairs-gps"
                 }
                 size={20}

@@ -19,6 +19,11 @@ import { useAdminHistory } from "@/context/AdminHistoryProvider";
 import { useUsers } from "@/context/UsersProvider";
 import { Image, ImageBackground } from "expo-image";
 import { useUrl } from "@/context/UrlProvider";
+import RewardHistoryAdd from "@/components/admin/history/rewards/RewardHistoryAdd";
+import RewardHistoryEdit from "@/components/admin/history/rewards/RewardHistoryEdit";
+import Modal from "@/components/modal";
+import PointsHistoryAdd from "@/components/admin/history/points/PointsHistoryAdd";
+import PointsHistoryEdit from "@/components/admin/history/points/PointsHistoryEdit";
 
 const History = () => {
   const { user } = useAuth();
@@ -38,7 +43,14 @@ const History = () => {
   const { users, getUsers } = useUsers();
   const { ipAddress, port } = useUrl();
   const [userSearch, setUserSearch] = useState("");
-  const [searchType, setSearchType] = useState(true); //true is rewards type search
+  const [searchType, setSearchType] = useState(true);
+  const [rewardAdd, setRewardAdd] = useState(false);
+  const [rewardEdit, setRewardEdit] = useState(false);
+  const [pointsAdd, setPointsAdd] = useState(false);
+  const [pointsEdit, setPointsEdit] = useState(false);
+  const [visibleModal, setVisibleModal] = useState(false);
+  const [rewardHistoryId, setRewardHistoryId] = useState("");
+  const [pointHistoryId, setPointHistoryId] = useState("");
 
   interface user {
     _id: string;
@@ -136,6 +148,49 @@ const History = () => {
     }
   };
 
+  const deleteRewardHistory = async (historyId: string) => {
+    setLoading(true);
+    try {
+      let url = `http://${ipAddress}:${port}/api/history/claim/${historyId}`;
+
+      let response = await axios.delete(url);
+
+      if (response.status === 200) {
+        setMessage(response.data.message);
+        setVisibleModal(true);
+        await fetchAllRewardsHistory();
+        setUserSearch("");
+      }
+    } catch (error: any) {
+      setMessage(error.response.data.message);
+      setVisibleModal(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deletePointHistory = async (historyId: string) => {
+    setLoading(true);
+
+    try {
+      let url = `http://${ipAddress}:${port}/api/history/dispose/${historyId}`;
+
+      let response = await axios.delete(url);
+
+      if (response.status === 200) {
+        setMessage(response.data.message);
+        setVisibleModal(true);
+        await fetchAllPointsHistory();
+        setUserSearch("");
+      }
+    } catch (error: any) {
+      setMessage(error.response.data.message);
+      setVisibleModal(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSearch = async (text: string) => {
     setUserSearch(text);
     setLoading(true);
@@ -204,11 +259,26 @@ const History = () => {
         >
           {/* Titlebar */}
           <View className="w-full flex items-center justify-center pt-4">
-            <View className="w-full flex items-start justify-center px-4 pb-4">
-              <Text className="text-xl font-semibold">Rewards History</Text>
-              <Text className="text-xs font-normal text-black/50">
-                all records of redeemed rewards
-              </Text>
+            <View className="w-full flex flex-row items-start justify-between px-4 pb-4">
+              <View className="w-3/4 flex items-start justify-center">
+                <Text className="text-xl font-semibold" numberOfLines={1}>
+                  Rewards History
+                </Text>
+                <Text
+                  className="text-xs font-normal text-black/50"
+                  numberOfLines={1}
+                >
+                  all records of redeemed rewards
+                </Text>
+              </View>
+              <View className="w-1/4 flex items-end justify-center">
+                <Pressable
+                  className="p-2 bg-[#050301] rounded-full"
+                  onPress={() => setRewardAdd(true)}
+                >
+                  <Feather name="plus" size={16} color={"white"} />
+                </Pressable>
+              </View>
             </View>
             <ScrollView
               horizontal
@@ -259,29 +329,54 @@ const History = () => {
                             <View className="flex flex-col h-full justify-between">
                               <View className="w-full flex flex-row items-start justify-between">
                                 <Text
-                                  className="text-xs font-normal text-white uppercase max-w-[60%]"
+                                  className="text-xs font-normal text-white uppercase max-w-[50%]"
                                   numberOfLines={1}
                                 >
                                   #{rewardHistory._id}
                                 </Text>
-                                <Text
-                                  className="text-xs font-normal text-white uppercase max-w-[20%]"
-                                  numberOfLines={1}
-                                >
-                                  {`${rewardHistory.pointsSpent} ${
-                                    rewardHistory.pointsSpent > 1
-                                      ? "pts."
-                                      : "pt."
-                                  }`}
-                                </Text>
+                                <View className="max-w-[40%] flex flex-row items-center justify-end">
+                                  <View className="py-3 px-4 rounded-full flex flex-row bg-[#050301]/50">
+                                    <Pressable
+                                      className="mr-4"
+                                      onPress={() => {
+                                        setRewardEdit(true);
+                                        setRewardHistoryId(rewardHistory._id);
+                                      }}
+                                    >
+                                      <Feather
+                                        name="edit-2"
+                                        size={16}
+                                        color={"white"}
+                                      />
+                                    </Pressable>
+                                    <Pressable
+                                      onPress={() =>
+                                        deleteRewardHistory(rewardHistory._id)
+                                      }
+                                    >
+                                      <Feather
+                                        name="trash"
+                                        size={16}
+                                        color={"white"}
+                                      />
+                                    </Pressable>
+                                  </View>
+                                </View>
                               </View>
                               <View className="w-full flex items-start justify-center">
-                                <View className="w-full flex items-start justify-center pb-4">
+                                <View className="w-full flex flex-row items-center justify-start pb-4">
                                   <Text
-                                    className="text-xl font-semibold text-white capitalize"
+                                    className="text-xl font-semibold text-white capitalize max-w-[60%]"
                                     numberOfLines={1}
                                   >
                                     {reward?.rewardName}
+                                  </Text>
+                                  <Text className="text-xs font-normal text-white/50 uppercase max-w-[30%] pl-2">
+                                    {`${rewardHistory.pointsSpent} ${
+                                      rewardHistory.pointsSpent > 1
+                                        ? "pts."
+                                        : "pt."
+                                    }`}
                                   </Text>
                                 </View>
                                 <View className="w-full overflow-hidden flex flex-row justify-start items-center">
@@ -297,7 +392,7 @@ const History = () => {
                                     </Text>
                                   </LinearGradient>
                                   <LinearGradient
-                                    className="flex items-center justify-center px-4 py-2 rounded-full max-w-[40%]"
+                                    className="flex items-center justify-center px-4 py-2 rounded-full max-w-[30%]"
                                     colors={["#00674F", "#06402B"]}
                                   >
                                     <Text
@@ -336,11 +431,26 @@ const History = () => {
             </ScrollView>
           </View>
           <View className="w-full flex items-center justify-center pt-6">
-            <View className="w-full flex items-start justify-center pb-4 px-4">
-              <Text className="text-xl font-semibold">Points History</Text>
-              <Text className="text-xs font-normal text-black/50">
-                all records of collected points
-              </Text>
+            <View className="w-full flex flex-row items-start justify-between px-4 pb-4">
+              <View className="w-3/4 flex items-start justify-center">
+                <Text className="text-xl font-semibold" numberOfLines={1}>
+                  Points History
+                </Text>
+                <Text
+                  className="text-xs font-normal text-black/50"
+                  numberOfLines={1}
+                >
+                  all records of collected points
+                </Text>
+              </View>
+              <View className="w-1/4 flex items-end justify-center">
+                <Pressable
+                  className="p-2 bg-[#050301] rounded-full"
+                  onPress={() => setPointsAdd(true)}
+                >
+                  <Feather name="plus" size={16} color={"white"} />
+                </Pressable>
+              </View>
             </View>
             <ScrollView
               horizontal
@@ -390,21 +500,39 @@ const History = () => {
                             <View className="flex flex-col h-full justify-between">
                               <View className="w-full flex flex-row items-start justify-between">
                                 <Text
-                                  className="text-xs font-normal text-white uppercase max-w-[60%]"
+                                  className="text-xs font-normal text-white uppercase max-w-[50%]"
                                   numberOfLines={1}
                                 >
                                   #{pointHistory._id}
                                 </Text>
-                                <Text
-                                  className="text-xs font-normal text-white uppercase max-w-[20%]"
-                                  numberOfLines={1}
-                                >
-                                  {`${pointHistory.pointsAccumulated} ${
-                                    pointHistory.pointsAccumulated > 1
-                                      ? "pts."
-                                      : "pt."
-                                  }`}
-                                </Text>
+                                <View className="max-w-[40%] flex flex-row items-center justify-end">
+                                  <View className="py-3 px-4 rounded-full flex flex-row bg-[#050301]/50">
+                                    <Pressable
+                                      className="pr-4"
+                                      onPress={() => {
+                                        setPointsEdit(true);
+                                        setPointHistoryId(pointHistory._id);
+                                      }}
+                                    >
+                                      <Feather
+                                        name="edit-2"
+                                        size={16}
+                                        color={"white"}
+                                      />
+                                    </Pressable>
+                                    <Pressable
+                                      onPress={() =>
+                                        deletePointHistory(pointHistory._id)
+                                      }
+                                    >
+                                      <Feather
+                                        name="trash"
+                                        size={16}
+                                        color={"white"}
+                                      />
+                                    </Pressable>
+                                  </View>
+                                </View>
                               </View>
                               <View className="w-full flex items-start justify-center">
                                 <View className="w-full flex items-start justify-center pb-4">
@@ -474,6 +602,49 @@ const History = () => {
         </ScrollView>
       </>
       {loading && <Loader />}
+      {rewardAdd && (
+        <RewardHistoryAdd
+          onClose={() => {
+            setRewardAdd(false);
+            setUserSearch("");
+          }}
+        />
+      )}
+      {pointsAdd && (
+        <PointsHistoryAdd
+          onClose={() => {
+            setPointsAdd(false);
+            setUserSearch("");
+          }}
+        />
+      )}
+      {rewardEdit && (
+        <RewardHistoryEdit
+          onClose={() => {
+            setRewardEdit(false);
+            setUserSearch("");
+          }}
+          historyId={rewardHistoryId}
+        />
+      )}
+      {pointsEdit && (
+        <PointsHistoryEdit
+          onClose={() => {
+            setPointsEdit(false);
+            setUserSearch("");
+          }}
+          historyId={pointHistoryId}
+        />
+      )}
+      {visibleModal && (
+        <Modal
+          header="History"
+          icon="history"
+          message={message}
+          isVisible={visibleModal}
+          onClose={() => setVisibleModal(false)}
+        />
+      )}
       <StatusBar style="auto" />
     </SafeAreaView>
   );

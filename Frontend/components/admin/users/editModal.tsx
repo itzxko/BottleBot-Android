@@ -11,9 +11,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import axios from "axios";
-import Modal from "../modal";
+import Modal from "../../modal";
 import { useUrl } from "@/context/UrlProvider";
-import Loader from "../loader";
+import Loader from "../../loader";
 
 interface user {
   _id: string;
@@ -76,6 +76,7 @@ const EditModal = ({
   const [level, setLevel] = useState("");
   const { ipAddress, port } = useUrl();
   const [loading, setLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
 
   useEffect(() => {
     if (user && user._id) {
@@ -149,12 +150,12 @@ const EditModal = ({
       if (response.status === 200) {
         setVisibleModal(true);
         setMessage(response.data.message);
-      } else {
-        setVisibleModal(true);
-        setMessage(response.data.message);
+        setIsError(false);
       }
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      setMessage(error.response.data.message);
+      setVisibleModal(true);
+      setIsError(true);
     } finally {
       setLoading(false);
     }
@@ -436,7 +437,9 @@ const EditModal = ({
           message={message}
           onClose={() => {
             setVisibleModal(false);
-            onClose();
+            if (!isError) {
+              onClose();
+            }
           }}
         />
       )}
