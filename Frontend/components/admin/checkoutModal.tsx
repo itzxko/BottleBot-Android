@@ -127,14 +127,8 @@ const CheckoutModal = ({
     }
   }, [users]);
 
-  const redeemItem = async ({
-    rewardId,
-    userId,
-  }: {
-    userId: string;
-    rewardId: string;
-  }) => {
-    if (selectedUser) {
+  const redeemItem = async (userId: string, rewardId: string) => {
+    if (userId) {
       try {
         const response = await axios.post(
           `http://${ipAddress}:${port}/api/history/claim`,
@@ -230,11 +224,8 @@ const CheckoutModal = ({
               <View className="w-2/12 flex items-center justify-center">
                 <Pressable
                   onPress={() => {
-                    redeemItem({
-                      userId: user._id,
-                      rewardId: reward?._id || "",
-                    });
                     setSelectedUser(user);
+                    redeemItem(user._id, reward?._id || "");
                   }}
                 >
                   <LinearGradient
