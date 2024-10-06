@@ -5,6 +5,7 @@ import {
   ScrollView,
   TextInput,
   Keyboard,
+  Pressable,
 } from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -13,8 +14,15 @@ import { StatusBar } from "expo-status-bar";
 import axios from "axios";
 import Modal from "../modal";
 import { useUrl } from "@/context/UrlProvider";
+import Loader from "../loader";
 
-const Usermodal = ({ onClose }: { onClose: () => void }) => {
+const Usermodal = ({
+  onClose,
+  accountLevel,
+}: {
+  onClose: () => void;
+  accountLevel: string;
+}) => {
   const [visibleModal, setVisibleModal] = useState(false);
   const [message, setMessage] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -33,11 +41,15 @@ const Usermodal = ({ onClose }: { onClose: () => void }) => {
   const [occupation, setOccupation] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [level, setLevel] = useState("");
+  const [level, setLevel] = useState("citizen");
   const { ipAddress, port } = useUrl();
+  const [loading, setLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [changeLevel, setChangeLevel] = useState(true);
 
   const registerUser = async () => {
     Keyboard.dismiss();
+    setLoading(true);
     try {
       let url = `http://${ipAddress}:${port}/api/users/register`;
 
@@ -74,12 +86,24 @@ const Usermodal = ({ onClose }: { onClose: () => void }) => {
       if (response.status === 200) {
         setVisibleModal(true);
         setMessage(response.data.message);
-      } else {
-        setVisibleModal(true);
-        setMessage(response.data.message);
+        setIsError(false);
       }
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      setVisibleModal(true);
+      setMessage(error.response.data.message);
+      setIsError(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLevelToggle = () => {
+    setChangeLevel(!changeLevel);
+
+    if (changeLevel) {
+      setLevel("staff");
+    } else {
+      setLevel("admin");
     }
   };
 
@@ -330,17 +354,35 @@ const Usermodal = ({ onClose }: { onClose: () => void }) => {
                   numberOfLines={1}
                   value={password}
                   onChangeText={setPassword}
+                  autoCapitalize="none"
                 ></TextInput>
               </View>
               <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl mb-2">
                 <Text className="text-xs font-semibold">Role</Text>
-                <TextInput
-                  className="text-xs font-normal max-w-[50%]"
-                  placeholder="user"
-                  numberOfLines={1}
-                  value={level}
-                  onChangeText={setLevel}
-                ></TextInput>
+                {accountLevel === "admin" ? (
+                  <View className="w-1/2 flex flex-row items-center justify-end ">
+                    <Text
+                      className="text-xs font-normal pr-1"
+                      numberOfLines={1}
+                    >
+                      {level}
+                    </Text>
+                    <Pressable
+                      onPress={handleLevelToggle}
+                      className="p-2 bg-black rounded-full"
+                    >
+                      <Feather name="rotate-cw" size={12} color={"white"} />
+                    </Pressable>
+                  </View>
+                ) : (
+                  <TextInput
+                    className="text-xs font-normal max-w-[50%]"
+                    placeholder="user"
+                    numberOfLines={1}
+                    value={level}
+                    editable={false}
+                  ></TextInput>
+                )}
               </View>
             </View>
           </View>
@@ -348,6 +390,8 @@ const Usermodal = ({ onClose }: { onClose: () => void }) => {
         </ScrollView>
       </SafeAreaView>
       <StatusBar style="auto" />
+      {loading && <Loader />}
+
       {visibleModal && (
         <Modal
           isVisible={visibleModal}
@@ -356,7 +400,10 @@ const Usermodal = ({ onClose }: { onClose: () => void }) => {
           message={message}
           onClose={() => {
             setVisibleModal(false);
-            onClose();
+
+            if (!isError) {
+              onClose();
+            }
           }}
         />
       )}

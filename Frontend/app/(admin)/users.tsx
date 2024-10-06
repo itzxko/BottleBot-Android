@@ -20,6 +20,7 @@ import { StatusBar } from "expo-status-bar";
 import EditModal from "@/components/admin/editModal";
 import { useUrl } from "@/context/UrlProvider";
 import { ImageBackground } from "expo-image";
+import { useAuth } from "@/context/AuthContext";
 
 const Users = () => {
   const [loading, setLoading] = useState(false);
@@ -34,6 +35,7 @@ const Users = () => {
   const { ipAddress, port } = useUrl();
   const [searchType, setSearchType] = useState("All");
   const [userSearch, setUserSearch] = useState("");
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -46,6 +48,7 @@ const Users = () => {
   }, []);
 
   const deleteUser = async (userId: string) => {
+    setLoading(true);
     try {
       let url = `http://${ipAddress}:${port}/api/users/${userId}`;
       let response = await axios.delete(url);
@@ -60,6 +63,8 @@ const Users = () => {
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -195,10 +200,10 @@ const Users = () => {
           showsVerticalScrollIndicator={false}
         >
           {users.length > 0 ? (
-            users.map((user: user) => (
+            users.map((mappedUser: user) => (
               <View
                 className="w-full h-[240px] flex items-center rounded-[32px] overflow-hidden justify-center mb-4"
-                key={user._id}
+                key={mappedUser._id}
               >
                 <ImageBackground
                   className="w-full h-full"
@@ -217,19 +222,25 @@ const Users = () => {
                     <View className="w-full h-full flex flex-col justify-between items-center">
                       <View className="w-full flex flex-row items-start justify-between">
                         <Text className="text-xs font-normal text-white/50 uppercase">
-                          {user.credentials.level}
+                          {mappedUser.credentials.level}
                         </Text>
-                        <Pressable onPress={() => deleteUser(user._id)}>
-                          <LinearGradient
-                            colors={["#FF0000", "#780606"]}
-                            className="p-2 rounded-full"
-                          >
-                            <Text className="hidden text-sm font-semibold text-white pr-1">
-                              Delete
-                            </Text>
-                            <Feather name="trash" size={16} color={"white"} />
-                          </LinearGradient>
-                        </Pressable>
+                        {(user?.credentials.level === "admin" &&
+                          user?._id !== mappedUser._id) ||
+                        (user?.credentials.level === "staff" &&
+                          mappedUser.credentials.level !== "admin" &&
+                          user._id !== mappedUser._id) ? (
+                          <Pressable onPress={() => deleteUser(mappedUser._id)}>
+                            <LinearGradient
+                              colors={["#FF0000", "#780606"]}
+                              className="p-2 rounded-full"
+                            >
+                              <Text className="hidden text-sm font-semibold text-white pr-1">
+                                Delete
+                              </Text>
+                              <Feather name="trash" size={16} color={"white"} />
+                            </LinearGradient>
+                          </Pressable>
+                        ) : null}
                       </View>
                       <View className="w-full flex items-start justify-center">
                         <View className="w-full pb-4">
@@ -237,14 +248,14 @@ const Users = () => {
                             className="text-xl font-semibold text-white"
                             numberOfLines={1}
                           >
-                            {`${user.personalInfo.firstName} ${user.personalInfo.lastName}`}
+                            {`${mappedUser.personalInfo.firstName} ${mappedUser.personalInfo.lastName}`}
                           </Text>
 
                           <Text
                             className="text-xs font-normal text-white/50 uppercase max-w-[60%]"
                             numberOfLines={1}
                           >
-                            #{user._id}
+                            #{mappedUser._id}
                           </Text>
                         </View>
                         <View className="w-full flex items-start justify-center">
@@ -252,7 +263,7 @@ const Users = () => {
                             className=""
                             onPress={() => {
                               setEditModal(true);
-                              setSelectedUser(user);
+                              setSelectedUser(mappedUser);
                             }}
                           >
                             <LinearGradient
@@ -302,6 +313,7 @@ const Users = () => {
       )}
       {userModal && (
         <Usermodal
+          accountLevel={user ? user.credentials.level : ""}
           onClose={() => {
             setUserModal(false);
             clearSearchFilter();
@@ -311,6 +323,7 @@ const Users = () => {
       {editModal && (
         <EditModal
           user={selectedUser}
+          accountLevel={user ? user.credentials.level : ""}
           onClose={() => {
             setEditModal(false);
             clearSearchFilter();

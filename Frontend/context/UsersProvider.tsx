@@ -9,6 +9,37 @@ export const UsersProvider = ({ children }: any) => {
   const [roles, setRoles] = useState([]);
   const { ipAddress, port } = useUrl();
 
+  interface user {
+    _id: string;
+    personalInfo: {
+      firstName: string;
+      lastName: string;
+      middleName: string;
+      dateOfBirth: Date;
+      gender: string;
+      civilStatus: string;
+      nationality: string;
+    };
+    contactInfo: {
+      address: {
+        houseNumber: number;
+        street: string;
+        barangay: string;
+        city: string;
+      };
+      phoneNumbers: [string];
+    };
+    economicInfo: {
+      employmentStatus: string;
+      occupation: string;
+    };
+    credentials: {
+      level: string;
+      email: string;
+      password: string;
+    };
+  }
+
   const getUsers = async () => {
     try {
       let url = `http://${ipAddress}:${port}/api/users/`;

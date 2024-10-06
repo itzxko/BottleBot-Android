@@ -54,10 +54,6 @@ const History: React.FC = () => {
   } = useHistory();
   const { ipAddress, port } = useUrl();
 
-  const toggleHistoryPage = () => {
-    setPointsPage(!pointsPage);
-  };
-
   useEffect(() => {
     const fetchRewards = async () => {
       try {
@@ -112,7 +108,7 @@ const History: React.FC = () => {
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            className="flex"
+            className="flex w-full"
           >
             {rewardsHistory.map(
               (rewardHistory: RewardHistory, index: number) => {
@@ -230,7 +226,7 @@ const History: React.FC = () => {
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            className="flex"
+            className="flex w-full"
           >
             {pointsHistory.map((pointHistory: PointHistory, index: number) => {
               const reward = redeemables.find(
