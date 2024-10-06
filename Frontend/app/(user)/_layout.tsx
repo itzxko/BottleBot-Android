@@ -18,13 +18,6 @@ const _layout = () => {
             }}
           />
           <Tabs.Screen
-            name="redeem"
-            options={{
-              headerShown: false,
-              title: "Redeem",
-            }}
-          />
-          <Tabs.Screen
             name="history"
             options={{
               headerShown: false,

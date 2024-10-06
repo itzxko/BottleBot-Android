@@ -17,7 +17,6 @@ import Loader from "@/components/loader";
 import { LinearGradient } from "expo-linear-gradient";
 import { useAdminHistory } from "@/context/AdminHistoryProvider";
 import { useUsers } from "@/context/UsersProvider";
-import { red } from "react-native-reanimated/lib/typescript/reanimated2/Colors";
 import { Image, ImageBackground } from "expo-image";
 import { useUrl } from "@/context/UrlProvider";
 
@@ -87,10 +86,6 @@ const History = () => {
     _id: string;
   }
 
-  const toggleHistoryPage = () => {
-    setPointsPage(!pointsPage);
-  };
-
   useEffect(() => {
     const fetchRewards = async () => {
       try {
@@ -114,15 +109,53 @@ const History = () => {
       } catch (error) {
         console.error("Error fetching data: ", error);
       } finally {
-        setLoading(false); // Ensure loading is set to false in both success and error cases
+        setLoading(false);
       }
     };
 
     fetchData();
   }, []);
 
-  const handleSearchType = () => {
-    setSearchType(!searchType);
+  const handleSearchType = async () => {
+    setLoading(true);
+
+    try {
+      setSearchType(!searchType);
+
+      if (searchType) {
+        await fetchAllRewardsHistory();
+        await searchPointHistory(userSearch);
+      } else {
+        await fetchAllPointsHistory();
+        await searchRewardHistory(userSearch);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSearch = async (text: string) => {
+    setUserSearch(text);
+    setLoading(true);
+
+    try {
+      if (text.trim() === "") {
+        await fetchAllPointsHistory();
+        await fetchAllRewardsHistory();
+      } else {
+        if (searchType) {
+          await searchRewardHistory(text);
+        } else {
+          await searchPointHistory(text);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -142,33 +175,25 @@ const History = () => {
         </View>
         <View className="w-full flex flex-row items-center justify-between px-4 py-4">
           <View className="w-full flex flex-row items-center justify-between pl-6 pr-4 py-3 rounded-full bg-[#E6E6E6]">
-            <View className="w-4/5 flex-row items-center justify-start">
+            <View className="w-6/12 flex-row items-center justify-start">
               <Feather name="search" size={16} color={"rgba(0, 0, 0, 0.5)"} />
               <TextInput
                 value={userSearch}
-                className="w-5/6 bg-[#E6E6E6] text-xs font-normal pl-2"
-                placeholder={
-                  searchType
-                    ? "search rewards history via user"
-                    : "search points history via user"
-                }
-                onChangeText={(text) => {
-                  setUserSearch(text);
-                  if (text.trim() === "") {
-                    fetchAllPointsHistory();
-                    fetchAllRewardsHistory();
-                  } else {
-                    searchType
-                      ? searchRewardHistory(userSearch)
-                      : searchPointHistory(userSearch);
-                  }
-                }}
+                className="w-full bg-[#E6E6E6] text-xs font-normal pl-2"
+                placeholder="search for a user's history"
+                onChangeText={handleSearch}
               />
             </View>
             <Pressable
-              className="p-2 flex items-center justify-center rounded-full bg-[#050301]"
+              className="w-4/12 px-4 py-2 flex flex-row items-center justify-between rounded-full bg-[#050301]"
               onPress={handleSearchType}
             >
+              <Text
+                className="text-xs font-normal text-white"
+                numberOfLines={1}
+              >
+                {searchType ? "Rewards" : "Points"}
+              </Text>
               <Feather name="rotate-cw" size={16} color={"white"} />
             </Pressable>
           </View>

@@ -13,6 +13,7 @@ import { StatusBar } from "expo-status-bar";
 import axios from "axios";
 import Modal from "../modal";
 import { useUrl } from "@/context/UrlProvider";
+import Loader from "../loader";
 
 interface user {
   _id: string;
@@ -46,9 +47,11 @@ interface user {
 }
 
 const EditModal = ({
+  accountLevel,
   user,
   onClose,
 }: {
+  accountLevel: string | null;
   user: user | null;
   onClose: () => void;
 }) => {
@@ -72,6 +75,7 @@ const EditModal = ({
   const [password, setPassword] = useState("");
   const [level, setLevel] = useState("");
   const { ipAddress, port } = useUrl();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (user && user._id) {
@@ -108,6 +112,7 @@ const EditModal = ({
 
   const updateUser = async () => {
     Keyboard.dismiss();
+    setLoading(true);
     try {
       let url = `http://${ipAddress}:${port}/api/users/${user?._id}`;
 
@@ -150,6 +155,8 @@ const EditModal = ({
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -400,6 +407,7 @@ const EditModal = ({
                   numberOfLines={1}
                   value={password}
                   onChangeText={setPassword}
+                  autoCapitalize="none"
                 ></TextInput>
               </View>
               <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl mb-2">
@@ -409,6 +417,7 @@ const EditModal = ({
                   placeholder="user"
                   numberOfLines={1}
                   value={level}
+                  editable={false}
                   onChangeText={setLevel}
                 ></TextInput>
               </View>
@@ -418,6 +427,7 @@ const EditModal = ({
         </ScrollView>
       </SafeAreaView>
       <StatusBar style="auto" />
+      {loading && <Loader />}
       {visibleModal && (
         <Modal
           isVisible={visibleModal}
