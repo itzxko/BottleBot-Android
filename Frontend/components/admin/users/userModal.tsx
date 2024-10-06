@@ -12,9 +12,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import axios from "axios";
-import Modal from "../modal";
+import Modal from "../../modal";
 import { useUrl } from "@/context/UrlProvider";
-import Loader from "../loader";
+import Loader from "../../loader";
 
 const Usermodal = ({
   onClose,

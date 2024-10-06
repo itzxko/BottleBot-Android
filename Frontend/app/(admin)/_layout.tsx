@@ -1,7 +1,7 @@
 import { View, Text } from "react-native";
 import React from "react";
 import { Tabs } from "expo-router";
-import { TabBar } from "@/components/admin/tabBar";
+import { TabBar } from "@/components/admin/Tab/tabBar";
 import { UsersProvider } from "@/context/UsersProvider";
 import { AdminHistoryProvider } from "@/context/AdminHistoryProvider";
 import { RewardsProvider } from "@/context/RewardsProvider";

@@ -2,24 +2,29 @@ import {
   View,
   Text,
   TouchableHighlight,
-  TextInput,
-  Pressable,
   ScrollView,
+  Pressable,
 } from "react-native";
-import React, { useState, useEffect } from "react";
-import { useRewards } from "@/context/RewardsProvider";
-import { StatusBar } from "expo-status-bar";
-import Loader from "@/components/loader";
+import React, { useEffect, useState } from "react";
 import { Feather, Ionicons } from "@expo/vector-icons";
-import { Image } from "expo-image";
-import { LinearGradient } from "expo-linear-gradient";
-import Modal from "@/components/modal";
-import { useUrl } from "@/context/UrlProvider";
 import { SafeAreaView } from "react-native-safe-area-context";
-import CheckoutModal from "@/components/admin/redeem/checkoutModal";
+import { StatusBar } from "expo-status-bar";
+import { useRewards } from "@/context/RewardsProvider";
+import { useUrl } from "@/context/UrlProvider";
 import { useAdminHistory } from "@/context/AdminHistoryProvider";
+import { Image } from "expo-image";
+import Modal from "@/components/modal";
+import { LinearGradient } from "expo-linear-gradient";
+import Loader from "@/components/loader";
+import ChooseUserEdit from "./ChooseUserEdit";
 
-const redeem = () => {
+const RewardHistoryEdit = ({
+  onClose,
+  historyId,
+}: {
+  onClose: () => void;
+  historyId: string;
+}) => {
   const { fetchRewards, filterRewards, rewards, categories } = useRewards();
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState("All");
@@ -27,7 +32,7 @@ const redeem = () => {
   const [visibleModal, setVisibleModal] = useState(false);
   const [message, setMessage] = useState("");
   const { ipAddress, port } = useUrl();
-  const [checkoutModal, setCheckoutModal] = useState(false);
+  const [chooseModal, setChooseModal] = useState(false);
   const [selectedReward, setSelectedReward] = useState<Item | null>(null);
   const { fetchAllRewardsHistory } = useAdminHistory();
 
@@ -40,6 +45,7 @@ const redeem = () => {
     rewardName: string;
     stocks: number;
   }
+
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -69,20 +75,21 @@ const redeem = () => {
 
   return (
     <>
-      <SafeAreaView className="flex-1 bg-[#F0F0F0]">
+      <SafeAreaView className="flex-1 w-full bg-[#F0F0F0] absolute top-0 left-0 right-0 bottom-0">
         <View className="relative w-full flex flex-row items-center justify-center p-4">
           <TouchableHighlight
             underlayColor={"#C9C9C9"}
             className="absolute left-4 rounded-full"
+            onPress={onClose}
           >
             <View className="p-2 bg-[#E1E1E1] rounded-full flex items-center justify-center">
               <Ionicons name="chevron-back" size={18} />
             </View>
           </TouchableHighlight>
-          <Text className="text-xl font-semibold">Redeem</Text>
+          <Text className="text-xl font-semibold">Add Reward History</Text>
         </View>
         <View className="w-full flex items-start justify-start pt-4 pb-2 px-4">
-          <Text className="text-xl font-semibold">Redeemable Items</Text>
+          <Text className="text-xl font-semibold">Choose Items</Text>
           <Text className="text-sm font-normal text-black/50">
             Choose a Reward of your choice
           </Text>
@@ -166,7 +173,7 @@ const redeem = () => {
                     className="flex items-center justify-center rounded-full"
                     underlayColor={"#41917F"}
                     onPress={() => {
-                      setCheckoutModal(true);
+                      setChooseModal(true);
                       setSelectedReward(item);
                     }}
                   >
@@ -191,14 +198,13 @@ const redeem = () => {
 
       <StatusBar style="auto" />
       {loading && <Loader />}
-      {checkoutModal && (
-        <CheckoutModal
+      {chooseModal && (
+        <ChooseUserEdit
+          historyId={historyId}
           onClose={() => {
-            setCheckoutModal(false);
-            fetchRewards();
+            setChooseModal(false);
+            onClose();
             fetchAllRewardsHistory();
-            setFilter("All");
-            setFiltered(false);
           }}
           reward={selectedReward}
         />
@@ -218,4 +224,4 @@ const redeem = () => {
   );
 };
 
-export default redeem;
+export default RewardHistoryEdit;
