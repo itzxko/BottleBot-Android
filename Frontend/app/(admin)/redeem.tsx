@@ -197,6 +197,8 @@ const redeem = () => {
             setCheckoutModal(false);
             fetchRewards();
             fetchAllRewardsHistory();
+            setFilter("All");
+            setFiltered(false);
           }}
           reward={selectedReward}
         />
