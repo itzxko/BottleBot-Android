@@ -197,7 +197,9 @@ const History: React.FC = () => {
                                       className="text-xs font-normal text-white"
                                       numberOfLines={1}
                                     >
-                                      {`${user.personalInfo.firstName} ${user.personalInfo.lastName}`}
+                                      {user?.personalInfo
+                                        ? `${user.personalInfo.firstName} ${user.personalInfo.lastName}`
+                                        : "Unknown User"}
                                     </Text>
                                   </LinearGradient>
                                   <LinearGradient
@@ -313,7 +315,9 @@ const History: React.FC = () => {
                                     className="text-xl font-semibold text-white capitalize"
                                     numberOfLines={1}
                                   >
-                                    {`${user.personalInfo.firstName} ${user.personalInfo.lastName}`}
+                                    {user?.personalInfo
+                                      ? `${user.personalInfo.firstName} ${user.personalInfo.lastName}`
+                                      : "Unknown User"}
                                   </Text>
                                 </View>
                                 <View className="w-full overflow-hidden flex flex-row justify-start items-center">
