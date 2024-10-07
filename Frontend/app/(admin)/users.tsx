@@ -68,10 +68,10 @@ const Users = () => {
     }
   };
 
-  const clearSearchFilter = () => {
+  const clearSearchFilter = async () => {
     setUserSearch("");
     setSearchType("All");
-    getUsers();
+    await getUsers();
   };
 
   interface user {
@@ -106,17 +106,43 @@ const Users = () => {
   }
 
   const handleSearchType = () => {
-    const newType =
-      searchType === "All"
-        ? "admin"
-        : searchType === "admin"
-        ? "staff"
-        : searchType === "staff"
-        ? "citizen"
-        : "All";
-    setSearchType(newType);
+    setLoading(true);
+    try {
+      const newType =
+        searchType === "All"
+          ? "admin"
+          : searchType === "admin"
+          ? "staff"
+          : searchType === "staff"
+          ? "citizen"
+          : "All";
+      setSearchType(newType);
 
-    filterUsers(newType, userSearch);
+      filterUsers(newType, userSearch);
+    } catch (error: any) {
+      console.log(error.response.data.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSearch = async (text: string) => {
+    setUserSearch(text);
+    setLoading(true);
+
+    try {
+      if (text.trim() === "") {
+        setUserSearch("");
+        setSearchType("All");
+        await getUsers();
+      } else {
+        await filterUsers(searchType, text);
+      }
+    } catch (error: any) {
+      console.log(error.response.data.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -153,16 +179,7 @@ const Users = () => {
                 className="w-full bg-[#E6E6E6] text-xs font-normal pl-2"
                 placeholder={"search users via username"}
                 value={userSearch}
-                onChangeText={(text) => {
-                  setUserSearch(text);
-                  {
-                    if (text.trim() === "") {
-                      clearSearchFilter();
-                    } else {
-                      filterUsers(searchType, text);
-                    }
-                  }
-                }}
+                onChangeText={handleSearch}
                 numberOfLines={1}
               />
             </View>
