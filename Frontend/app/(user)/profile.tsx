@@ -5,6 +5,7 @@ import {
   ScrollView,
   ImageBackground,
   TextInput,
+  Pressable,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useEffect, useState } from "react";
@@ -21,6 +22,36 @@ import Modal from "@/components/modal";
 import { useRouter } from "expo-router";
 import { useUrl } from "@/context/UrlProvider";
 
+interface user {
+  _id: string;
+  personalInfo: {
+    firstName: string;
+    lastName: string;
+    middleName: string;
+    dateOfBirth: Date;
+    gender: string;
+    civilStatus: string;
+    nationality: string;
+  };
+  contactInfo: {
+    address: {
+      houseNumber: number;
+      street: string;
+      barangay: string;
+      city: string;
+    };
+    phoneNumbers: [string];
+  };
+  economicInfo: {
+    employmentStatus: string;
+    occupation: string;
+  };
+  credentials: {
+    level: string;
+    email: string;
+    password: string;
+  };
+}
 const profile = () => {
   const [loading, setLoading] = useState(false);
   const [newPassword, setNewPassword] = useState("");
@@ -28,104 +59,142 @@ const profile = () => {
   const [visibleModal, setVisibleModal] = useState(false);
   const route = useRouter();
   const { ipAddress, port } = useUrl();
+  const { user, updateUser, logout } = useAuth();
+  const [isError, setIsError] = useState(false);
 
-  interface user {
-    _id: string;
-    personalInfo: {
-      firstName: string;
-      lastName: string;
-      gender: string;
-      nationality: string;
-      dateOfBirth: Date;
-    };
-    contactInfo: {
-      address: {
-        houseNumber: string;
-        brgy: string;
-        street: string;
-        city: string;
-      };
-      phoneNumbers: [string];
-    };
-    economicInfo: {
-      occupation: string;
-    };
-    credentials: {
-      email: string;
-      password: string;
-    };
-  }
+  //fields state of users
+  const [firstName, setFirstName] = useState("");
+  const [middleName, setMiddleName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [birthDate, setBirthDate] = useState("");
+  const [gender, setGender] = useState("");
+  const [civilStatus, setCivilStatus] = useState("");
+  const [nationality, setNationality] = useState("");
+  const [houseNumber, setHouseNumber] = useState("");
+  const [street, setStreet] = useState("");
+  const [brgy, setBrgy] = useState("");
+  const [city, setCity] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [employmentStatus, setEmploymentStatus] = useState("");
+  const [occupation, setOccupation] = useState("");
+  const [password, setPassword] = useState("");
+  const [level, setLevel] = useState("");
 
   const [edit, setEdit] = useState(false);
-  const { user, updateUser, logout } = useAuth();
   const navigation = useNavigation();
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
+
+  const setFieldsData = (user: user) => {
+    setFirstName(user?.personalInfo.firstName);
+    setMiddleName(user?.personalInfo.middleName);
+    setLastName(user?.personalInfo.lastName);
+    setBirthDate(formattedDate);
+    setGender(user?.personalInfo.gender);
+    setCivilStatus(user?.personalInfo.civilStatus);
+    setNationality(user?.personalInfo.nationality);
+    setHouseNumber(user?.contactInfo.address.houseNumber.toString());
+    setStreet(user?.contactInfo.address.street);
+    setBrgy(user?.contactInfo.address.barangay);
+    setCity(user?.contactInfo.address.city);
+    setPhoneNumber(user?.contactInfo.phoneNumbers[0]);
+    setEmploymentStatus(user?.economicInfo.employmentStatus);
+    setOccupation(user?.economicInfo.occupation);
+    setEmail(user.credentials.email);
+    setPassword(user?.credentials.password);
+    setLevel(user?.credentials.level);
+  };
 
   const handleLogout = () => {
     logout();
     route.push("/");
   };
 
-  const updatePassword = async () => {
+  const updateProfile = async () => {
+    setLoading(true);
     if (user) {
       try {
         let url = `http://${ipAddress}:${port}/api/users/${user._id}`;
 
         const response = await axios.put(url, {
           personalInfo: {
-            firstName: `${user.personalInfo.firstName}`,
-            middleName: `${user.personalInfo.middleName}`,
-            lastName: `${user.personalInfo.lastName}`,
-            dateOfBirth: `${user.personalInfo.dateOfBirth}`,
-            gender: `${user.personalInfo.gender}`,
-            civilStatus: `${user.personalInfo.civilStatus}`,
-            nationality: `${user.personalInfo.nationality}`,
+            firstName: firstName,
+            middleName: middleName,
+            lastName: lastName,
+            dateOfBirth: birthDate,
+            gender: gender,
+            civilStatus: civilStatus,
+            nationality: nationality,
           },
           contactInfo: {
             address: {
-              houseNumber: `${user.contactInfo.address.houseNumber}`,
-              street: `${user.contactInfo.address.street}`,
-              barangay: `${user.contactInfo.address.barangay}`,
-              city: `${user.contactInfo.address.city}`,
+              houseNumber: houseNumber,
+              street: street,
+              barangay: brgy,
+              city: city,
             },
-            phoneNumbers: `${user.contactInfo.phoneNumbers}`,
+            phoneNumbers: [phoneNumber],
           },
           economicInfo: {
-            employmentStatus: `${user.economicInfo.employmentStatus}`,
-            occupation: `${user.economicInfo.occupation}`,
+            employmentStatus: employmentStatus,
+            occupation: occupation,
           },
           credentials: {
-            email: `${user.credentials.email}`,
-            password: newPassword,
+            email: email,
+            password: password,
           },
         });
 
         if (response.status === 200) {
           setMessage(response.data.message);
           setVisibleModal(true);
-          setNewPassword("");
-
-          updateUser({
-            ...user,
-            credentials: {
-              ...user.credentials,
-              password: newPassword, // Update password
-            },
-          });
-        } else {
-          setMessage(response.data.message);
-          setVisibleModal(true);
-          setNewPassword("");
+          setIsError(false);
         }
-      } catch (error) {
-        const errorMessage =
-          (error as Error)?.message || "An unknown error occurred";
-
-        setMessage(errorMessage);
+      } catch (error: any) {
+        setMessage(error.response.data.message);
         setVisibleModal(true);
-        setNewPassword("");
+        setIsError(true);
+      } finally {
+        setLoading(false);
       }
     }
   };
+
+  const fetchUser = async () => {
+    setLoading(true);
+    if (user) {
+      try {
+        let url = `http://${ipAddress}:${port}/api/users/${user._id}`;
+
+        let response = await axios.get(url);
+
+        if (response.status === 200) {
+          updateUser(response.data.user);
+          setFieldsData(response.data.user);
+          console.log(user);
+        }
+      } catch (error: any) {
+        setMessage(error.response.data.message);
+        setVisibleModal(true);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const formattedDate = (() => {
+    if (!user || !user.personalInfo.dateOfBirth) {
+      return "loading...";
+    }
+
+    const date = new Date(user.personalInfo.dateOfBirth);
+    return isNaN(date.getTime())
+      ? "Invalid Date"
+      : date.toLocaleDateString("en-US"); // Format the date as needed
+  })();
 
   return (
     <>
@@ -172,25 +241,59 @@ const profile = () => {
                     : `${user.personalInfo.firstName} ${user.personalInfo.lastName}`}
                 </Text>
                 <View className="w-full flex flex-row justify-start items-center">
-                  <View className="rounded-full  mr-1">
+                  <View className="rounded-full  mr-1 max-w-[50%]">
                     <LinearGradient
                       colors={["#00674F", "#06402B"]}
                       className="flex items-center justify-center px-4 py-2 rounded-full"
                     >
-                      <Text className="text-xs text-white font-normal uppercase">
+                      <Text
+                        className="text-xs text-white font-normal uppercase"
+                        numberOfLines={1}
+                      >
                         {!user ? "loading..." : `#${user._id}`}
                       </Text>
                     </LinearGradient>
                   </View>
-                  <View className="bg-[#E1E1E1] rounded-xl mr-2">
+                  <View className="bg-[#E1E1E1] rounded-xl mr-2 max-w-[30%]">
                     <LinearGradient
                       colors={["#00674F", "#06402B"]}
                       className="flex items-center justify-center px-4 py-2 rounded-full"
                     >
-                      <Text className="text-xs text-white font-normal">
+                      <Text
+                        className="text-xs text-white font-normal"
+                        numberOfLines={1}
+                      >
                         {!user ? "loading..." : `${user.personalInfo.gender}`}
                       </Text>
                     </LinearGradient>
+                  </View>
+                  <View className="flex flex-row justify-start items-center">
+                    {!edit ? (
+                      <Pressable
+                        className="p-2 bg-[#050301] rounded-full"
+                        onPress={() => setEdit(true)}
+                      >
+                        <Feather name="edit-2" size={14} color={"white"} />
+                      </Pressable>
+                    ) : (
+                      <>
+                        <Pressable
+                          className="p-2 bg-[#050301] rounded-full mr-2"
+                          onPress={() => {
+                            fetchUser();
+                            setEdit(false);
+                          }}
+                        >
+                          <Feather name="x" size={14} color={"white"} />
+                        </Pressable>
+                        <Pressable
+                          className="p-2 bg-[#050301] rounded-full"
+                          onPress={updateProfile}
+                        >
+                          <Feather name="check" size={14} color={"white"} />
+                        </Pressable>
+                      </>
+                    )}
                   </View>
                 </View>
               </View>
@@ -207,7 +310,7 @@ const profile = () => {
                 name, birthday, nationality etc.
               </Text>
               {/* Cards */}
-              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-3xl p-5 mt-2">
+              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-1">
                     <Feather name="user" size={14} color={"rgba(0, 0, 0, 1)"} />
@@ -216,21 +319,21 @@ const profile = () => {
                     className="text-xs font-semibold text-black"
                     numberOfLines={1}
                   >
-                    User Name
+                    First Name
                   </Text>
                 </View>
                 <View className="w-1/2 flex items-end justify-center">
-                  <Text
-                    className="text-xs font-normal text-black"
+                  <TextInput
+                    className="w-full text-xs font-normal text-right"
                     numberOfLines={1}
-                  >
-                    {!user
-                      ? "loading..."
-                      : `${user.personalInfo.firstName} ${user.personalInfo.lastName}`}
-                  </Text>
+                    value={firstName}
+                    onChangeText={(text) => setFirstName(text)}
+                    placeholder="your firstname"
+                    editable={edit ? true : false}
+                  />
                 </View>
               </View>
-              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-3xl p-5 mt-2">
+              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-1">
                     <Feather name="mail" size={14} color={"rgba(0, 0, 0, 1)"} />
@@ -239,19 +342,44 @@ const profile = () => {
                     className="text-xs font-semibold text-black"
                     numberOfLines={1}
                   >
-                    E-mail
+                    Middle Name
                   </Text>
                 </View>
                 <View className="w-1/2 flex items-end justify-center">
-                  <Text
-                    className="text-xs font-normal text-black"
+                  <TextInput
+                    className="w-full text-xs font-normal text-right"
                     numberOfLines={1}
-                  >
-                    {!user ? "loading..." : `${user.credentials.email}`}
-                  </Text>
+                    value={middleName}
+                    onChangeText={(text) => setMiddleName(text)}
+                    placeholder="your middlename"
+                    editable={edit ? true : false}
+                  />
                 </View>
               </View>
-              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-3xl p-5 mt-2">
+              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
+                <View className="w-1/2 flex flex-row items-center justify-start">
+                  <View className="pr-1">
+                    <Feather name="mail" size={14} color={"rgba(0, 0, 0, 1)"} />
+                  </View>
+                  <Text
+                    className="text-xs font-semibold text-black"
+                    numberOfLines={1}
+                  >
+                    Last Name
+                  </Text>
+                </View>
+                <View className="w-1/2 flex items-end justify-center">
+                  <TextInput
+                    className="w-full text-xs font-normal text-right"
+                    numberOfLines={1}
+                    value={lastName}
+                    onChangeText={(text) => setLastName(text)}
+                    placeholder="your lastname"
+                    editable={edit ? true : false}
+                  />
+                </View>
+              </View>
+              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-1">
                     <Feather
@@ -268,22 +396,17 @@ const profile = () => {
                   </Text>
                 </View>
                 <View className="w-1/2 flex items-end justify-center">
-                  <Text
-                    className="text-xs font-normal text-black"
+                  <TextInput
+                    className="w-full text-xs font-normal text-right"
                     numberOfLines={1}
-                  >
-                    {!user || !user.personalInfo.dateOfBirth
-                      ? "loading..."
-                      : (() => {
-                          const date = new Date(user.personalInfo.dateOfBirth);
-                          return isNaN(date.getTime())
-                            ? "Invalid Date"
-                            : date.toLocaleDateString("en-US"); // Format the date as needed
-                        })()}
-                  </Text>
+                    value={birthDate}
+                    onChangeText={(text) => setBirthDate(text)}
+                    placeholder="yyyy-mm-dd"
+                    editable={edit ? true : false}
+                  />
                 </View>
               </View>
-              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-3xl p-5 mt-2">
+              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-1">
                     <Feather name="map" size={14} color={"rgba(0, 0, 0, 1)"} />
@@ -292,31 +415,77 @@ const profile = () => {
                     className="text-xs font-semibold text-black"
                     numberOfLines={1}
                   >
-                    Address
+                    Gender
                   </Text>
                 </View>
                 <View className="w-1/2 flex items-end justify-center">
+                  <TextInput
+                    className="w-full text-xs font-normal text-right"
+                    numberOfLines={1}
+                    value={gender}
+                    onChangeText={(text) => setGender(text)}
+                    placeholder="male or female"
+                    editable={edit ? true : false}
+                  />
+                </View>
+              </View>
+              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
+                <View className="w-1/2 flex flex-row items-center justify-start">
+                  <View className="pr-1">
+                    <Feather name="map" size={14} color={"rgba(0, 0, 0, 1)"} />
+                  </View>
                   <Text
-                    className="text-xs font-normal text-black capitalize"
+                    className="text-xs font-semibold text-black"
                     numberOfLines={1}
                   >
-                    {!user
-                      ? "loading..."
-                      : `${user.contactInfo.address.houseNumber} ${user.contactInfo.address.street} ${user.contactInfo.address.barangay}, ${user.contactInfo.address.city}`}
+                    Civil Status
                   </Text>
+                </View>
+                <View className="w-1/2 flex items-end justify-center">
+                  <TextInput
+                    className="w-full text-xs font-normal text-right"
+                    numberOfLines={1}
+                    value={civilStatus}
+                    onChangeText={(text) => setCivilStatus(text)}
+                    placeholder="your civil status"
+                    editable={edit ? true : false}
+                  />
+                </View>
+              </View>
+              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
+                <View className="w-1/2 flex flex-row items-center justify-start">
+                  <View className="pr-1">
+                    <Feather name="map" size={14} color={"rgba(0, 0, 0, 1)"} />
+                  </View>
+                  <Text
+                    className="text-xs font-semibold text-black"
+                    numberOfLines={1}
+                  >
+                    Nationality
+                  </Text>
+                </View>
+                <View className="w-1/2 flex items-end justify-center">
+                  <TextInput
+                    className="w-full text-xs font-normal text-right"
+                    numberOfLines={1}
+                    value={nationality}
+                    onChangeText={(text) => setNationality(text)}
+                    placeholder="your nationality"
+                    editable={edit ? true : false}
+                  />
                 </View>
               </View>
             </View>
             {/* Additional Information */}
             <View className="w-full flex items-start justify-center py-4">
               <Text className="text-lg font-semibold text-black">
-                Additional Information
+                Contact Information
               </Text>
               <Text className="text-xs font-normal text-black/50 pb-2">
                 phone number, address etc.
               </Text>
               {/* Cards */}
-              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-3xl p-5 mt-2">
+              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-1">
                     <Feather
@@ -329,19 +498,21 @@ const profile = () => {
                     className="text-xs font-semibold text-black"
                     numberOfLines={1}
                   >
-                    Phone Number
+                    House Number
                   </Text>
                 </View>
                 <View className="w-1/2 flex items-end justify-center">
-                  <Text
-                    className="text-xs font-normal text-black"
+                  <TextInput
+                    className="w-full text-xs font-normal text-right"
                     numberOfLines={1}
-                  >
-                    {!user ? "loading..." : `${user.contactInfo.phoneNumbers}`}
-                  </Text>
+                    value={houseNumber}
+                    onChangeText={(text) => setHouseNumber(text)}
+                    placeholder="house number"
+                    editable={edit ? true : false}
+                  />
                 </View>
               </View>
-              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-3xl p-5 mt-2">
+              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-1">
                     <Feather name="flag" size={14} color={"rgba(0, 0, 0, 1)"} />
@@ -350,19 +521,21 @@ const profile = () => {
                     className="text-xs font-semibold text-black"
                     numberOfLines={1}
                   >
-                    Nationality
+                    Street
                   </Text>
                 </View>
                 <View className="w-1/2 flex items-end justify-center">
-                  <Text
-                    className="text-xs font-normal text-black"
+                  <TextInput
+                    className="w-full text-xs font-normal text-right"
                     numberOfLines={1}
-                  >
-                    {!user ? "loading..." : `${user.personalInfo.nationality}`}
-                  </Text>
+                    value={street}
+                    onChangeText={(text) => setStreet(text)}
+                    placeholder="street"
+                    editable={edit ? true : false}
+                  />
                 </View>
               </View>
-              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-3xl p-5 mt-2">
+              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-1">
                     <MaterialIcons
@@ -375,23 +548,138 @@ const profile = () => {
                     className="text-xs font-semibold text-black"
                     numberOfLines={1}
                   >
+                    Barangay
+                  </Text>
+                </View>
+                <View className="w-1/2 flex items-end justify-center">
+                  <TextInput
+                    className="w-full text-xs font-normal text-right"
+                    numberOfLines={1}
+                    value={brgy}
+                    onChangeText={(text) => setBrgy(text)}
+                    placeholder="brgy number"
+                    editable={edit ? true : false}
+                  />
+                </View>
+              </View>
+              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
+                <View className="w-1/2 flex flex-row items-center justify-start">
+                  <View className="pr-1">
+                    <MaterialIcons
+                      name="work-outline"
+                      size={14}
+                      color={"rgba(0, 0, 0, 1)"}
+                    />
+                  </View>
+                  <Text
+                    className="text-xs font-semibold text-black"
+                    numberOfLines={1}
+                  >
+                    City
+                  </Text>
+                </View>
+                <View className="w-1/2 flex items-end justify-center">
+                  <TextInput
+                    className="w-full text-xs font-normal text-right"
+                    numberOfLines={1}
+                    value={city}
+                    onChangeText={(text) => setCity(text)}
+                    placeholder="city/municipality"
+                    editable={edit ? true : false}
+                  />
+                </View>
+              </View>
+              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
+                <View className="w-1/2 flex flex-row items-center justify-start">
+                  <View className="pr-1">
+                    <MaterialIcons
+                      name="work-outline"
+                      size={14}
+                      color={"rgba(0, 0, 0, 1)"}
+                    />
+                  </View>
+                  <Text
+                    className="text-xs font-semibold text-black"
+                    numberOfLines={1}
+                  >
+                    Phone Number
+                  </Text>
+                </View>
+                <View className="w-1/2 flex items-end justify-center">
+                  <TextInput
+                    className="w-full text-xs font-normal text-right"
+                    numberOfLines={1}
+                    value={phoneNumber}
+                    onChangeText={(text) => setPhoneNumber(text)}
+                    placeholder="your contact number"
+                    editable={edit ? true : false}
+                  />
+                </View>
+              </View>
+            </View>
+            <View className="w-full flex items-start justify-center py-4">
+              <Text className="text-lg font-semibold text-black">
+                Economic Information
+              </Text>
+              <Text className="text-xs font-normal text-black/50 pb-2">
+                employment and occupation
+              </Text>
+              {/* Cards */}
+              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
+                <View className="w-1/2 flex flex-row items-center justify-start">
+                  <View className="pr-1">
+                    <Feather
+                      name="smartphone"
+                      size={14}
+                      color={"rgba(0, 0, 0, 1)"}
+                    />
+                  </View>
+                  <Text
+                    className="text-xs font-semibold text-black"
+                    numberOfLines={1}
+                  >
+                    Employment Status
+                  </Text>
+                </View>
+                <View className="w-1/2 flex items-end justify-center">
+                  <TextInput
+                    className="w-full text-xs font-normal text-right"
+                    numberOfLines={1}
+                    value={employmentStatus}
+                    onChangeText={(text) => setEmploymentStatus(text)}
+                    placeholder="employed or what"
+                    editable={edit ? true : false}
+                  />
+                </View>
+              </View>
+              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
+                <View className="w-1/2 flex flex-row items-center justify-start">
+                  <View className="pr-1">
+                    <Feather name="flag" size={14} color={"rgba(0, 0, 0, 1)"} />
+                  </View>
+                  <Text
+                    className="text-xs font-semibold text-black"
+                    numberOfLines={1}
+                  >
                     Occupation
                   </Text>
                 </View>
                 <View className="w-1/2 flex items-end justify-center">
-                  <Text
-                    className="text-xs font-normal text-black"
+                  <TextInput
+                    className="w-full text-xs font-normal text-right"
                     numberOfLines={1}
-                  >
-                    {!user ? "loading..." : `${user.economicInfo.occupation}`}
-                  </Text>
+                    value={occupation}
+                    onChangeText={(text) => setOccupation(text)}
+                    placeholder="work"
+                    editable={edit ? true : false}
+                  />
                 </View>
               </View>
             </View>
             {/* Security */}
             <View className="w-full flex items-start justify-center py-4">
-              <View className="w-full flex flex-row items-center justify-between pb-2">
-                <View className="w-1/2 flex items-start justify-center">
+              <View className="w-full flex items-center justify-center pb-2">
+                <View className="w-full flex items-start justify-center py-2">
                   <Text className="text-lg font-semibold text-black">
                     Privacy and Security
                   </Text>
@@ -399,65 +687,85 @@ const profile = () => {
                     email, password & role
                   </Text>
                 </View>
-                {edit ? (
-                  <TouchableHighlight
-                    className="flex rounded-full"
-                    underlayColor={"#41917F"}
-                    onPress={() => {
-                      setEdit(false);
-                      updatePassword();
-                    }}
-                  >
-                    <View className="px-4 py-2 bg-[#00674F] rounded-full">
-                      <Text className="text-xs font-semibold text-white">
-                        Save
-                      </Text>
+                <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
+                  <View className="w-1/2 flex flex-row items-center justify-start">
+                    <View className="pr-1">
+                      <MaterialIcons
+                        name="work-outline"
+                        size={14}
+                        color={"rgba(0, 0, 0, 1)"}
+                      />
                     </View>
-                  </TouchableHighlight>
-                ) : (
-                  <TouchableHighlight
-                    className="flex rounded-full"
-                    underlayColor={"#41917F"}
-                    onPress={() => setEdit(true)}
-                  >
-                    <View className="px-4 py-2 bg-[#00674F] rounded-full">
-                      <Text className="text-xs font-semibold text-white">
-                        Edit
-                      </Text>
-                    </View>
-                  </TouchableHighlight>
-                )}
-              </View>
-              {/* Cards */}
-              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-3xl p-5 mt-2">
-                <View className="w-1/2 flex flex-row items-center justify-start">
-                  <View className="pr-1">
-                    <Feather name="key" size={14} color={"rgba(0, 0, 0, 1)"} />
-                  </View>
-                  <Text
-                    className="text-xs font-semibold text-black"
-                    numberOfLines={1}
-                  >
-                    Password
-                  </Text>
-                </View>
-                <View className="w-1/2 flex items-end justify-center">
-                  {edit ? (
-                    <TextInput
-                      className="text-xs font-normal text-black"
-                      placeholder="enter new password"
-                      autoCapitalize="none"
-                      onChangeText={setNewPassword}
-                      value={newPassword}
-                    ></TextInput>
-                  ) : (
                     <Text
-                      className="text-xs font-normal text-black"
+                      className="text-xs font-semibold text-black"
                       numberOfLines={1}
                     >
-                      {user?.credentials.password}
+                      Email
                     </Text>
-                  )}
+                  </View>
+                  <View className="w-1/2 flex items-end justify-center">
+                    <TextInput
+                      className="w-full text-xs font-normal text-right"
+                      numberOfLines={1}
+                      value={email}
+                      onChangeText={(text) => setEmail(text)}
+                      placeholder="email address"
+                      editable={edit ? true : false}
+                    />
+                  </View>
+                </View>
+                <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
+                  <View className="w-1/2 flex flex-row items-center justify-start">
+                    <View className="pr-1">
+                      <MaterialIcons
+                        name="work-outline"
+                        size={14}
+                        color={"rgba(0, 0, 0, 1)"}
+                      />
+                    </View>
+                    <Text
+                      className="text-xs font-semibold text-black"
+                      numberOfLines={1}
+                    >
+                      Password
+                    </Text>
+                  </View>
+                  <View className="w-1/2 flex items-end justify-center">
+                    <TextInput
+                      className="w-full text-xs font-normal text-right"
+                      numberOfLines={1}
+                      value={password}
+                      onChangeText={(text) => setPassword(text)}
+                      placeholder="your password"
+                      editable={edit ? true : false}
+                    />
+                  </View>
+                </View>
+                <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
+                  <View className="w-1/2 flex flex-row items-center justify-start">
+                    <View className="pr-1">
+                      <MaterialIcons
+                        name="work-outline"
+                        size={14}
+                        color={"rgba(0, 0, 0, 1)"}
+                      />
+                    </View>
+                    <Text
+                      className="text-xs font-semibold text-black"
+                      numberOfLines={1}
+                    >
+                      Level
+                    </Text>
+                  </View>
+                  <View className="w-1/2 flex items-end justify-center">
+                    <TextInput
+                      className="w-full text-xs font-normal text-right"
+                      numberOfLines={1}
+                      value={level}
+                      onChangeText={(text) => setLevel(text)}
+                      editable={false}
+                    />
+                  </View>
                 </View>
               </View>
             </View>
@@ -473,7 +781,13 @@ const profile = () => {
           message={message}
           header="Account Update"
           isVisible={visibleModal}
-          onClose={() => setVisibleModal(false)}
+          onClose={() => {
+            setVisibleModal(false);
+            if (!isError) {
+              setEdit(false);
+              fetchUser();
+            }
+          }}
           icon="profile"
         />
       )}

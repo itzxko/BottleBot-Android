@@ -14,38 +14,30 @@ export const UserHistoryProvider = ({ children }: any) => {
   }
 
   const fetchPointsHistory = async (user: user) => {
-    if (user) {
-      try {
-        let url = `http://${ipAddress}:${port}/api/history/dispose/${user._id}`;
-        let response = await axios.get(url);
-        if (response.status === 200) {
-          setPointsHistory(response.data.userdisposalhistory);
-        } else {
-          console.log(response.data.message);
-        }
-      } catch (error) {
-        console.log(error);
+    try {
+      let url = `http://${ipAddress}:${port}/api/history/dispose/${user._id}`;
+      let response = await axios.get(url);
+      if (response.status === 200) {
+        setPointsHistory(response.data.userdisposalhistory);
+      } else {
+        console.log(response.data.message);
       }
-    } else {
-      console.log("not user");
+    } catch (error) {
+      console.log(error);
     }
   };
 
   const fetchRewardsHistory = async (user: user) => {
-    if (user) {
-      try {
-        let url = `http://${ipAddress}:${port}/api/history/claim/${user._id}`;
-        let response = await axios.get(url);
-        if (response.status === 200) {
-          setRewardsHistory(response.data.userrewardclaimhistory);
-        } else {
-          console.log(response.data.message);
-        }
-      } catch (error) {
-        console.log(error);
+    try {
+      let url = `http://${ipAddress}:${port}/api/history/claim/${user._id}`;
+      let response = await axios.get(url);
+      if (response.status === 200) {
+        setRewardsHistory(response.data.userrewardclaimhistory);
+      } else {
+        console.log(response.data.message);
       }
-    } else {
-      console.log("not user");
+    } catch (error) {
+      console.log(error);
     }
   };
 
