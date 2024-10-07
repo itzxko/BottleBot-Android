@@ -106,7 +106,7 @@ const Dashboard = () => {
                   </View>
                   <View className="w-2/3 flex items-end justify-center">
                     <Text
-                      className="text-xs font-normal text-black/50"
+                      className="text-xs font-normal uppercase text-black/50"
                       numberOfLines={1}
                     >
                       {`Lat: ${mapRegion.latitude}, Long: ${mapRegion.longitude}`}
