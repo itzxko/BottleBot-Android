@@ -20,18 +20,17 @@ const _layout = () => {
               }}
             />
             <Tabs.Screen
+              name="monitor"
+              options={{
+                headerShown: false,
+                title: "Monitor",
+              }}
+            />
+            <Tabs.Screen
               name="redeem"
               options={{
                 headerShown: false,
                 title: "Redeem",
-              }}
-            />
-
-            <Tabs.Screen
-              name="rewards"
-              options={{
-                headerShown: false,
-                title: "Rewards",
               }}
             />
 

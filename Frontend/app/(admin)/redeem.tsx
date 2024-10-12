@@ -11,13 +11,15 @@ import { useRewards } from "@/context/RewardsProvider";
 import { StatusBar } from "expo-status-bar";
 import Loader from "@/components/loader";
 import { Feather, Ionicons } from "@expo/vector-icons";
-import { Image } from "expo-image";
+import { Image, ImageBackground } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import Modal from "@/components/modal";
 import { useUrl } from "@/context/UrlProvider";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CheckoutModal from "@/components/admin/redeem/checkoutModal";
 import { useAdminHistory } from "@/context/AdminHistoryProvider";
+import RewardsForm from "@/components/admin/redeem/rewardsForm";
+import axios from "axios";
 
 const redeem = () => {
   const { fetchRewards, filterRewards, rewards, categories } = useRewards();
@@ -28,8 +30,13 @@ const redeem = () => {
   const [message, setMessage] = useState("");
   const { ipAddress, port } = useUrl();
   const [checkoutModal, setCheckoutModal] = useState(false);
+  const [rewardsForm, setRewardsForm] = useState(false);
+  const [rewardId, setRewardId] = useState("");
   const [selectedReward, setSelectedReward] = useState<Item | null>(null);
   const { fetchAllRewardsHistory } = useAdminHistory();
+  const [clickedReward, setClickedReward] = useState<string | null>(null);
+  const [type, setType] = useState("add");
+  const [isError, setIsError] = useState(false);
 
   interface Item {
     _id: string;
@@ -67,6 +74,28 @@ const redeem = () => {
     }
   };
 
+  const deleteReward = async (rewardId: string) => {
+    setLoading(true);
+
+    try {
+      let url = `http://${ipAddress}:${port}/api/rewards/${rewardId}`;
+
+      let response = await axios.delete(url);
+
+      if (response.status === 200) {
+        setVisibleModal(true);
+        setIsError(false);
+        setMessage(response.data.message);
+      }
+    } catch (error: any) {
+      setVisibleModal(true);
+      setMessage(error.response.data.message);
+      setIsError(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <>
       <SafeAreaView className="flex-1 bg-[#F0F0F0]">
@@ -80,6 +109,18 @@ const redeem = () => {
             </View>
           </TouchableHighlight>
           <Text className="text-xl font-semibold">Redeem</Text>
+          <TouchableHighlight
+            underlayColor={"#C9C9C9"}
+            className="absolute right-4 rounded-full"
+            onPress={() => {
+              setType("add");
+              setRewardsForm(true);
+            }}
+          >
+            <View className="p-2 bg-[#E1E1E1] rounded-full flex items-center justify-center">
+              <Feather name="plus" size={18} />
+            </View>
+          </TouchableHighlight>
         </View>
         <View className="w-full flex items-start justify-start pt-4 pb-2 px-4">
           <Text className="text-xl font-semibold">Redeemable Items</Text>
@@ -140,12 +181,54 @@ const redeem = () => {
                 key={item._id}
               >
                 <View className="w-full h-[70%] flex items-center justify-center bg-gray-400 rounded-3xl overflow-hidden">
-                  <Image
+                  <ImageBackground
                     className="w-full flex-1"
                     source={{
                       uri: `http://192.168.254.139:8080/api/images/${item.image}`,
                     }}
-                  />
+                  >
+                    <Pressable
+                      className="flex-1 w-full items-center justify-center"
+                      onPress={() =>
+                        setClickedReward((prevReward) =>
+                          prevReward === item._id ? null : item._id
+                        )
+                      }
+                    >
+                      {clickedReward === item._id ? (
+                        <LinearGradient
+                          colors={[
+                            "rgba(31, 31, 31, 0.2)",
+                            "rgba(31, 31, 31, 0.8)",
+                          ]}
+                          className="w-full flex-1 flex-row items-center justify-center"
+                        >
+                          <View className="flex flex-row px-4 py-2 bg-[#050301]/50 rounded-3xl">
+                            <Pressable
+                              className="p-2"
+                              onPress={() => {
+                                setRewardId(item._id);
+                                setRewardsForm(true);
+                                setType("edit");
+                              }}
+                            >
+                              <Feather
+                                name="edit-2"
+                                size={16}
+                                color={"white"}
+                              />
+                            </Pressable>
+                            <Pressable
+                              className="p-2"
+                              onPress={() => deleteReward(item._id)}
+                            >
+                              <Feather name="trash" size={16} color={"white"} />
+                            </Pressable>
+                          </View>
+                        </LinearGradient>
+                      ) : null}
+                    </Pressable>
+                  </ImageBackground>
                 </View>
                 <View className="w-full px-1 py-3 flex flex-row items-center justify-between ">
                   <View className="max-w-[60%]">
@@ -191,6 +274,16 @@ const redeem = () => {
 
       <StatusBar style="auto" />
       {loading && <Loader />}
+      {rewardsForm && (
+        <RewardsForm
+          onClose={() => {
+            setRewardsForm(false);
+            setSelectedReward(null);
+          }}
+          rewardId={rewardId}
+          type={type}
+        />
+      )}
       {checkoutModal && (
         <CheckoutModal
           onClose={() => {
@@ -210,6 +303,10 @@ const redeem = () => {
           isVisible={visibleModal}
           onClose={() => {
             setVisibleModal(false);
+            if (!isError) {
+              fetchRewards();
+              fetchAllRewardsHistory();
+            }
           }}
           icon="redeem"
         />
