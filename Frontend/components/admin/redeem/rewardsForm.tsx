@@ -87,8 +87,9 @@ const RewardsForm = ({
   }, []);
 
   const addReward = async () => {
-    const formData = new FormData();
+    setLoading(true);
 
+    const formData = new FormData();
     formData.append("rewardName", rewardName);
     formData.append("rewardDescription", rewardDescription);
     formData.append("pointsRequired", pointsRequired.toString());
@@ -120,10 +121,14 @@ const RewardsForm = ({
       setVisibleModal(true);
       setIsError(true);
       setMessage(error.response.data.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   const updateReward = async () => {
+    setLoading(true);
+
     const formData = new FormData();
     formData.append("rewardName", rewardName);
     formData.append("rewardDescription", rewardDescription);
@@ -163,6 +168,8 @@ const RewardsForm = ({
       setVisibleModal(true);
       setIsError(true);
       setMessage(error.response.data.message);
+    } finally {
+      setLoading(false);
     }
   };
 
