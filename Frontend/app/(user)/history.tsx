@@ -82,8 +82,6 @@ const History: React.FC = () => {
     fetchData();
   }, []);
 
-  console.log(rewardsHistory);
-
   return (
     <SafeAreaView className="flex-1 bg-[#F0F0F0]">
       <>

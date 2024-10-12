@@ -174,7 +174,6 @@ const profile = () => {
         if (response.status === 200) {
           updateUser(response.data.user);
           setFieldsData(response.data.user);
-          console.log(user);
         }
       } catch (error: any) {
         setMessage(error.response.data.message);
@@ -234,8 +233,8 @@ const profile = () => {
                   source={require("../../assets/images/Man.jpg")}
                 ></ImageBackground>
               </View>
-              <View className="w-3/4 flex items-start justify-center py-2">
-                <Text className="text-lg font-semibold py-1">
+              <View className="w-full flex items-start justify-center py-2">
+                <Text className="text-lg font-semibold py-1" numberOfLines={1}>
                   {!user
                     ? "loading..."
                     : `${user.personalInfo.firstName} ${user.personalInfo.lastName}`}

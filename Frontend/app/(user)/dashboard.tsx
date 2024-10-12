@@ -44,7 +44,6 @@ const Dashboard = () => {
         latitudeDelta: 0.01, // Adjust this for zoom level
         longitudeDelta: 0.01, // Adjust this for zoom level
       });
-      console.log(location.coords.latitude, location.coords.longitude);
     } catch (error) {
       console.error("Error getting location:", error);
       alert("Unable to retrieve location. Please try again.");
