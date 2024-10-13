@@ -98,21 +98,26 @@ export default function Login() {
 
               <View className="w-full flex items-start justify-center py-6">
                 <Text className="font-semibold text-sm pb-2">Username:</Text>
-                <TextInput
-                  className="bg-[#E6E6E6]  w-full px-6 py-3 rounded-2xl text-sm"
-                  placeholder="Enter your email"
-                  onChangeText={setEmail}
-                  value={email}
-                  spellCheck={false}
-                  autoCapitalize="none"
-                />
+                <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl">
+                  <Feather name="user" size={16} />
+                  <TextInput
+                    className="text-xs font-normal w-[90%] text-left"
+                    placeholder="enter username"
+                    numberOfLines={1}
+                    value={email}
+                    onChangeText={setEmail}
+                    autoCapitalize="none"
+                  ></TextInput>
+                </View>
               </View>
 
               <View className="w-full flex items-start justify-center pb-6">
                 <Text className="font-semibold text-sm pb-2">Password:</Text>
-                <View className="flex flex-row items-center justify-center w-full bg-[#E6E6E6]  px-8 py-3 rounded-2xl">
+                <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl">
+                  <Feather name="lock" size={16} />
                   <TextInput
-                    className="bg-[#E6E6E6] w-full text-sm"
+                    className="text-xs font-normal w-[80%] text-left"
+                    numberOfLines={1}
                     placeholder="Enter your password"
                     textContentType={"password"}
                     secureTextEntry={hidePass ? true : false}
@@ -122,7 +127,7 @@ export default function Login() {
                     autoCapitalize="none"
                   />
                   <Feather
-                    name={hidePass ? "eye-off" : "eye"}
+                    name={hidePass ? "eye" : "eye-off"}
                     size={16}
                     onPress={togglePassword}
                   />
@@ -137,7 +142,7 @@ export default function Login() {
 
               <View className="w-full flex items-center justify-center py-6">
                 <TouchableHighlight
-                  className="w-full flex items-center justify-center rounded-2xl"
+                  className="w-full flex items-center justify-center rounded-xl"
                   onPress={onLogin}
                   underlayColor={"#41917F"}
                 >
@@ -145,9 +150,9 @@ export default function Login() {
                     colors={["#00674F", "#06402B"]}
                     start={{ x: 0, y: 1 }}
                     end={{ x: 1, y: 0 }}
-                    className="w-full  rounded-2xl shadow shadow-[#050301]"
+                    className="w-full  rounded-xl shadow shadow-[#050301]"
                   >
-                    <Text className="flex py-[16px] bg-transparent text-center text-sm text-white font-semibold">
+                    <Text className="flex py-[16px] bg-transparent text-center text-xs text-white font-semibold">
                       Login
                     </Text>
                   </LinearGradient>
