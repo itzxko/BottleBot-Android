@@ -9,12 +9,16 @@ import {
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
-import { MaterialIcons, Octicons } from "@expo/vector-icons";
+import { Feather, MaterialIcons, Octicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import Loader from "@/components/loader";
+import { useQueue } from "@/context/QueueProvider";
+import { useAuth } from "@/context/AuthContext";
 
 const Dashboard = () => {
   const startNavigation = () => {};
+  const { addtoQueue, fetchQueue } = useQueue();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [mapRegion, setMapRegion] = useState({
     latitude: 14.680105493791455,
@@ -54,6 +58,7 @@ const Dashboard = () => {
     const getUserLocation = async () => {
       setLoading(true);
       await userLocation();
+      await fetchQueue();
       setLoading(false);
     };
 
@@ -84,70 +89,75 @@ const Dashboard = () => {
 
             <View className="absolute flex items-center rounded-t-3xl justify-center w-full left-0 bottom-0 bg-[#F0F0F0] ">
               <View className="w-full flex items-center justify-center px-4 py-8">
-                <View className="w-full flex items-center justify-center pb-4">
+                {/* Header */}
+                <View className="w-full flex items-center justify-center pb-6">
                   <Text className="font-bold text-lg">Dashboard</Text>
                   <Text className="font-normal text-xs text-black/50">
                     Allow location access to provide accurate data
                   </Text>
                 </View>
-
-                <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-3xl p-5">
-                  <View className="w-1/3 flex flex-row items-center justify-start">
-                    <View className="pr-2">
-                      <Octicons name="location" size={14} />
-                    </View>
+                {/* BottleBot */}
+                <View className="w-full flex flex-row items-center justify-between pl-2 pr-6 py-2 bg-[#E6E6E6] rounded-xl mb-2">
+                  <View className="max-w-[50%] flex flex-row items-center justify-start px-4 py-2.5 rounded-lg bg-[#050301]">
+                    <Pressable>
+                      <Feather name="navigation-2" size={16} color={"white"} />
+                    </Pressable>
                     <Text
-                      className="text-xs font-semibold text-black"
+                      className="text-xs font-semibold text-white pl-2"
                       numberOfLines={1}
                     >
-                      BottleBot
+                      BottleBot Location
                     </Text>
                   </View>
-                  <View className="w-2/3 flex items-end justify-center">
-                    <Text
-                      className="text-xs font-normal uppercase text-black/50"
-                      numberOfLines={1}
-                    >
-                      {`Lat: ${mapRegion.latitude}, Long: ${mapRegion.longitude}`}
-                    </Text>
-                  </View>
+                  <TextInput
+                    className="text-xs font-normal max-w-[50%] text-right"
+                    placeholder="single"
+                    numberOfLines={1}
+                    value={`${mapRegion.latitude.toString()}, ${mapRegion.longitude.toString()}`}
+                  ></TextInput>
                 </View>
-
-                <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-3xl p-5 mt-2">
-                  <View className="w-1/3 flex flex-row items-center justify-start">
-                    <View className="pr-2">
-                      <MaterialIcons name="location-history" size={16} />
-                    </View>
+                {/* User */}
+                <View className="w-full flex flex-row items-center justify-between pl-2 pr-6 py-2 bg-[#E6E6E6] rounded-xl mb-2">
+                  <View className="max-w-[50%] flex flex-row items-center justify-start px-4 py-2.5 rounded-lg bg-[#050301]">
+                    <Pressable>
+                      <Feather name="navigation-2" size={16} color={"white"} />
+                    </Pressable>
                     <Text
-                      className="text-xs font-semibold text-black"
+                      className="text-xs font-semibold text-white pl-2"
                       numberOfLines={1}
                     >
-                      User (You)
+                      Your Location
                     </Text>
                   </View>
-                  <View className="w-2/3 flex items-end justify-center">
-                    <Text
-                      className="text-xs font-normal uppercase text-black/50"
-                      numberOfLines={1}
-                    >
-                      {`Lat: ${mapRegion.latitude}, Long: ${mapRegion.longitude}`}
-                    </Text>
-                  </View>
+                  <TextInput
+                    className="text-xs font-normal max-w-[50%] text-right"
+                    placeholder="single"
+                    numberOfLines={1}
+                    value={`${mapRegion.latitude.toString()}, ${mapRegion.longitude.toString()}`}
+                  ></TextInput>
                 </View>
 
                 <View className="w-full flex items-center justify-center py-4">
                   <TouchableHighlight
-                    className="w-full flex items-center justify-center rounded-3xl"
+                    className="w-full flex items-center justify-center rounded-xl"
                     underlayColor={"#41917F"}
-                    onPress={startNavigation}
+                    onPress={() =>
+                      addtoQueue({
+                        userId: user?._id,
+                        lon: mapRegion.longitude,
+                        lat: mapRegion.latitude,
+                        locationName: "shitty place",
+                        status: "pending",
+                      })
+                    }
                   >
                     <LinearGradient
                       colors={["#00674F", "#06402B"]}
                       start={{ x: 0, y: 1 }}
                       end={{ x: 1, y: 0 }}
-                      className="w-full  rounded-3xl shadow shadow-[#050301]"
+                      className="w-full  rounded-xl shadow shadow-[#050301]"
                     >
-                      <Text className="flex py-[17px] bg-transparent text-center text-sm text-white font-semibold">
+                      <Text className="flex py-3.5 bg-transparent text-center text-sm text-white font-semibold">
                         Start Navigation
                       </Text>
                     </LinearGradient>

@@ -28,7 +28,6 @@ const redeem = () => {
   const [filtered, setFiltered] = useState(false);
   const [visibleModal, setVisibleModal] = useState(false);
   const [message, setMessage] = useState("");
-  const { ipAddress, port } = useUrl();
   const [checkoutModal, setCheckoutModal] = useState(false);
   const [rewardsForm, setRewardsForm] = useState(false);
   const [rewardId, setRewardId] = useState("");
@@ -83,28 +82,6 @@ const redeem = () => {
       setFilter(category);
       setFiltered(true);
       await filterRewards(category);
-    }
-  };
-
-  const deleteReward = async (rewardId: string) => {
-    setLoading(true);
-
-    try {
-      let url = `http://${ipAddress}:${port}/api/rewards/${rewardId}`;
-
-      let response = await axios.delete(url);
-
-      if (response.status === 200) {
-        setVisibleModal(true);
-        setIsError(false);
-        setMessage(response.data.message);
-      }
-    } catch (error: any) {
-      setVisibleModal(true);
-      setMessage(error.response.data.message);
-      setIsError(true);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -229,12 +206,6 @@ const redeem = () => {
                                 size={16}
                                 color={"white"}
                               />
-                            </Pressable>
-                            <Pressable
-                              className="p-2"
-                              onPress={() => deleteReward(item._id)}
-                            >
-                              <Feather name="trash" size={16} color={"white"} />
                             </Pressable>
                           </View>
                         </LinearGradient>

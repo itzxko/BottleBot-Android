@@ -243,7 +243,7 @@ const profile = () => {
                   <View className="rounded-full  mr-1 max-w-[50%]">
                     <LinearGradient
                       colors={["#00674F", "#06402B"]}
-                      className="flex items-center justify-center px-4 py-2 rounded-full"
+                      className="flex items-center justify-center px-4 py-2 rounded-xl"
                     >
                       <Text
                         className="text-xs text-white font-normal uppercase"
@@ -256,7 +256,7 @@ const profile = () => {
                   <View className="bg-[#E1E1E1] rounded-xl mr-2 max-w-[30%]">
                     <LinearGradient
                       colors={["#00674F", "#06402B"]}
-                      className="flex items-center justify-center px-4 py-2 rounded-full"
+                      className="flex items-center justify-center px-4 py-2 rounded-xl"
                     >
                       <Text
                         className="text-xs text-white font-normal"

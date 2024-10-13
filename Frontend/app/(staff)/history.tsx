@@ -29,7 +29,6 @@ import { useRewards } from "@/context/RewardsProvider";
 const History = () => {
   const { user } = useAuth();
   const { fetchRewards, rewards } = useRewards();
-  const [pointsPage, setPointsPage] = useState(false);
   const navigation = useNavigation();
   const [message, setMessage] = useState("");
   const [redeemables, setRedeemables] = useState<RedeemableItem[]>([]);
@@ -44,16 +43,10 @@ const History = () => {
     fetchAllHistory,
   } = useAdminHistory();
   const { users, getUsers } = useUsers();
-  const { ipAddress, port } = useUrl();
   const [userSearch, setUserSearch] = useState("");
   const [searchType, setSearchType] = useState(true);
   const [rewardAdd, setRewardAdd] = useState(false);
-  const [rewardEdit, setRewardEdit] = useState(false);
-  const [pointsAdd, setPointsAdd] = useState(false);
-  const [pointsEdit, setPointsEdit] = useState(false);
   const [visibleModal, setVisibleModal] = useState(false);
-  const [rewardHistoryId, setRewardHistoryId] = useState("");
-  const [pointHistoryId, setPointHistoryId] = useState("");
 
   interface user {
     _id: string;
@@ -133,49 +126,6 @@ const History = () => {
       }
     } catch (error) {
       console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const deleteRewardHistory = async (historyId: string) => {
-    setLoading(true);
-    try {
-      let url = `http://${ipAddress}:${port}/api/history/claim/${historyId}`;
-
-      let response = await axios.delete(url);
-
-      if (response.status === 200) {
-        setMessage(response.data.message);
-        setVisibleModal(true);
-        await fetchAllRewardsHistory();
-        setUserSearch("");
-      }
-    } catch (error: any) {
-      setMessage(error.response.data.message);
-      setVisibleModal(true);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const deletePointHistory = async (historyId: string) => {
-    setLoading(true);
-
-    try {
-      let url = `http://${ipAddress}:${port}/api/history/dispose/${historyId}`;
-
-      let response = await axios.delete(url);
-
-      if (response.status === 200) {
-        setMessage(response.data.message);
-        setVisibleModal(true);
-        await fetchAllPointsHistory();
-        setUserSearch("");
-      }
-    } catch (error: any) {
-      setMessage(error.response.data.message);
-      setVisibleModal(true);
     } finally {
       setLoading(false);
     }
@@ -324,34 +274,6 @@ const History = () => {
                                 >
                                   #{rewardHistory._id}
                                 </Text>
-                                <View className="max-w-[40%] flex flex-row items-center justify-end">
-                                  <View className="py-3 px-4 rounded-full flex flex-row bg-[#050301]/50">
-                                    <Pressable
-                                      className="mr-4"
-                                      onPress={() => {
-                                        setRewardEdit(true);
-                                        setRewardHistoryId(rewardHistory._id);
-                                      }}
-                                    >
-                                      <Feather
-                                        name="edit-2"
-                                        size={16}
-                                        color={"white"}
-                                      />
-                                    </Pressable>
-                                    <Pressable
-                                      onPress={() =>
-                                        deleteRewardHistory(rewardHistory._id)
-                                      }
-                                    >
-                                      <Feather
-                                        name="trash"
-                                        size={16}
-                                        color={"white"}
-                                      />
-                                    </Pressable>
-                                  </View>
-                                </View>
                               </View>
                               <View className="w-full flex items-start justify-center">
                                 <View className="w-full flex flex-row items-center justify-start pb-4">
@@ -433,14 +355,6 @@ const History = () => {
                   all records of collected points
                 </Text>
               </View>
-              <View className="w-1/4 flex items-end justify-center">
-                <Pressable
-                  className="p-2 bg-[#050301] rounded-full"
-                  onPress={() => setPointsAdd(true)}
-                >
-                  <Feather name="plus" size={16} color={"white"} />
-                </Pressable>
-              </View>
             </View>
             <ScrollView
               horizontal
@@ -450,7 +364,7 @@ const History = () => {
               {pointsHistory.length > 0 ? (
                 pointsHistory.map(
                   (pointHistory: PointsHistory, index: number) => {
-                    const reward = redeemables.find(
+                    const reward = rewards.find(
                       (reward: RedeemableItem) => reward._id === "hehe"
                     );
 
@@ -495,34 +409,6 @@ const History = () => {
                                 >
                                   #{pointHistory._id}
                                 </Text>
-                                <View className="max-w-[40%] flex flex-row items-center justify-end">
-                                  <View className="py-3 px-4 rounded-full flex flex-row bg-[#050301]/50">
-                                    <Pressable
-                                      className="pr-4"
-                                      onPress={() => {
-                                        setPointsEdit(true);
-                                        setPointHistoryId(pointHistory._id);
-                                      }}
-                                    >
-                                      <Feather
-                                        name="edit-2"
-                                        size={16}
-                                        color={"white"}
-                                      />
-                                    </Pressable>
-                                    <Pressable
-                                      onPress={() =>
-                                        deletePointHistory(pointHistory._id)
-                                      }
-                                    >
-                                      <Feather
-                                        name="trash"
-                                        size={16}
-                                        color={"white"}
-                                      />
-                                    </Pressable>
-                                  </View>
-                                </View>
                               </View>
                               <View className="w-full flex items-start justify-center">
                                 <View className="w-full flex items-start justify-center pb-4">
@@ -598,32 +484,6 @@ const History = () => {
             setRewardAdd(false);
             setUserSearch("");
           }}
-        />
-      )}
-      {pointsAdd && (
-        <PointsHistoryAdd
-          onClose={() => {
-            setPointsAdd(false);
-            setUserSearch("");
-          }}
-        />
-      )}
-      {rewardEdit && (
-        <RewardHistoryEdit
-          onClose={() => {
-            setRewardEdit(false);
-            setUserSearch("");
-          }}
-          historyId={rewardHistoryId}
-        />
-      )}
-      {pointsEdit && (
-        <PointsHistoryEdit
-          onClose={() => {
-            setPointsEdit(false);
-            setUserSearch("");
-          }}
-          historyId={pointHistoryId}
         />
       )}
       {visibleModal && (

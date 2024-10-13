@@ -9,6 +9,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons, Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import axios from "axios";
 import Loader from "@/components/loader";
@@ -16,7 +17,7 @@ import Modal from "@/components/modal";
 import Usermodal from "@/components/admin/users/userModal";
 import { useUsers } from "@/context/UsersProvider";
 import { StatusBar } from "expo-status-bar";
-import EditModal from "@/components/admin/users/editModal";
+import ViewModal from "@/components/staff/users/viewModal";
 import { useUrl } from "@/context/UrlProvider";
 import { ImageBackground } from "expo-image";
 import { useAuth } from "@/context/AuthContext";
@@ -30,7 +31,7 @@ const Users = () => {
   const [message, setMessage] = useState("");
   const [visibleModal, setVisibleModal] = useState(false);
   const { getUsers, users, roles, filterUsers } = useUsers();
-  const [editModal, setEditModal] = useState(false);
+  const [viewModal, setViewModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState<user | null>(null);
   const { ipAddress, port } = useUrl();
   const [searchType, setSearchType] = useState("All");
@@ -246,20 +247,6 @@ const Users = () => {
                         <Text className="text-xs font-normal text-white/50 uppercase">
                           {mappedUser.credentials.level}
                         </Text>
-                        {user?.credentials.level === "admin" &&
-                        user?._id !== mappedUser._id ? (
-                          <Pressable onPress={() => deleteUser(mappedUser._id)}>
-                            <LinearGradient
-                              colors={["#FF0000", "#780606"]}
-                              className="p-2 rounded-full"
-                            >
-                              <Text className="hidden text-sm font-semibold text-white pr-1">
-                                Delete
-                              </Text>
-                              <Feather name="trash" size={16} color={"white"} />
-                            </LinearGradient>
-                          </Pressable>
-                        ) : null}
                       </View>
                       <View className="w-full flex items-start justify-center">
                         <View className="w-full pb-4">
@@ -281,7 +268,7 @@ const Users = () => {
                           <Pressable
                             className=""
                             onPress={() => {
-                              setEditModal(true);
+                              setViewModal(true);
                               setSelectedUser(mappedUser);
                             }}
                           >
@@ -290,7 +277,7 @@ const Users = () => {
                               className="flex flex-row justify-center items-center px-4 py-2 rounded-full"
                             >
                               <Text className="text-sm font-semibold text-white pr-1">
-                                Edit
+                                View
                               </Text>
                               <MaterialCommunityIcons
                                 name="arrow-up-right"
@@ -344,12 +331,11 @@ const Users = () => {
           }}
         />
       )}
-      {editModal && (
-        <EditModal
+      {viewModal && (
+        <ViewModal
           user={selectedUser}
-          accountLevel={user ? user.credentials.level : ""}
           onClose={() => {
-            setEditModal(false);
+            setViewModal(false);
             clearSearchFilter();
           }}
         />
