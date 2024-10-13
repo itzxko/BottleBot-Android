@@ -41,6 +41,15 @@ export const AdminHistoryProvider = ({ children }: any) => {
     }
   };
 
+  const fetchAllHistory = async () => {
+    try {
+      await fetchAllRewardsHistory();
+      await fetchAllPointsHistory();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const searchRewardHistory = async (user: string) => {
     try {
       let url = `http://${ipAddress}:${port}/api/history/claim?userName=${user}`;
@@ -82,6 +91,7 @@ export const AdminHistoryProvider = ({ children }: any) => {
         pointsHistory,
         searchRewardHistory,
         searchPointHistory,
+        fetchAllHistory,
       }}
     >
       {children}
