@@ -113,6 +113,7 @@ const Dashboard = () => {
                     className="text-xs font-normal max-w-[50%] text-right"
                     placeholder="single"
                     numberOfLines={1}
+                    readOnly={true}
                     value={`${mapRegion.latitude.toString()}, ${mapRegion.longitude.toString()}`}
                   ></TextInput>
                 </View>
@@ -133,6 +134,7 @@ const Dashboard = () => {
                     className="text-xs font-normal max-w-[50%] text-right"
                     placeholder="single"
                     numberOfLines={1}
+                    readOnly={true}
                     value={`${mapRegion.latitude.toString()}, ${mapRegion.longitude.toString()}`}
                   ></TextInput>
                 </View>

@@ -235,8 +235,8 @@ const Users = () => {
                   <LinearGradient
                     className="w-full h-full p-6"
                     colors={[
-                      "rgba(18, 18, 18, 0.2)",
-                      "rgba(18, 18, 18, 0.6)",
+                      "rgba(18, 18, 18, 0)",
+                      "rgba(18, 18, 18, 0.4)",
                       "rgba(18, 18, 18, 1)",
                     ]}
                     start={{ x: 1, y: 0 }} // Start from the upper right corner

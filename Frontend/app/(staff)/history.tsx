@@ -18,15 +18,16 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useAdminHistory } from "@/context/AdminHistoryProvider";
 import { useUsers } from "@/context/UsersProvider";
 import { Image, ImageBackground } from "expo-image";
-import { useUrl } from "@/context/UrlProvider";
 import RewardHistoryAdd from "@/components/admin/history/rewards/RewardHistoryAdd";
 import RewardHistoryEdit from "@/components/admin/history/rewards/RewardHistoryEdit";
 import Modal from "@/components/modal";
 import PointsHistoryAdd from "@/components/admin/history/points/PointsHistoryAdd";
 import PointsHistoryEdit from "@/components/admin/history/points/PointsHistoryEdit";
 import { useRewards } from "@/context/RewardsProvider";
+import { useUrl } from "@/context/UrlProvider";
 
 const History = () => {
+  const { ipAddress, port } = useUrl();
   const { user } = useAuth();
   const { fetchRewards, rewards } = useRewards();
   const navigation = useNavigation();
@@ -252,7 +253,7 @@ const History = () => {
                           source={
                             reward
                               ? {
-                                  uri: `http://192.168.254.139:8080/api/images/${reward.image}`,
+                                  uri: `http://${ipAddress}:${port}/api/images/${reward.image}`,
                                 }
                               : require("../../assets/images/borgar.jpg")
                           }
@@ -260,8 +261,8 @@ const History = () => {
                           <LinearGradient
                             className="w-full h-full p-5"
                             colors={[
-                              "rgba(18, 18, 18, 0.2)",
-                              "rgba(18, 18, 18, 0.8)",
+                              "rgba(18, 18, 18, 0)",
+                              "rgba(18, 18, 18, 0.6)",
                             ]}
                             start={{ x: 0, y: 0 }}
                             end={{ x: 0, y: 1 }}
@@ -269,7 +270,7 @@ const History = () => {
                             <View className="flex flex-col h-full justify-between">
                               <View className="w-full flex flex-row items-start justify-between">
                                 <Text
-                                  className="text-xs font-normal text-white uppercase max-w-[50%]"
+                                  className="text-xs font-normal text-white/50 uppercase max-w-[50%]"
                                   numberOfLines={1}
                                 >
                                   #{rewardHistory._id}
@@ -395,8 +396,8 @@ const History = () => {
                           <LinearGradient
                             className="w-full h-full p-5"
                             colors={[
-                              "rgba(18, 18, 18, 0.2)",
-                              "rgba(18, 18, 18, 0.8)",
+                              "rgba(18, 18, 18, 0)",
+                              "rgba(18, 18, 18, 0.6)",
                             ]}
                             start={{ x: 0, y: 0 }}
                             end={{ x: 0, y: 1 }}
@@ -404,7 +405,7 @@ const History = () => {
                             <View className="flex flex-col h-full justify-between">
                               <View className="w-full flex flex-row items-start justify-between">
                                 <Text
-                                  className="text-xs font-normal text-white uppercase max-w-[50%]"
+                                  className="text-xs font-normal text-white/50 uppercase max-w-[50%]"
                                   numberOfLines={1}
                                 >
                                   #{pointHistory._id}

@@ -34,12 +34,14 @@ export default function Login() {
   const { setToken, setUser } = useAuth();
   const [userLevel, setUserLevel] = useState(null);
   const { ipAddress, port } = useUrl();
+  const [loading, setLoading] = useState(false);
 
   const togglePassword = () => {
     setHidePass(!hidePass);
   };
 
   const onLogin = async () => {
+    setLoading(true);
     try {
       let url = `http://${ipAddress}:${port}/api/auth/login`;
 
@@ -48,28 +50,26 @@ export default function Login() {
         password: password,
       });
 
-      if (response) {
-        console.log(response.data.message);
+      if (response.data.success === true) {
+        setToken(response.data.token);
+        setUser(response.data.user);
 
-        if (response.data.message === "Login success!") {
-          setToken(response.data.token);
-          setUser(response.data.user);
-
-          if (response.data.user.credentials.level === "citizen") {
-            route.push("/(user)/dashboard");
-          } else if (response.data.user.credentials.level === "admin") {
-            route.push("/(admin)/dashboard");
-          } else {
-            route.push("/(staff)/dashboard");
-          }
+        if (response.data.user.credentials.level === "citizen") {
+          route.push("/(user)/dashboard");
+        } else if (response.data.user.credentials.level === "admin") {
+          route.push("/(admin)/dashboard");
+        } else {
+          route.push("/(staff)/dashboard");
         }
+      } else {
+        setVisibleModal(true);
+        setMessage(response.data.message);
       }
     } catch (error: any) {
       setMessage(error.response.data.message);
       setVisibleModal(true);
-      setTimeout(() => {
-        setVisibleModal(false);
-      }, 5000);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -161,8 +161,8 @@ export default function Login() {
             </View>
             <View className="w-full flex-1 items-center justify-center ">
               <Image
-                source={require("../assets/images/BottleBot-Text-Light.png")}
-                className="w-[30px] h-[30px]"
+                source={require("../assets/images/Bottle-Bot.png")}
+                className="w-[60px] h-[60px]"
               />
             </View>
           </LinearGradient>
