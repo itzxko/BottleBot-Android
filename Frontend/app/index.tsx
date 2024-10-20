@@ -12,15 +12,15 @@ const Index = () => {
 
   setTimeout(() => {
     gotoLogin();
-  }, 2000);
+  }, 1600);
 
   return (
     <View className="flex-1 items-center justify-center">
       <LottieView
-        source={require("../assets/json/LogoTransparent.json")}
+        source={require("../assets/json/SplashScreen.json")}
         autoPlay
         loop
-        style={{ width: 300, height: 300 }}
+        style={{ width: 100, height: 100 }}
       />
     </View>
   );
