@@ -5,7 +5,7 @@ import { blue } from "react-native-reanimated/lib/typescript/reanimated2/Colors"
 
 export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   return (
-    <View className="absolute bottom-5 flex-row items-center justify-evenly mx-[50px] bg-white p-4 rounded-3xl shadow-xl shadow-black">
+    <View className="absolute bottom-5 flex-row items-center justify-evenly mx-[50px] bg-white p-4 rounded-2xl shadow-xl shadow-black">
       {state.routes.map((route, index) => {
         const { options } = descriptors[route.key];
         const label =
@@ -48,7 +48,7 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
             key={route.name}
           >
             {isFocused ? (
-              <Text className="text-[10px] font-semibold text-[#00674F]">
+              <Text className="text-[10px] font-semibold text-[#00674F] capitalize">
                 {typeof label === "string" ? label : options.title}
               </Text>
             ) : (
@@ -67,7 +67,7 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
                     : "user"
                 }
                 size={20}
-                color={"rgba(0, 0, 0, 0.2)"}
+                color={"rgba(79, 79, 79, 0.2)"}
               />
             )}
           </TouchableOpacity>
