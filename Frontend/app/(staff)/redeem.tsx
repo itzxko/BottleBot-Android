@@ -22,6 +22,7 @@ import RewardsForm from "@/components/admin/redeem/rewardsForm";
 import axios from "axios";
 
 const redeem = () => {
+  const { ipAddress, port } = useUrl();
   const { fetchRewards, filterRewards, rewards, categories } = useRewards();
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState("All");
@@ -173,7 +174,7 @@ const redeem = () => {
                   <ImageBackground
                     className="w-full flex-1"
                     source={{
-                      uri: `http://192.168.254.139:8080/api/images/${item.image}`,
+                      uri: `http://${ipAddress}:${port}/api/images/${item.image}`,
                     }}
                   >
                     <Pressable
