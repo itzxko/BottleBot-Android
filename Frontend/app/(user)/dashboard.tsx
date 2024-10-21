@@ -16,8 +16,7 @@ import { useQueue } from "@/context/QueueProvider";
 import { useAuth } from "@/context/AuthContext";
 
 const Dashboard = () => {
-  const startNavigation = () => {};
-  const { addtoQueue, fetchQueue } = useQueue();
+  const { queue, fetchQueue, deleteFromQueue, addtoQueue } = useQueue();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [mapRegion, setMapRegion] = useState({
@@ -26,6 +25,10 @@ const Dashboard = () => {
     latitudeDelta: 0.01,
     longitudeDelta: 0.01,
   });
+
+  useEffect(() => {
+    fetchQueue();
+  }, []);
 
   const userLocation = async () => {
     // Request location permission
@@ -118,8 +121,8 @@ const Dashboard = () => {
                   ></TextInput>
                 </View>
                 {/* User */}
-                <View className="w-full flex flex-row items-center justify-between pl-2 pr-6 py-2 bg-[#E6E6E6] rounded-xl mb-2">
-                  <View className="max-w-[50%] flex flex-row items-center justify-start px-4 py-2.5 rounded-lg bg-[#050301]">
+                <View className="w-full flex flex-row items-center justify-between pl-2 pr-6 py-2 bg-[#E6E6E6] rounded-3xl mb-2">
+                  <View className="max-w-[50%] flex flex-row items-center justify-start px-4 py-2.5 rounded-xl bg-[#050301]">
                     <Pressable>
                       <Feather name="navigation-2" size={16} color={"white"} />
                     </Pressable>
