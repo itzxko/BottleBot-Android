@@ -100,10 +100,12 @@ const Usermodal = ({
   const handleLevelToggle = () => {
     setChangeLevel(!changeLevel);
 
-    if (changeLevel) {
+    if (level === "citizen") {
       setLevel("staff");
-    } else {
+    } else if (level === "staff") {
       setLevel("admin");
+    } else {
+      setLevel("citizen");
     }
   };
 
