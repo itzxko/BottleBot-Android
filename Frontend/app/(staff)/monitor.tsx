@@ -13,14 +13,17 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useQueue } from "@/context/QueueProvider";
 
 const monitor = () => {
-  const { queue, fetchQueue, deleteFromQueue } = useQueue();
-
-  useEffect(() => {
-    fetchQueue();
-  }, []);
+  const { queue, deleteFromQueue } = useQueue();
 
   interface queue {
-    userId: string;
+    userId: {
+      personalInfo: {
+        firstName: string;
+        middleName: string;
+        lastName: string;
+      };
+      _id: string;
+    };
     location: {
       locationName: string;
     };
@@ -139,7 +142,7 @@ const monitor = () => {
           {queue.length > 0 ? (
             queue.map((request: queue) => (
               <View
-                className="w-full flex flex-row items-start justify-between gap-x-4 pb-6"
+                className="w-full flex flex-row items-start justify-between gap-x-4 pb-8"
                 key={request._id}
               >
                 <Pressable
@@ -161,7 +164,7 @@ const monitor = () => {
                     className="text-sm font-semibold uppercase"
                     numberOfLines={1}
                   >
-                    #{request.userId}
+                    {`${request.userId.personalInfo.firstName} ${request.userId.personalInfo.middleName} ${request.userId.personalInfo.lastName}`}
                   </Text>
                   <Text
                     className="text-xs font-normal text-black/50 capitalize"

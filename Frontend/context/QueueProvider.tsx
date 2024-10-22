@@ -8,7 +8,7 @@ export const QueueProvider = ({ children }: any) => {
   const [queue, setQueue] = useState([]);
   const { ipAddress, port } = useUrl();
 
-  const fetchQueue = () => {
+  const initializeWebSocket = () => {
     const socket = new WebSocket(`ws://${ipAddress}:${port}/api/queue`);
 
     socket.onopen = () => {
@@ -77,7 +77,7 @@ export const QueueProvider = ({ children }: any) => {
 
   return (
     <QueueContext.Provider
-      value={{ queue, fetchQueue, deleteFromQueue, addtoQueue }}
+      value={{ queue, initializeWebSocket, deleteFromQueue, addtoQueue }}
     >
       {children}
     </QueueContext.Provider>

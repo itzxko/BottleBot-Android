@@ -15,6 +15,7 @@ import axios from "axios";
 import Modal from "../../modal";
 import { useUrl } from "@/context/UrlProvider";
 import Loader from "../../loader";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 interface user {
   _id: string;
@@ -61,7 +62,7 @@ const EditModal = ({
   const [firstName, setFirstName] = useState("");
   const [middleName, setMiddleName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [birthDate, setBirthDate] = useState("");
+  const [birthDate, setBirthDate] = useState(new Date());
   const [gender, setGender] = useState("");
   const [civilStatus, setCivilStatus] = useState("");
   const [nationality, setNationality] = useState("");
@@ -80,12 +81,21 @@ const EditModal = ({
   const [isError, setIsError] = useState(false);
   const [changeLevel, setChangeLevel] = useState(true);
 
+  //datepicker
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [formattedBirthDate, setFormattedBirthDate] = useState("");
+
   useEffect(() => {
     if (user && user._id) {
       setFirstName(user.personalInfo.firstName);
       setMiddleName(user.personalInfo.middleName);
       setLastName(user.personalInfo.lastName);
-      setBirthDate(formattedDate);
+
+      //date
+      const date = new Date(user.personalInfo.dateOfBirth);
+      setBirthDate(date);
+      setFormattedBirthDate(formatDate(date));
+
       setGender(user.personalInfo.gender);
       setCivilStatus(user.personalInfo.civilStatus);
       setNationality(user.personalInfo.nationality);
@@ -102,16 +112,16 @@ const EditModal = ({
     }
   }, [user]);
 
-  const formattedDate = (() => {
-    if (!user || !user.personalInfo.dateOfBirth) {
-      return "loading...";
-    }
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString();
+  };
 
-    const date = new Date(user.personalInfo.dateOfBirth);
-    return isNaN(date.getTime())
-      ? "Invalid Date"
-      : date.toLocaleDateString("en-US"); // Format the date as needed
-  })();
+  const onDateChange = (event: any, selectedDate?: Date) => {
+    const currentDate = selectedDate || birthDate;
+    setShowDatePicker(false);
+    setBirthDate(currentDate);
+    setFormattedBirthDate(formatDate(currentDate));
+  };
 
   const updateUser = async () => {
     Keyboard.dismiss();
@@ -172,6 +182,26 @@ const EditModal = ({
       setLevel("admin");
     } else {
       setLevel("citizen");
+    }
+  };
+
+  const handleGenderToggle = () => {
+    if (gender === "Male") {
+      setGender("Female");
+    } else if (gender === "Female") {
+      setGender("Other");
+    } else if (gender === "Other") {
+      setGender("Male");
+    }
+  };
+
+  const handleStatusToggle = () => {
+    if (civilStatus === "Single") {
+      setCivilStatus("Married");
+    } else if (civilStatus === "Married") {
+      setCivilStatus("Widowed");
+    } else if (civilStatus === "Widowed") {
+      setCivilStatus("Single");
     }
   };
 
@@ -252,35 +282,55 @@ const EditModal = ({
               {/* Birth Date */}
               <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl mb-2">
                 <Text className="text-xs font-semibold">Birth Date</Text>
-                <TextInput
-                  className="text-xs font-normal max-w-[50%] text-right"
-                  placeholder="yyyy-mm-dd"
-                  numberOfLines={1}
-                  value={birthDate}
-                  onChangeText={setBirthDate}
-                ></TextInput>
+                <View className="w-1/2 flex flex-row items-center justify-end ">
+                  <Text className="text-xs font-normal pr-1" numberOfLines={1}>
+                    {formattedBirthDate || "Select a date"}
+                  </Text>
+                  <Pressable
+                    onPress={() => setShowDatePicker(true)}
+                    className="p-2 bg-black rounded-full"
+                  >
+                    <Feather name="calendar" size={12} color={"white"} />
+                  </Pressable>
+                </View>
               </View>
+              {showDatePicker && (
+                <DateTimePicker
+                  value={birthDate}
+                  mode="date"
+                  display="default"
+                  onChange={onDateChange}
+                />
+              )}
               {/* Gender */}
               <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl mb-2">
                 <Text className="text-xs font-semibold">Gender</Text>
-                <TextInput
-                  className="text-xs font-normal max-w-[50%] text-right"
-                  placeholder="m/f"
-                  numberOfLines={1}
-                  value={gender}
-                  onChangeText={setGender}
-                ></TextInput>
+                <View className="w-1/2 flex flex-row items-center justify-end ">
+                  <Text className="text-xs font-normal pr-1" numberOfLines={1}>
+                    {gender}
+                  </Text>
+                  <Pressable
+                    onPress={handleGenderToggle}
+                    className="p-2 bg-black rounded-full"
+                  >
+                    <Feather name="rotate-cw" size={12} color={"white"} />
+                  </Pressable>
+                </View>
               </View>
               {/* Civil Status */}
               <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl mb-2">
                 <Text className="text-xs font-semibold">Civil Status</Text>
-                <TextInput
-                  className="text-xs font-normal max-w-[50%] text-right"
-                  placeholder="single"
-                  numberOfLines={1}
-                  value={civilStatus}
-                  onChangeText={setCivilStatus}
-                ></TextInput>
+                <View className="w-1/2 flex flex-row items-center justify-end ">
+                  <Text className="text-xs font-normal pr-1" numberOfLines={1}>
+                    {civilStatus}
+                  </Text>
+                  <Pressable
+                    onPress={handleStatusToggle}
+                    className="p-2 bg-black rounded-full"
+                  >
+                    <Feather name="rotate-cw" size={12} color={"white"} />
+                  </Pressable>
+                </View>
               </View>
               {/* Nationality */}
               <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl mb-2">

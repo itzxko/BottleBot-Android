@@ -13,11 +13,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useQueue } from "@/context/QueueProvider";
 
 const monitor = () => {
-  const { queue, fetchQueue, deleteFromQueue } = useQueue();
-
-  useEffect(() => {
-    fetchQueue();
-  }, []);
+  const { queue, deleteFromQueue } = useQueue();
 
   interface queue {
     userId: {

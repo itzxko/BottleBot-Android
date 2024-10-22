@@ -23,6 +23,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Modal from "../components/modal";
 import { useAuth } from "@/context/AuthContext";
 import { useUrl } from "@/context/UrlProvider";
+import { useQueue } from "@/context/QueueProvider";
 
 export default function Login() {
   const [hidePass, setHidePass] = useState(true);
@@ -35,6 +36,7 @@ export default function Login() {
   const [userLevel, setUserLevel] = useState(null);
   const { ipAddress, port } = useUrl();
   const [loading, setLoading] = useState(false);
+  const { initializeWebSocket } = useQueue();
 
   const togglePassword = () => {
     setHidePass(!hidePass);
@@ -53,6 +55,7 @@ export default function Login() {
       if (response.data.success === true) {
         setToken(response.data.token);
         setUser(response.data.user);
+        initializeWebSocket();
 
         if (response.data.user.credentials.level === "citizen") {
           route.push("/(user)/dashboard");
