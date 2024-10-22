@@ -21,6 +21,7 @@ import axios from "axios";
 import Modal from "@/components/modal";
 import { useRouter } from "expo-router";
 import { useUrl } from "@/context/UrlProvider";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 interface user {
   _id: string;
@@ -67,7 +68,7 @@ const profile = () => {
   const [middleName, setMiddleName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
-  const [birthDate, setBirthDate] = useState("");
+  const [birthDate, setBirthDate] = useState(new Date());
   const [gender, setGender] = useState("");
   const [civilStatus, setCivilStatus] = useState("");
   const [nationality, setNationality] = useState("");
@@ -84,6 +85,10 @@ const profile = () => {
   const [edit, setEdit] = useState(false);
   const navigation = useNavigation();
 
+  //datepicker
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [formattedBirthDate, setFormattedBirthDate] = useState("");
+
   useEffect(() => {
     fetchUser();
   }, []);
@@ -92,7 +97,12 @@ const profile = () => {
     setFirstName(user?.personalInfo.firstName);
     setMiddleName(user?.personalInfo.middleName);
     setLastName(user?.personalInfo.lastName);
-    setBirthDate(formattedDate);
+
+    //date
+    const date = new Date(user.personalInfo.dateOfBirth);
+    setBirthDate(date);
+    setFormattedBirthDate(formatDate(date));
+
     setGender(user?.personalInfo.gender);
     setCivilStatus(user?.personalInfo.civilStatus);
     setNationality(user?.personalInfo.nationality);
@@ -145,6 +155,7 @@ const profile = () => {
           credentials: {
             email: email,
             password: password,
+            level: level,
           },
         });
 
@@ -184,16 +195,36 @@ const profile = () => {
     }
   };
 
-  const formattedDate = (() => {
-    if (!user || !user.personalInfo.dateOfBirth) {
-      return "loading...";
-    }
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString();
+  };
 
-    const date = new Date(user.personalInfo.dateOfBirth);
-    return isNaN(date.getTime())
-      ? "Invalid Date"
-      : date.toLocaleDateString("en-US"); // Format the date as needed
-  })();
+  const onDateChange = (event: any, selectedDate?: Date) => {
+    const currentDate = selectedDate || birthDate;
+    setShowDatePicker(false);
+    setBirthDate(currentDate);
+    setFormattedBirthDate(formatDate(currentDate));
+  };
+
+  const handleGenderToggle = () => {
+    if (gender === "Male") {
+      setGender("Female");
+    } else if (gender === "Female") {
+      setGender("Other");
+    } else if (gender === "Other") {
+      setGender("Male");
+    }
+  };
+
+  const handleStatusToggle = () => {
+    if (civilStatus === "Single") {
+      setCivilStatus("Married");
+    } else if (civilStatus === "Married") {
+      setCivilStatus("Widowed");
+    } else if (civilStatus === "Widowed") {
+      setCivilStatus("Single");
+    }
+  };
 
   return (
     <>
@@ -233,7 +264,7 @@ const profile = () => {
                   source={require("../../assets/images/Man.jpg")}
                 ></ImageBackground>
               </View>
-              <View className="w-3/4 flex items-start justify-center py-2">
+              <View className="w-full flex items-start justify-center py-2">
                 <Text className="text-lg font-semibold py-1" numberOfLines={1}>
                   {!user
                     ? "loading..."
@@ -378,7 +409,7 @@ const profile = () => {
                   />
                 </View>
               </View>
-              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
+              <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-1">
                     <Feather
@@ -394,21 +425,42 @@ const profile = () => {
                     Birth Date
                   </Text>
                 </View>
-                <View className="w-1/2 flex items-end justify-center">
-                  <TextInput
-                    className="w-full text-xs font-normal text-right"
+                <View className="w-1/2 flex flex-row items-center justify-end ">
+                  <Text
+                    className={`${
+                      edit ? "text-black" : "text-black/25"
+                    } text-xs font-normal pr-1`}
                     numberOfLines={1}
-                    value={birthDate}
-                    onChangeText={(text) => setBirthDate(text)}
-                    placeholder="yyyy-mm-dd"
-                    editable={edit ? true : false}
-                  />
+                  >
+                    {formattedBirthDate || "Select a date"}
+                  </Text>
+                  <Pressable
+                    onPress={() => {
+                      if (edit) {
+                        setShowDatePicker(true);
+                      }
+                    }}
+                    className={`${
+                      edit ? "bg-black" : "bg-black/25"
+                    } p-2 rounded-full`}
+                  >
+                    <Feather name="calendar" size={12} color={"white"} />
+                  </Pressable>
                 </View>
               </View>
-              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
+              {showDatePicker && (
+                <DateTimePicker
+                  value={birthDate}
+                  mode="date"
+                  display="default"
+                  onChange={onDateChange}
+                />
+              )}
+              {/* Gender */}
+              <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-1">
-                    <Feather name="map" size={14} color={"rgba(0, 0, 0, 1)"} />
+                    <Feather name="meh" size={14} color={"rgba(0, 0, 0, 1)"} />
                   </View>
                   <Text
                     className="text-xs font-semibold text-black"
@@ -417,21 +469,38 @@ const profile = () => {
                     Gender
                   </Text>
                 </View>
-                <View className="w-1/2 flex items-end justify-center">
-                  <TextInput
-                    className="w-full text-xs font-normal text-right"
+                <View className="w-1/2 flex flex-row items-center justify-end ">
+                  <Text
+                    className={`${
+                      edit ? "text-black" : "text-black/25"
+                    } text-xs font-normal pr-1`}
                     numberOfLines={1}
-                    value={gender}
-                    onChangeText={(text) => setGender(text)}
-                    placeholder="male or female"
-                    editable={edit ? true : false}
-                  />
+                  >
+                    {gender}
+                  </Text>
+                  <Pressable
+                    onPress={() => {
+                      if (edit) {
+                        handleGenderToggle();
+                      }
+                    }}
+                    className={`${
+                      edit ? "bg-black" : "bg-black/25"
+                    } p-2 rounded-full`}
+                  >
+                    <Feather name="rotate-cw" size={12} color={"white"} />
+                  </Pressable>
                 </View>
               </View>
-              <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
+              {/* Civil Status */}
+              <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-1">
-                    <Feather name="map" size={14} color={"rgba(0, 0, 0, 1)"} />
+                    <Feather
+                      name="activity"
+                      size={14}
+                      color={"rgba(0, 0, 0, 1)"}
+                    />
                   </View>
                   <Text
                     className="text-xs font-semibold text-black"
@@ -440,21 +509,33 @@ const profile = () => {
                     Civil Status
                   </Text>
                 </View>
-                <View className="w-1/2 flex items-end justify-center">
-                  <TextInput
-                    className="w-full text-xs font-normal text-right"
+                <View className="w-1/2 flex flex-row items-center justify-end ">
+                  <Text
+                    className={`${
+                      edit ? "text-black" : "text-black/25"
+                    } text-xs font-normal pr-1`}
                     numberOfLines={1}
-                    value={civilStatus}
-                    onChangeText={(text) => setCivilStatus(text)}
-                    placeholder="your civil status"
-                    editable={edit ? true : false}
-                  />
+                  >
+                    {civilStatus}
+                  </Text>
+                  <Pressable
+                    onPress={() => {
+                      if (edit) {
+                        handleStatusToggle();
+                      }
+                    }}
+                    className={`${
+                      edit ? "bg-black" : "bg-black/25"
+                    } p-2 rounded-full`}
+                  >
+                    <Feather name="rotate-cw" size={12} color={"white"} />
+                  </Pressable>
                 </View>
               </View>
               <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-1">
-                    <Feather name="map" size={14} color={"rgba(0, 0, 0, 1)"} />
+                    <Feather name="flag" size={14} color={"rgba(0, 0, 0, 1)"} />
                   </View>
                   <Text
                     className="text-xs font-semibold text-black"
@@ -487,11 +568,7 @@ const profile = () => {
               <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-1">
-                    <Feather
-                      name="smartphone"
-                      size={14}
-                      color={"rgba(0, 0, 0, 1)"}
-                    />
+                    <Feather name="hash" size={14} color={"rgba(0, 0, 0, 1)"} />
                   </View>
                   <Text
                     className="text-xs font-semibold text-black"
@@ -514,7 +591,11 @@ const profile = () => {
               <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-1">
-                    <Feather name="flag" size={14} color={"rgba(0, 0, 0, 1)"} />
+                    <Feather
+                      name="corner-up-right"
+                      size={14}
+                      color={"rgba(0, 0, 0, 1)"}
+                    />
                   </View>
                   <Text
                     className="text-xs font-semibold text-black"
@@ -537,8 +618,8 @@ const profile = () => {
               <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-1">
-                    <MaterialIcons
-                      name="work-outline"
+                    <Feather
+                      name="corner-right-up"
                       size={14}
                       color={"rgba(0, 0, 0, 1)"}
                     />
@@ -564,8 +645,8 @@ const profile = () => {
               <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-1">
-                    <MaterialIcons
-                      name="work-outline"
+                    <Feather
+                      name="corner-down-left"
                       size={14}
                       color={"rgba(0, 0, 0, 1)"}
                     />
@@ -591,8 +672,8 @@ const profile = () => {
               <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-1">
-                    <MaterialIcons
-                      name="work-outline"
+                    <Feather
+                      name="tablet"
                       size={14}
                       color={"rgba(0, 0, 0, 1)"}
                     />
@@ -628,7 +709,7 @@ const profile = () => {
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-1">
                     <Feather
-                      name="smartphone"
+                      name="briefcase"
                       size={14}
                       color={"rgba(0, 0, 0, 1)"}
                     />
@@ -654,7 +735,11 @@ const profile = () => {
               <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-1">
-                    <Feather name="flag" size={14} color={"rgba(0, 0, 0, 1)"} />
+                    <Feather
+                      name="clipboard"
+                      size={14}
+                      color={"rgba(0, 0, 0, 1)"}
+                    />
                   </View>
                   <Text
                     className="text-xs font-semibold text-black"
@@ -689,8 +774,8 @@ const profile = () => {
                 <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
                   <View className="w-1/2 flex flex-row items-center justify-start">
                     <View className="pr-1">
-                      <MaterialIcons
-                        name="work-outline"
+                      <Feather
+                        name="at-sign"
                         size={14}
                         color={"rgba(0, 0, 0, 1)"}
                       />
@@ -716,8 +801,8 @@ const profile = () => {
                 <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
                   <View className="w-1/2 flex flex-row items-center justify-start">
                     <View className="pr-1">
-                      <MaterialIcons
-                        name="work-outline"
+                      <Feather
+                        name="lock"
                         size={14}
                         color={"rgba(0, 0, 0, 1)"}
                       />
@@ -743,8 +828,8 @@ const profile = () => {
                 <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
                   <View className="w-1/2 flex flex-row items-center justify-start">
                     <View className="pr-1">
-                      <MaterialIcons
-                        name="work-outline"
+                      <Feather
+                        name="terminal"
                         size={14}
                         color={"rgba(0, 0, 0, 1)"}
                       />

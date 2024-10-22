@@ -16,7 +16,8 @@ import { useQueue } from "@/context/QueueProvider";
 import { useAuth } from "@/context/AuthContext";
 
 const Dashboard = () => {
-  const { queue, fetchQueue, deleteFromQueue, addtoQueue } = useQueue();
+  const { queue, initializeWebSocket, deleteFromQueue, addtoQueue } =
+    useQueue();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [mapRegion, setMapRegion] = useState({
@@ -25,10 +26,6 @@ const Dashboard = () => {
     latitudeDelta: 0.01,
     longitudeDelta: 0.01,
   });
-
-  useEffect(() => {
-    fetchQueue();
-  }, []);
 
   const userLocation = async () => {
     // Request location permission
@@ -61,7 +58,7 @@ const Dashboard = () => {
     const getUserLocation = async () => {
       setLoading(true);
       await userLocation();
-      await fetchQueue();
+      await initializeWebSocket();
       setLoading(false);
     };
 

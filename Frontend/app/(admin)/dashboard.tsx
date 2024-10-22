@@ -14,54 +14,57 @@ import { LinearGradient } from "expo-linear-gradient";
 import Loader from "@/components/loader";
 import { useQueue } from "@/context/QueueProvider";
 import { Image } from "expo-image";
+import ConfigForm from "@/components/dashboard/configForm";
+import { useLocation } from "@/context/LocationProvider";
+import { useUrl } from "@/context/UrlProvider";
+import axios from "axios";
 
 const Dashboard = () => {
-  const { queue, fetchQueue, deleteFromQueue } = useQueue();
+  const { queue, initializeWebSocket, deleteFromQueue } = useQueue();
   const [loading, setLoading] = useState(false);
-  const [mapRegion, setMapRegion] = useState({
-    latitude: 14.680105493791455,
-    longitude: 121.00993905398246,
-    latitudeDelta: 0.01,
-    longitudeDelta: 0.01,
-  });
+  const [configForm, setConfigForm] = useState(false);
+  const { yourLocation, defaultLocation, getUserLocation } = useLocation();
+  const [config, setConfig] = useState<config | undefined>();
+  const { ipAddress, port } = useUrl();
 
-  const userLocation = async () => {
-    // Request location permission
-    const { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted") {
-      alert("Permission to access location was denied");
-      return;
-    }
-
-    // Get current location
-    try {
-      const location = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.High, // Use high accuracy
-      });
-
-      // Set the map region to the user's current location
-      setMapRegion({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-        latitudeDelta: 0.01, // Adjust this for zoom level
-        longitudeDelta: 0.01, // Adjust this for zoom level
-      });
-    } catch (error) {
-      console.error("Error getting location:", error);
-      alert("Unable to retrieve location. Please try again.");
-    }
-  };
+  interface config {
+    defaultLocation: {
+      lat: number;
+      lon: number;
+      locationName: string;
+    };
+    bottleExchange: {
+      baseWeight: number;
+      baseUnit: string;
+      equivalentInPoints: number;
+    };
+    _id: string;
+  }
 
   useEffect(() => {
-    const getUserLocation = async () => {
+    const getLocation = async () => {
       setLoading(true);
-      await userLocation();
+      await getUserLocation();
       setLoading(false);
     };
 
-    getUserLocation();
-    fetchQueue();
+    getLocation();
+    checkConfig();
   }, []);
+
+  const checkConfig = async () => {
+    try {
+      let url = `http://${ipAddress}:${port}/api/configurations`;
+
+      let response = await axios.get(url);
+
+      if (response.data.success === true) {
+        setConfig(response.data.config);
+      }
+    } catch (error: any) {
+      console.log(error);
+    }
+  };
 
   return (
     <>
@@ -71,7 +74,7 @@ const Dashboard = () => {
             {/* Map Background */}
             <MapView
               style={{ width: "100%", height: "100%" }}
-              region={mapRegion}
+              region={yourLocation}
             >
               {queue &&
                 queue.map((queue: any) => (
@@ -90,12 +93,26 @@ const Dashboard = () => {
                     />
                   </Marker>
                 ))}
-              <Marker coordinate={mapRegion} title="Marker">
+              <Marker coordinate={yourLocation} title="Your Location">
                 <Image
                   source={require("../../assets/images/Admin-Pin.png")}
                   className="w-[56px] h-[56px]"
                 />
               </Marker>
+              {config && (
+                <Marker
+                  coordinate={{
+                    latitude: config.defaultLocation.lat,
+                    longitude: config.defaultLocation.lon,
+                  }}
+                  title="Default Location"
+                >
+                  <Image
+                    source={require("../../assets/images/Default-Pin.png")}
+                    className="w-[56px] h-[56px]"
+                  />
+                </Marker>
+              )}
             </MapView>
 
             <View className="w-full h-full absolute top-0 left-0">
@@ -134,7 +151,7 @@ const Dashboard = () => {
                     placeholder="single"
                     numberOfLines={1}
                     readOnly={true}
-                    value={`${mapRegion.latitude.toString()}, ${mapRegion.longitude.toString()}`}
+                    value={`${yourLocation.latitude.toString()}, ${yourLocation.longitude.toString()}`}
                   ></TextInput>
                 </View>
                 {/* User */}
@@ -155,13 +172,13 @@ const Dashboard = () => {
                     placeholder="single"
                     numberOfLines={1}
                     readOnly={true}
-                    value={`${mapRegion.latitude.toString()}, ${mapRegion.longitude.toString()}`}
+                    value={`${yourLocation.latitude.toString()}, ${yourLocation.longitude.toString()}`}
                   ></TextInput>
                 </View>
                 {/* Default */}
                 <View className="w-full flex flex-row items-center justify-between pl-2 pr-6 py-2 bg-[#E6E6E6] rounded-2xl mb-2">
                   <View className="max-w-[50%] flex flex-row items-center justify-start px-4 py-2.5 rounded-xl bg-[#050301]">
-                    <Pressable>
+                    <Pressable onPress={() => setConfigForm(true)}>
                       <Feather name="edit-2" size={16} color={"white"} />
                     </Pressable>
                     <Text
@@ -177,7 +194,7 @@ const Dashboard = () => {
                     placeholder="single"
                     numberOfLines={1}
                     readOnly={true}
-                    value={`${mapRegion.latitude.toString()}, ${mapRegion.longitude.toString()}`}
+                    value={`${config?.defaultLocation.lat}, ${config?.defaultLocation.lon}`}
                   ></TextInput>
                 </View>
               </View>
@@ -187,6 +204,15 @@ const Dashboard = () => {
         </View>
       </View>
       {loading && <Loader />}
+      {configForm && (
+        <ConfigForm
+          onClose={() => {
+            setConfigForm(false);
+            checkConfig();
+          }}
+          config={config}
+        />
+      )}
     </>
   );
 };
