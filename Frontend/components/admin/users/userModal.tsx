@@ -344,11 +344,17 @@ const Usermodal = ({
                 <Text className="text-xs font-semibold">Phone Number</Text>
                 <TextInput
                   className="text-xs font-normal max-w-[50%] text-right"
+                  keyboardType="numeric"
                   placeholder="contact number"
                   numberOfLines={1}
                   value={number}
-                  onChangeText={setNumber}
-                ></TextInput>
+                  onChangeText={(text) => {
+                    const numericText = text.replace(/[^0-9]/g, "");
+                    if (numericText.length <= 11) {
+                      setNumber(numericText);
+                    }
+                  }}
+                />
               </View>
             </View>
             {/* Economic Info */}
