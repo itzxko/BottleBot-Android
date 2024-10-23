@@ -687,12 +687,18 @@ const profile = () => {
                 </View>
                 <View className="w-1/2 flex items-end justify-center">
                   <TextInput
-                    className="w-full text-xs font-normal text-right"
+                    className="text-xs font-normal max-w-[50%] text-right"
+                    keyboardType="numeric"
+                    placeholder="contact number"
                     numberOfLines={1}
                     value={phoneNumber}
-                    onChangeText={(text) => setPhoneNumber(text)}
-                    placeholder="your contact number"
                     editable={edit ? true : false}
+                    onChangeText={(text) => {
+                      const numericText = text.replace(/[^0-9]/g, "");
+                      if (numericText.length <= 11) {
+                        setPhoneNumber(numericText);
+                      }
+                    }}
                   />
                 </View>
               </View>
