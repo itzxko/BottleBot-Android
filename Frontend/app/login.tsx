@@ -113,7 +113,6 @@ export default function Login() {
               </View>
 
               <View className="w-full flex items-start justify-center py-6">
-                <Text className="font-semibold text-sm pb-2">User Name:</Text>
                 <Text className="font-semibold text-xs pb-2">Username:</Text>
                 <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl">
                   <RemixIcon name="at-line" size={16} />
