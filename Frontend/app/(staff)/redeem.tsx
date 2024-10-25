@@ -20,15 +20,16 @@ import CheckoutModal from "@/components/admin/redeem/checkoutModal";
 import { useAdminHistory } from "@/context/AdminHistoryProvider";
 import RewardsForm from "@/components/admin/redeem/rewardsForm";
 import axios from "axios";
+import RemixIcon from "react-native-remix-icon";
 
 const redeem = () => {
-  const { ipAddress, port } = useUrl();
   const { fetchRewards, filterRewards, rewards, categories } = useRewards();
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState("All");
   const [filtered, setFiltered] = useState(false);
   const [visibleModal, setVisibleModal] = useState(false);
   const [message, setMessage] = useState("");
+  const { ipAddress, port } = useUrl();
   const [checkoutModal, setCheckoutModal] = useState(false);
   const [rewardsForm, setRewardsForm] = useState(false);
   const [rewardId, setRewardId] = useState("");
@@ -95,10 +96,10 @@ const redeem = () => {
             className="absolute left-4 rounded-full"
           >
             <View className="p-2 bg-[#E1E1E1] rounded-full flex items-center justify-center">
-              <Ionicons name="chevron-back" size={18} />
+              <RemixIcon name="arrow-left-s-line" size={16} color="black" />
             </View>
           </TouchableHighlight>
-          <Text className="text-xl font-semibold">Redeem</Text>
+          <Text className="text-sm font-semibold">Redeem</Text>
           <TouchableHighlight
             underlayColor={"#C9C9C9"}
             className="absolute right-4 rounded-full"
@@ -108,12 +109,12 @@ const redeem = () => {
             }}
           >
             <View className="p-2 bg-[#E1E1E1] rounded-full flex items-center justify-center">
-              <Feather name="plus" size={18} />
+              <RemixIcon name="add-line" size={16} color="black" />
             </View>
           </TouchableHighlight>
         </View>
         <View className="w-full flex items-start justify-start pt-4 pb-2 px-4">
-          <Text className="text-xl font-semibold">Redeemable Items</Text>
+          <Text className="text-sm font-semibold">Redeemable Items</Text>
           <Text className="text-sm font-normal text-black/50">
             Choose a Reward of your choice
           </Text>
@@ -140,7 +141,7 @@ const redeem = () => {
                     colors={
                       filter !== category
                         ? ["#E1E1E1", "#d9d9d9"]
-                        : ["#00674F", "#06402B"]
+                        : ["#699900", "#466600"]
                     }
                     className="px-6 py-3 flex items-center justify-center rounded-full"
                   >
@@ -202,10 +203,10 @@ const redeem = () => {
                                 setType("edit");
                               }}
                             >
-                              <Feather
-                                name="edit-2"
+                              <RemixIcon
+                                name="edit-2-line"
                                 size={16}
-                                color={"white"}
+                                color="white"
                               />
                             </Pressable>
                           </View>
@@ -238,11 +239,11 @@ const redeem = () => {
                     }}
                   >
                     <LinearGradient
-                      colors={["#00674F", "#06402B"]}
+                      colors={["#699900", "#466600"]}
                       className="p-2 rounded-full shadow shadow-black"
                     >
-                      <Ionicons
-                        name="return-down-forward"
+                      <RemixIcon
+                        name="arrow-right-s-line"
                         size={16}
                         color="white"
                       />

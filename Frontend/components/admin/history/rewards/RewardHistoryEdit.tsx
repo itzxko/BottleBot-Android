@@ -17,6 +17,7 @@ import Modal from "@/components/modal";
 import { LinearGradient } from "expo-linear-gradient";
 import Loader from "@/components/loader";
 import ChooseUserEdit from "./ChooseUserEdit";
+import RemixIcon from "react-native-remix-icon";
 
 const RewardHistoryEdit = ({
   onClose,
@@ -83,13 +84,13 @@ const RewardHistoryEdit = ({
             onPress={onClose}
           >
             <View className="p-2 bg-[#E1E1E1] rounded-full flex items-center justify-center">
-              <Ionicons name="chevron-back" size={18} />
+              <RemixIcon name="arrow-left-s-line" size={16} color="black" />
             </View>
           </TouchableHighlight>
-          <Text className="text-xl font-semibold">Add Reward History</Text>
+          <Text className="text-sm font-semibold">Edit Reward History</Text>
         </View>
         <View className="w-full flex items-start justify-start pt-4 pb-2 px-4">
-          <Text className="text-xl font-semibold">Choose Items</Text>
+          <Text className="text-sm font-semibold">Choose Items</Text>
           <Text className="text-sm font-normal text-black/50">
             Choose a Reward of your choice
           </Text>
@@ -116,7 +117,7 @@ const RewardHistoryEdit = ({
                     colors={
                       filter !== category
                         ? ["#E1E1E1", "#d9d9d9"]
-                        : ["#00674F", "#06402B"]
+                        : ["#699900", "#466600"]
                     }
                     className="px-6 py-3 flex items-center justify-center rounded-full"
                   >
@@ -178,11 +179,11 @@ const RewardHistoryEdit = ({
                     }}
                   >
                     <LinearGradient
-                      colors={["#00674F", "#06402B"]}
+                      colors={["#699900", "#466600"]}
                       className="p-2 rounded-full shadow shadow-black"
                     >
-                      <Ionicons
-                        name="return-down-forward"
+                      <RemixIcon
+                        name="arrow-right-s-line"
                         size={16}
                         color="white"
                       />

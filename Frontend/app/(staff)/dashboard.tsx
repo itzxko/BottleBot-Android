@@ -18,10 +18,12 @@ import ConfigForm from "@/components/dashboard/configForm";
 import { useLocation } from "@/context/LocationProvider";
 import { useUrl } from "@/context/UrlProvider";
 import axios from "axios";
+import RemixIcon from "react-native-remix-icon";
 
 const Dashboard = () => {
   const { queue, initializeWebSocket, deleteFromQueue } = useQueue();
   const [loading, setLoading] = useState(false);
+  const [configForm, setConfigForm] = useState(false);
   const { yourLocation, defaultLocation, getUserLocation } = useLocation();
   const [config, setConfig] = useState<config | undefined>();
   const { ipAddress, port } = useUrl();
@@ -123,23 +125,27 @@ const Dashboard = () => {
               />
             </View>
 
-            <View className="absolute flex items-center rounded-t-3xl justify-center w-full left-0 bottom-0 bg-[#F0F0F0] ">
+            <View className="absolute flex items-center rounded-t-3xl justify-center w-full left-0 bottom-0 bg-[#FAFAFA] ">
               <View className="w-full flex items-center justify-center px-4 py-8">
                 {/* Header */}
                 <View className="w-full flex items-center justify-center pb-6">
-                  <Text className="font-bold text-lg">Dashboard</Text>
+                  <Text className="font-bold text-sm">Dashboard</Text>
                   <Text className="font-normal text-xs text-black/50">
                     Allow location access to provide accurate data
                   </Text>
                 </View>
                 {/* BottleBot */}
-                <View className="w-full flex flex-row items-center justify-between pl-2 pr-6 py-2 bg-[#E6E6E6] rounded-2xl mb-2">
-                  <View className="max-w-[50%] flex flex-row items-center justify-start px-4 py-2.5 rounded-xl bg-[#050301]">
+                <View className="w-full flex flex-row items-center justify-between pl-2 pr-6 py-2 bg-[#E6E6E6] rounded-full mb-2">
+                  <View className="max-w-[50%] flex flex-row items-center justify-start px-4 py-2.5 rounded-full bg-[#050301]">
                     <Pressable>
-                      <Feather name="navigation-2" size={16} color={"white"} />
+                      <RemixIcon
+                        name="map-pin-2-line"
+                        size={16}
+                        color="white"
+                      />
                     </Pressable>
                     <Text
-                      className="text-xs font-semibold text-white pl-2"
+                      className="text-xs font-normal text-white pl-2"
                       numberOfLines={1}
                     >
                       BottleBot Location
@@ -154,13 +160,17 @@ const Dashboard = () => {
                   ></TextInput>
                 </View>
                 {/* User */}
-                <View className="w-full flex flex-row items-center justify-between pl-2 pr-6 py-2 bg-[#E6E6E6] rounded-2xl mb-2">
-                  <View className="max-w-[50%] flex flex-row items-center justify-start px-4 py-2.5 rounded-xl bg-[#050301]">
+                <View className="w-full flex flex-row items-center justify-between pl-2 pr-6 py-2 bg-[#E6E6E6] rounded-full mb-2">
+                  <View className="max-w-[50%] flex flex-row items-center justify-start px-4 py-2.5 rounded-full bg-[#050301]">
                     <Pressable>
-                      <Feather name="navigation-2" size={16} color={"white"} />
+                      <RemixIcon
+                        name="map-pin-2-line"
+                        size={16}
+                        color="white"
+                      />
                     </Pressable>
                     <Text
-                      className="text-xs font-semibold text-white pl-2"
+                      className="text-xs font-normal text-white pl-2"
                       numberOfLines={1}
                     >
                       Your Location
@@ -175,13 +185,13 @@ const Dashboard = () => {
                   ></TextInput>
                 </View>
                 {/* Default */}
-                <View className="w-full flex flex-row items-center justify-between pl-2 pr-6 py-2 bg-[#E6E6E6] rounded-2xl mb-2">
-                  <View className="max-w-[50%] flex flex-row items-center justify-start px-4 py-2.5 rounded-xl bg-[#050301]">
+                <View className="w-full flex flex-row items-center justify-between pl-2 pr-6 py-2 bg-[#E6E6E6] rounded-full mb-2">
+                  <View className="max-w-[50%] flex flex-row items-center justify-start px-4 py-2.5 rounded-full bg-[#050301]">
                     <Pressable>
-                      <Feather name="edit-2" size={16} color={"white"} />
+                      <RemixIcon name="edit-2-line" size={16} color="white" />
                     </Pressable>
                     <Text
-                      className="text-xs font-semibold text-white pl-2"
+                      className="text-xs font-normal text-white pl-2"
                       numberOfLines={1}
                     >
                       Default Location
@@ -203,6 +213,15 @@ const Dashboard = () => {
         </View>
       </View>
       {loading && <Loader />}
+      {configForm && (
+        <ConfigForm
+          onClose={() => {
+            setConfigForm(false);
+            checkConfig();
+          }}
+          config={config}
+        />
+      )}
     </>
   );
 };

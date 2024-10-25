@@ -15,6 +15,7 @@ import Loader from "../../loader";
 import Modal from "../../modal";
 import { useUrl } from "@/context/UrlProvider";
 import axios from "axios";
+import RemixIcon from "react-native-remix-icon";
 
 interface Item {
   _id: string;
@@ -170,11 +171,11 @@ const CheckoutModal = ({
               <Ionicons name="chevron-back" size={18} />
             </View>
           </TouchableHighlight>
-          <Text className="text-xl font-semibold">Checkout</Text>
+          <Text className="text-sm font-semibold">Checkout</Text>
         </View>
         {/* Header */}
         <View className="w-full flex items-start justify-center py-4">
-          <Text className="text-lg font-semibold" numberOfLines={1}>
+          <Text className="text-sm font-semibold" numberOfLines={1}>
             Select User
           </Text>
           <Text className="text-xs font-normal text-black/50" numberOfLines={1}>
@@ -201,7 +202,7 @@ const CheckoutModal = ({
                 <View className="w-2/3 flex items-start justify-center pl-2">
                   <Text
                     numberOfLines={1}
-                    className="text-sm font-semibold uppercase"
+                    className="text-sm font-semibold capitalize"
                   >{`${user.personalInfo.firstName} ${user.personalInfo.lastName}`}</Text>
                   <View className="flex-row items-center justify-start">
                     <Text
@@ -230,10 +231,10 @@ const CheckoutModal = ({
                 >
                   <LinearGradient
                     className="flex p-5 rounded-3xl bg-gray-300"
-                    colors={["#00674F", "#06402B"]}
+                    colors={["#699900", "#466600"]}
                   >
-                    <Ionicons
-                      name="return-up-forward"
+                    <RemixIcon
+                      name="arrow-go-forward-line"
                       size={16}
                       color={"white"}
                     />

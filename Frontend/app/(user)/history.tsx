@@ -95,7 +95,7 @@ const History: React.FC = () => {
               <Ionicons name="chevron-back" size={18} />
             </View>
           </TouchableHighlight>
-          <Text className="text-xl font-semibold">History</Text>
+          <Text className="text-sm font-semibold">History</Text>
         </View>
         <ScrollView
           className="flex-1 w-full"
@@ -105,7 +105,7 @@ const History: React.FC = () => {
           <View className="w-full flex items-center justify-center pt-4">
             <View className="w-full flex flex-row items-start justify-between px-4 pb-4">
               <View className="w-3/4 flex items-start justify-center">
-                <Text className="text-xl font-semibold" numberOfLines={1}>
+                <Text className="text-sm font-semibold" numberOfLines={1}>
                   Rewards History
                 </Text>
                 <Text
@@ -173,7 +173,7 @@ const History: React.FC = () => {
                               <View className="w-full flex items-start justify-center">
                                 <View className="w-full flex flex-row items-center justify-start pb-4">
                                   <Text
-                                    className="text-xl font-semibold text-white capitalize max-w-[60%]"
+                                    className="text-sm font-semibold text-white capitalize max-w-[60%]"
                                     numberOfLines={1}
                                   >
                                     {reward?.rewardName}
@@ -189,7 +189,7 @@ const History: React.FC = () => {
                                 <View className="w-full overflow-hidden flex flex-row justify-start items-center">
                                   <LinearGradient
                                     className="flex items-center justify-center px-4 py-2 rounded-full mr-1 max-w-[60%]"
-                                    colors={["#D2AF26", "#BE8400"]}
+                                    colors={["#699900", "#466600"]}
                                   >
                                     <Text
                                       className="text-xs font-normal text-white"
@@ -202,7 +202,7 @@ const History: React.FC = () => {
                                   </LinearGradient>
                                   <LinearGradient
                                     className="flex items-center justify-center px-4 py-2 rounded-full max-w-[30%]"
-                                    colors={["#00674F", "#06402B"]}
+                                    colors={["#699900", "#466600"]}
                                   >
                                     <Text
                                       className="text-xs font-normal text-white"
@@ -242,7 +242,7 @@ const History: React.FC = () => {
           <View className="w-full flex items-center justify-center pt-6">
             <View className="w-full flex flex-row items-start justify-between px-4 pb-4">
               <View className="w-3/4 flex items-start justify-center">
-                <Text className="text-xl font-semibold" numberOfLines={1}>
+                <Text className="text-sm font-semibold" numberOfLines={1}>
                   Points History
                 </Text>
                 <Text
@@ -310,7 +310,7 @@ const History: React.FC = () => {
                               <View className="w-full flex items-start justify-center">
                                 <View className="w-full flex items-start justify-center pb-4">
                                   <Text
-                                    className="text-xl font-semibold text-white capitalize"
+                                    className="text-sm font-semibold text-white capitalize"
                                     numberOfLines={1}
                                   >
                                     {user?.personalInfo
@@ -321,7 +321,7 @@ const History: React.FC = () => {
                                 <View className="w-full overflow-hidden flex flex-row justify-start items-center">
                                   <LinearGradient
                                     className="flex items-center justify-center px-4 py-2 rounded-full mr-1 max-w-[60%]"
-                                    colors={["#D2AF26", "#BE8400"]}
+                                    colors={["#699900", "#466600"]}
                                   >
                                     <Text
                                       className="text-xs font-normal text-white"
@@ -336,7 +336,7 @@ const History: React.FC = () => {
                                   </LinearGradient>
                                   <LinearGradient
                                     className="flex items-center justify-center px-4 py-2 rounded-full max-w-[40%]"
-                                    colors={["#00674F", "#06402B"]}
+                                    colors={["#699900", "#466600"]}
                                   >
                                     <Text
                                       className="text-xs font-normal text-white"

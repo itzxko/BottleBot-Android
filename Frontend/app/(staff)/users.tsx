@@ -9,7 +9,6 @@ import {
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons, Feather, MaterialCommunityIcons } from "@expo/vector-icons";
-import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import axios from "axios";
 import Loader from "@/components/loader";
@@ -17,11 +16,13 @@ import Modal from "@/components/modal";
 import Usermodal from "@/components/admin/users/userModal";
 import { useUsers } from "@/context/UsersProvider";
 import { StatusBar } from "expo-status-bar";
-import ViewModal from "@/components/staff/users/viewModal";
+import EditModal from "@/components/admin/users/editModal";
 import { useUrl } from "@/context/UrlProvider";
 import { ImageBackground } from "expo-image";
 import { useAuth } from "@/context/AuthContext";
 import { useAdminHistory } from "@/context/AdminHistoryProvider";
+import RemixIcon from "react-native-remix-icon";
+import ViewModal from "@/components/staff/users/viewModal";
 
 const Users = () => {
   const [loading, setLoading] = useState(false);
@@ -31,7 +32,7 @@ const Users = () => {
   const [message, setMessage] = useState("");
   const [visibleModal, setVisibleModal] = useState(false);
   const { getUsers, users, roles, filterUsers } = useUsers();
-  const [viewModal, setViewModal] = useState(false);
+  const [editModal, setEditModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState<user | null>(null);
   const { ipAddress, port } = useUrl();
   const [searchType, setSearchType] = useState("All");
@@ -39,6 +40,7 @@ const Users = () => {
   const { user } = useAuth();
   const [isError, setIsError] = useState(false);
   const { fetchAllHistory } = useAdminHistory();
+  const [viewModal, setViewModal] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -162,7 +164,7 @@ const Users = () => {
             onPress={() => console.log()}
           >
             <View className="p-2 bg-[#E1E1E1] rounded-full flex items-center justify-center">
-              <Ionicons name="chevron-back" size={18} />
+              <RemixIcon name="arrow-left-s-line" size={16} color="black" />
             </View>
           </TouchableHighlight>
           <TouchableHighlight
@@ -171,16 +173,20 @@ const Users = () => {
             onPress={() => setUserModal(true)}
           >
             <View className="p-2 bg-[#E1E1E1] rounded-full flex items-center justify-center">
-              <Feather name="plus" size={20} />
+              <RemixIcon name="add-line" size={16} color="black" />
             </View>
           </TouchableHighlight>
-          <Text className="text-xl font-semibold">Users</Text>
+          <Text className="text-sm font-semibold">Users</Text>
         </View>
         {/* Search and Filter */}
         <View className="w-full flex flex-row items-center justify-between pt-4">
           <View className="w-full flex flex-row items-center justify-between pl-6 pr-4 py-3 rounded-full bg-[#E6E6E6]">
             <View className="w-6/12 flex-row items-center justify-start">
-              <Feather name="search" size={16} color={"rgba(0, 0, 0, 0.5)"} />
+              <RemixIcon
+                name="search-2-line"
+                size={16}
+                color={"rgba(0, 0, 0, 0.5)"}
+              />
               <TextInput
                 className="w-full bg-[#E6E6E6] text-xs font-normal pl-2"
                 placeholder={"search users via username"}
@@ -199,7 +205,7 @@ const Users = () => {
               >
                 {searchType}
               </Text>
-              <Feather name="rotate-cw" size={16} color={"white"} />
+              <RemixIcon name="refresh-line" size={16} color="white" />
             </Pressable>
           </View>
         </View>
@@ -207,7 +213,7 @@ const Users = () => {
         <View className="w-full flex items-center justify-center py-4">
           <View className="w-full flex items-start justify-center">
             <Text
-              className="text-lg font-semibold text-black"
+              className="text-sm font-semibold text-black"
               numberOfLines={1}
             >
               Manage Users
@@ -251,7 +257,7 @@ const Users = () => {
                       <View className="w-full flex items-start justify-center">
                         <View className="w-full pb-4">
                           <Text
-                            className="text-xl font-semibold text-white"
+                            className="text-sm font-semibold text-white"
                             numberOfLines={1}
                           >
                             {`${mappedUser.personalInfo.firstName} ${mappedUser.personalInfo.lastName}`}
@@ -273,16 +279,16 @@ const Users = () => {
                             }}
                           >
                             <LinearGradient
-                              colors={["#D2AF26", "#BE8400"]}
+                              colors={["#699900", "#466600"]}
                               className="flex flex-row justify-center items-center px-4 py-2 rounded-full"
                             >
-                              <Text className="text-sm font-semibold text-white pr-1">
+                              <Text className="text-xs font-semibold text-white pr-1">
                                 View
                               </Text>
-                              <MaterialCommunityIcons
-                                name="arrow-up-right"
-                                color={"white"}
+                              <RemixIcon
+                                name="edit-2-line"
                                 size={16}
+                                color="white"
                               />
                             </LinearGradient>
                           </Pressable>
@@ -295,11 +301,11 @@ const Users = () => {
             ))
           ) : (
             <View className="w-full h-[240px] items-center justify-center">
-              <View className="p-3 mb-2 rounded-full bg-black">
-                <Feather name="cloud-off" size={20} color={"white"} />
+              <View className="p-3 mb-2 rounded-full bg-[#699900]">
+                <RemixIcon name="blur-off-fill" size={16} color="white" />
               </View>
               <Text className="text-xs font-normal text-black/50">
-                User not Found
+                No Users Found
               </Text>
             </View>
           )}

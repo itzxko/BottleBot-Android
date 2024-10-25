@@ -14,6 +14,7 @@ import { useUrl } from "@/context/UrlProvider";
 import axios from "axios";
 import Modal from "@/components/modal";
 import Loader from "@/components/loader";
+import RemixIcon from "react-native-remix-icon";
 
 interface user {
   _id: string;
@@ -101,7 +102,7 @@ const FieldsEdit = ({
               {/* Inner View for padding */}
               <View className="flex flex-row items-start justify-between w-full pb-6">
                 <View className="w-2/3 flex items-start justify-center">
-                  <Text className="text-lg font-semibold" numberOfLines={1}>
+                  <Text className="text-sm font-semibold" numberOfLines={1}>
                     Input Fields
                   </Text>
                   <Text
@@ -112,7 +113,7 @@ const FieldsEdit = ({
                   </Text>
                 </View>
                 <Pressable onPress={onClose}>
-                  <Feather name="x" size={16} color={"black"} />
+                  <RemixIcon name="close-line" size={16} color={"black"} />
                 </Pressable>
               </View>
               <View className="w-full flex items-start justify-center py-2">
@@ -147,7 +148,7 @@ const FieldsEdit = ({
               </View>
               <Pressable className="w-full pt-4" onPress={updatePointHistory}>
                 <LinearGradient
-                  colors={["#00674F", "#06402B"]}
+                  colors={["#699900", "#466600"]}
                   className="flex items-center justify-center w-full px-4 py-[14px] rounded-xl"
                 >
                   <Text className="text-xs font-semibold text-white">

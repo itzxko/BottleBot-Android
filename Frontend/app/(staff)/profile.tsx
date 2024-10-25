@@ -22,6 +22,7 @@ import Modal from "@/components/modal";
 import { useRouter } from "expo-router";
 import { useUrl } from "@/context/UrlProvider";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import RemixIcon from "react-native-remix-icon";
 
 interface user {
   _id: string;
@@ -237,7 +238,7 @@ const profile = () => {
             onPress={() => navigation.goBack()}
           >
             <View className="p-2 bg-[#E1E1E1] rounded-full flex items-center justify-center">
-              <Ionicons name="chevron-back" size={18} />
+              <RemixIcon name="arrow-left-s-line" size={16} color="black" />
             </View>
           </TouchableHighlight>
           <TouchableHighlight
@@ -246,10 +247,10 @@ const profile = () => {
             onPress={handleLogout}
           >
             <View className="p-2.5 bg-[#E1E1E1] rounded-full flex items-center justify-center">
-              <Feather name="user-x" size={14} />
+              <RemixIcon name="door-open-line" size={14} color="black" />
             </View>
           </TouchableHighlight>
-          <Text className="text-xl font-semibold">Profile</Text>
+          <Text className="text-sm font-semibold">Profile</Text>
         </View>
         <ScrollView
           className="flex-1 w-full"
@@ -265,7 +266,7 @@ const profile = () => {
                 ></ImageBackground>
               </View>
               <View className="w-full flex items-start justify-center py-2">
-                <Text className="text-lg font-semibold py-1" numberOfLines={1}>
+                <Text className="text-sm font-semibold py-1" numberOfLines={1}>
                   {!user
                     ? "loading..."
                     : `${user.personalInfo.firstName} ${user.personalInfo.lastName}`}
@@ -273,7 +274,7 @@ const profile = () => {
                 <View className="w-full flex flex-row justify-start items-center">
                   <View className="rounded-full  mr-1 max-w-[50%]">
                     <LinearGradient
-                      colors={["#00674F", "#06402B"]}
+                      colors={["#699900", "#466600"]}
                       className="flex items-center justify-center px-4 py-2 rounded-xl"
                     >
                       <Text
@@ -286,7 +287,7 @@ const profile = () => {
                   </View>
                   <View className="bg-[#E1E1E1] rounded-xl mr-2 max-w-[30%]">
                     <LinearGradient
-                      colors={["#00674F", "#06402B"]}
+                      colors={["#699900", "#466600"]}
                       className="flex items-center justify-center px-4 py-2 rounded-xl"
                     >
                       <Text
@@ -303,7 +304,7 @@ const profile = () => {
                         className="p-2 bg-[#050301] rounded-full"
                         onPress={() => setEdit(true)}
                       >
-                        <Feather name="edit-2" size={14} color={"white"} />
+                        <RemixIcon name="edit-2-line" size={14} color="white" />
                       </Pressable>
                     ) : (
                       <>
@@ -333,7 +334,7 @@ const profile = () => {
           <View className="w-full flex items-center justify-center">
             {/* Basic Information */}
             <View className="w-full flex items-start justify-center py-4">
-              <Text className="text-lg font-semibold text-black">
+              <Text className="text-sm font-semibold text-black">
                 Basic Informations
               </Text>
               <Text className="text-xs font-normal text-black/50 pb-2">
@@ -343,7 +344,11 @@ const profile = () => {
               <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-1">
-                    <Feather name="user" size={14} color={"rgba(0, 0, 0, 1)"} />
+                    <RemixIcon
+                      name="user-4-line"
+                      size={14}
+                      color={"rgba(0, 0, 0, 1)"}
+                    />
                   </View>
                   <Text
                     className="text-xs font-semibold text-black"
@@ -366,7 +371,11 @@ const profile = () => {
               <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-1">
-                    <Feather name="mail" size={14} color={"rgba(0, 0, 0, 1)"} />
+                    <RemixIcon
+                      name="user-4-line"
+                      size={14}
+                      color={"rgba(0, 0, 0, 1)"}
+                    />
                   </View>
                   <Text
                     className="text-xs font-semibold text-black"
@@ -389,7 +398,11 @@ const profile = () => {
               <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-1">
-                    <Feather name="mail" size={14} color={"rgba(0, 0, 0, 1)"} />
+                    <RemixIcon
+                      name="user-4-line"
+                      size={14}
+                      color={"rgba(0, 0, 0, 1)"}
+                    />
                   </View>
                   <Text
                     className="text-xs font-semibold text-black"
@@ -412,8 +425,8 @@ const profile = () => {
               <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-1">
-                    <Feather
-                      name="calendar"
+                    <RemixIcon
+                      name="calendar-event-line"
                       size={14}
                       color={"rgba(0, 0, 0, 1)"}
                     />
@@ -444,7 +457,11 @@ const profile = () => {
                       edit ? "bg-black" : "bg-black/25"
                     } p-2 rounded-full`}
                   >
-                    <Feather name="calendar" size={12} color={"white"} />
+                    <RemixIcon
+                      name="calendar-event-line"
+                      size={14}
+                      color="white"
+                    />
                   </Pressable>
                 </View>
               </View>
@@ -460,7 +477,11 @@ const profile = () => {
               <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-1">
-                    <Feather name="meh" size={14} color={"rgba(0, 0, 0, 1)"} />
+                    <RemixIcon
+                      name="user-smile-line"
+                      size={14}
+                      color={"rgba(0, 0, 0, 1)"}
+                    />
                   </View>
                   <Text
                     className="text-xs font-semibold text-black"
@@ -488,7 +509,7 @@ const profile = () => {
                       edit ? "bg-black" : "bg-black/25"
                     } p-2 rounded-full`}
                   >
-                    <Feather name="rotate-cw" size={12} color={"white"} />
+                    <RemixIcon name="refresh-line" size={12} color={"white"} />
                   </Pressable>
                 </View>
               </View>
@@ -496,8 +517,8 @@ const profile = () => {
               <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-1">
-                    <Feather
-                      name="activity"
+                    <RemixIcon
+                      name="survey-line"
                       size={14}
                       color={"rgba(0, 0, 0, 1)"}
                     />
@@ -528,14 +549,18 @@ const profile = () => {
                       edit ? "bg-black" : "bg-black/25"
                     } p-2 rounded-full`}
                   >
-                    <Feather name="rotate-cw" size={12} color={"white"} />
+                    <RemixIcon name="refresh-line" size={12} color={"white"} />
                   </Pressable>
                 </View>
               </View>
               <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-1">
-                    <Feather name="flag" size={14} color={"rgba(0, 0, 0, 1)"} />
+                    <RemixIcon
+                      name="flag-2-line"
+                      size={14}
+                      color={"rgba(0, 0, 0, 1)"}
+                    />
                   </View>
                   <Text
                     className="text-xs font-semibold text-black"
@@ -558,7 +583,7 @@ const profile = () => {
             </View>
             {/* Additional Information */}
             <View className="w-full flex items-start justify-center py-4">
-              <Text className="text-lg font-semibold text-black">
+              <Text className="text-sm font-semibold text-black">
                 Contact Information
               </Text>
               <Text className="text-xs font-normal text-black/50 pb-2">
@@ -568,7 +593,11 @@ const profile = () => {
               <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-1">
-                    <Feather name="hash" size={14} color={"rgba(0, 0, 0, 1)"} />
+                    <RemixIcon
+                      name="home-3-line"
+                      size={14}
+                      color={"rgba(0, 0, 0, 1)"}
+                    />
                   </View>
                   <Text
                     className="text-xs font-semibold text-black"
@@ -591,8 +620,8 @@ const profile = () => {
               <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-1">
-                    <Feather
-                      name="corner-up-right"
+                    <RemixIcon
+                      name="home-3-line"
                       size={14}
                       color={"rgba(0, 0, 0, 1)"}
                     />
@@ -618,8 +647,8 @@ const profile = () => {
               <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-1">
-                    <Feather
-                      name="corner-right-up"
+                    <RemixIcon
+                      name="home-3-line"
                       size={14}
                       color={"rgba(0, 0, 0, 1)"}
                     />
@@ -645,8 +674,8 @@ const profile = () => {
               <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-1">
-                    <Feather
-                      name="corner-down-left"
+                    <RemixIcon
+                      name="home-3-line"
                       size={14}
                       color={"rgba(0, 0, 0, 1)"}
                     />
@@ -672,8 +701,8 @@ const profile = () => {
               <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-1">
-                    <Feather
-                      name="tablet"
+                    <RemixIcon
+                      name="hashtag"
                       size={14}
                       color={"rgba(0, 0, 0, 1)"}
                     />
@@ -704,7 +733,7 @@ const profile = () => {
               </View>
             </View>
             <View className="w-full flex items-start justify-center py-4">
-              <Text className="text-lg font-semibold text-black">
+              <Text className="text-sm font-semibold text-black">
                 Economic Information
               </Text>
               <Text className="text-xs font-normal text-black/50 pb-2">
@@ -714,8 +743,8 @@ const profile = () => {
               <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-1">
-                    <Feather
-                      name="briefcase"
+                    <RemixIcon
+                      name="briefcase-line"
                       size={14}
                       color={"rgba(0, 0, 0, 1)"}
                     />
@@ -741,8 +770,8 @@ const profile = () => {
               <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
                 <View className="w-1/2 flex flex-row items-center justify-start">
                   <View className="pr-1">
-                    <Feather
-                      name="clipboard"
+                    <RemixIcon
+                      name="building-2-line"
                       size={14}
                       color={"rgba(0, 0, 0, 1)"}
                     />
@@ -770,7 +799,7 @@ const profile = () => {
             <View className="w-full flex items-start justify-center py-4">
               <View className="w-full flex items-center justify-center pb-2">
                 <View className="w-full flex items-start justify-center py-2">
-                  <Text className="text-lg font-semibold text-black">
+                  <Text className="text-sm font-semibold text-black">
                     Privacy and Security
                   </Text>
                   <Text className="text-xs font-normal text-black/50">
@@ -780,8 +809,8 @@ const profile = () => {
                 <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
                   <View className="w-1/2 flex flex-row items-center justify-start">
                     <View className="pr-1">
-                      <Feather
-                        name="at-sign"
+                      <RemixIcon
+                        name="at-line"
                         size={14}
                         color={"rgba(0, 0, 0, 1)"}
                       />
@@ -807,8 +836,8 @@ const profile = () => {
                 <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
                   <View className="w-1/2 flex flex-row items-center justify-start">
                     <View className="pr-1">
-                      <Feather
-                        name="lock"
+                      <RemixIcon
+                        name="shield-keyhole-line"
                         size={14}
                         color={"rgba(0, 0, 0, 1)"}
                       />
@@ -834,8 +863,8 @@ const profile = () => {
                 <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-6 py-3 mt-2">
                   <View className="w-1/2 flex flex-row items-center justify-start">
                     <View className="pr-1">
-                      <Feather
-                        name="terminal"
+                      <RemixIcon
+                        name="terminal-line"
                         size={14}
                         color={"rgba(0, 0, 0, 1)"}
                       />
