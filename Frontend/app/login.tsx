@@ -87,9 +87,20 @@ export default function Login() {
         >
           <LinearGradient
             className="w-full h-full"
-            colors={["rgba(5, 3, 1, .7)", "rgba(5, 3, 1, 0.4)"]}
-            start={{ x: 1, y: 1 }} // Top-left corner
-            end={{ x: 1, y: 0 }} // Bottom-right corner
+            colors={[
+              "#553657",
+              "#8f4164",
+              "#c5525c",
+              "#e87443",
+              "#e7872f",
+              "#df9c19",
+              "#bdac00",
+              "#aaa600",
+              "#989f00",
+              "#d0b100",
+            ]}
+            start={{ x: 0, y: 1 }} // Bottom-left corner
+            end={{ x: 1, y: 0 }} // Top-right corner
           >
             <SafeAreaView className="w-full flex bg-[#F6F6F6] rounded-3xl items-center justify-center py-20 px-6">
               <View className="w-full flex items-center justify-center pb-6">
@@ -102,6 +113,7 @@ export default function Login() {
               </View>
 
               <View className="w-full flex items-start justify-center py-6">
+                <Text className="font-semibold text-sm pb-2">User Name:</Text>
                 <Text className="font-semibold text-xs pb-2">Username:</Text>
                 <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl">
                   <RemixIcon name="at-line" size={16} />
