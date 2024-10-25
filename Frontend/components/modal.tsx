@@ -3,6 +3,7 @@ import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+import RemixIcon from "react-native-remix-icon";
 
 const Modal = ({
   message,
@@ -29,24 +30,22 @@ const Modal = ({
         <View className="w-full flex items-center justify-center bg-[#F0F0F0] p-6">
           <View className="w-full flex items-center justify-center pb-2">
             <LinearGradient
-              className="flex p-3 bg-black rounded-full"
-              colors={["#00674F", "#06402B"]}
+              className="flex p-3 rounded-full"
+              colors={["#699900", "#466600"]}
             >
-              <MaterialCommunityIcons
-                name={
-                  icon === "redeem"
-                    ? "shopping-outline"
-                    : icon === "login"
-                    ? "account-alert-outline"
-                    : icon === "profile"
-                    ? "account-sync"
-                    : icon === "history"
-                    ? "clock-time-two-outline"
-                    : "crosshairs-gps"
-                }
-                size={20}
-                color={"white"}
-              />
+              {icon === "login" ? (
+                <RemixIcon name="user-4-line" size={16} color="white" />
+              ) : icon === "history" ? (
+                <RemixIcon name="calendar-event-line" size={16} color="white" />
+              ) : icon === "redeem" ? (
+                <RemixIcon name="shopping-bag-line" size={16} color="white" />
+              ) : icon === "users" ? (
+                <RemixIcon name="user-smile-line" size={16} color="white" />
+              ) : icon === "profile" ? (
+                <RemixIcon name="user-4-line" size={16} color="white" />
+              ) : (
+                <RemixIcon name="user-4-line" size={16} color="white" />
+              )}
             </LinearGradient>
           </View>
           <Text className="text-xs font-normal text-black text-center">

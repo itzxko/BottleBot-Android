@@ -7,7 +7,6 @@ import {
   Pressable,
   ImageBackground,
   TouchableHighlight,
-  Image,
 } from "react-native";
 import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useState, useEffect } from "react";
@@ -26,6 +25,7 @@ import { useUrl } from "@/context/UrlProvider";
 import { useQueue } from "@/context/QueueProvider";
 import RemixIcon from "react-native-remix-icon";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Image } from "expo-image";
 
 export default function Login() {
   const [hidePass, setHidePass] = useState(true);
@@ -83,26 +83,21 @@ export default function Login() {
       <View className="relative flex-1 w-full bg-[#102B33]">
         <ImageBackground
           className="w-full object-cover object-center"
-          source={require(".././assets/images/user-auth.jpg")}
+          source={require(".././assets/images/Leaves.jpg")}
         >
           <LinearGradient
             className="w-full h-full"
-            colors={[
-              "#553657",
-              "#8f4164",
-              "#c5525c",
-              "#e87443",
-              "#e7872f",
-              "#df9c19",
-              "#bdac00",
-              "#aaa600",
-              "#989f00",
-              "#d0b100",
-            ]}
+            colors={["rgba(33, 33, 33, .8)", "rgba(33, 33, 33, 0.1)"]}
             start={{ x: 0, y: 1 }} // Bottom-left corner
             end={{ x: 1, y: 0 }} // Top-right corner
           >
-            <SafeAreaView className="w-full flex bg-[#F6F6F6] rounded-3xl items-center justify-center py-20 px-6">
+            <SafeAreaView className="w-full flex bg-[#F6F6F6] rounded-3xl items-center justify-center py-16 px-6">
+              <View className="w-full flex items-center justify-center pb-4">
+                <Image
+                  source={require("../assets/images/Bottle_Bot.png")}
+                  className="w-[100px] h-[100px]"
+                />
+              </View>
               <View className="w-full flex items-center justify-center pb-6">
                 <Text className="text-sm font-semibold tracking-wider">
                   Account Login.
@@ -173,12 +168,6 @@ export default function Login() {
                 </TouchableHighlight>
               </View>
             </SafeAreaView>
-            <View className="w-full flex-1 items-center justify-center ">
-              <Image
-                source={require("../assets/images/Bottle_Bot.png")}
-                className="w-[60px] h-[60px]"
-              />
-            </View>
           </LinearGradient>
         </ImageBackground>
         <StatusBar style="auto" />
