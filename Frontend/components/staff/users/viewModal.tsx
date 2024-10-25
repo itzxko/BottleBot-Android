@@ -8,6 +8,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import RemixIcon from "react-native-remix-icon";
 
 interface user {
   _id: string;
@@ -108,11 +109,11 @@ const ViewModal = ({
           onPress={onClose}
         >
           <View className="p-2 bg-[#E1E1E1] rounded-full flex items-center justify-center">
-            <Ionicons name="chevron-back" size={18} />
+            <RemixIcon name="arrow-left-s-line" size={16} color="black" />
           </View>
         </TouchableHighlight>
 
-        <Text className="text-xl font-semibold">View User</Text>
+        <Text className="text-sm font-semibold">View User</Text>
       </View>
       <ScrollView
         className="flex-1 w-full"
@@ -123,7 +124,7 @@ const ViewModal = ({
           <View className="w-full py-4">
             {/* Title */}
             <View className="w-full flex items-start justify-center pb-4">
-              <Text className="text-lg font-semibold">
+              <Text className="text-sm font-semibold">
                 Personal Information
               </Text>
               <Text className="text-xs font-normal text-black/50">
@@ -219,7 +220,7 @@ const ViewModal = ({
           <View className="w-full py-4">
             {/* Title */}
             <View className="w-full flex items-start justify-center pb-4">
-              <Text className="text-lg font-semibold">Contact Information</Text>
+              <Text className="text-sm font-semibold">Contact Information</Text>
               <Text className="text-xs font-normal text-black/50">
                 phone number, address etc.
               </Text>
@@ -289,7 +290,7 @@ const ViewModal = ({
           <View className="w-full py-4">
             {/* Title */}
             <View className="w-full flex items-start justify-center pb-4">
-              <Text className="text-lg font-semibold">
+              <Text className="text-sm font-semibold">
                 Economic Information
               </Text>
               <Text className="text-xs font-normal text-black/50">
@@ -324,7 +325,7 @@ const ViewModal = ({
           <View className="w-full py-4">
             {/* Title */}
             <View className="w-full flex items-start justify-center pb-4">
-              <Text className="text-lg font-semibold">Credentials</Text>
+              <Text className="text-sm font-semibold">Credentials</Text>
               <Text className="text-xs font-normal text-black/50">
                 email, password & role
               </Text>

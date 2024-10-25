@@ -11,6 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
 import { useQueue } from "@/context/QueueProvider";
+import RemixIcon from "react-native-remix-icon";
 
 const monitor = () => {
   const { queue, deleteFromQueue } = useQueue();
@@ -40,19 +41,19 @@ const monitor = () => {
           className="absolute left-4 rounded-full"
         >
           <View className="p-2 bg-[#E1E1E1] rounded-full flex items-center justify-center">
-            <Ionicons name="chevron-back" size={18} />
+            <RemixIcon name="arrow-left-s-line" size={16} color="black" />
           </View>
         </TouchableHighlight>
 
-        <Text className="text-xl font-semibold">Monitoring</Text>
+        <Text className="text-sm font-semibold">Monitoring</Text>
       </View>
       <ScrollView
         className="flex-1 flex-col w-full px-4 py-4"
         showsVerticalScrollIndicator={false}
       >
-        <View className="w-full flex flex-col items-center justify-center p-4 bg-[#FAFAFA] rounded-3xl mb-4">
+        <View className="w-full flex flex-col items-center justify-center p-6 bg-[#FAFAFA] rounded-3xl mb-4">
           <View className="w-full flex flex-col items-start justify-center pb-8">
-            <Text className="text-lg font-semibold">Bot Status</Text>
+            <Text className="text-sm font-semibold">Bot Status</Text>
             <Text className="text-xs font-normal text-black/50">
               power supply, sim module, capacity
             </Text>
@@ -65,7 +66,7 @@ const monitor = () => {
               className="w-full rounded-2xl flex flex-row items-center justify-between px-6 py-4 mb-2"
             >
               <View className="w-1/2 flex flex-row items-center justify-start gap-x-2">
-                <Feather name="battery" size={16} color={"white"} />
+                <RemixIcon name="battery-line" size={16} color="white" />
                 <Text
                   className="text-xs font-normal text-white"
                   numberOfLines={1}
@@ -89,7 +90,7 @@ const monitor = () => {
               className="w-full rounded-2xl flex flex-row items-center justify-between px-6 py-4 mb-2"
             >
               <View className="w-1/2 flex flex-row items-center justify-start gap-x-2">
-                <Feather name="wifi" size={16} color={"white"} />
+                <RemixIcon name="sim-card-line" size={16} color="white" />
                 <Text
                   className="text-xs font-normal text-white"
                   numberOfLines={1}
@@ -113,7 +114,7 @@ const monitor = () => {
               className="w-full rounded-2xl flex flex-row items-center justify-between px-6 py-4"
             >
               <View className="w-1/2 flex flex-row items-center justify-start gap-x-2">
-                <Feather name="trash-2" size={16} color={"white"} />
+                <RemixIcon name="delete-bin-4-line" size={16} color="white" />
                 <Text
                   className="text-xs font-normal text-white"
                   numberOfLines={1}
@@ -132,9 +133,9 @@ const monitor = () => {
             </LinearGradient>
           </View>
         </View>
-        <View className="w-full flex flex-col items-center justify-center p-4 bg-[#FAFAFA] rounded-3xl">
+        <View className="w-full flex flex-col items-center justify-center p-6 bg-[#FAFAFA] rounded-3xl">
           <View className="w-full flex flex-col items-start justify-center pb-8">
-            <Text className="text-lg font-semibold">User Queue</Text>
+            <Text className="text-sm font-semibold">User Queue</Text>
             <Text className="text-xs font-normal text-black/50">
               users waiting in line for their turn
             </Text>
@@ -148,13 +149,13 @@ const monitor = () => {
                 <Pressable
                   className={`flex p-3 items-center justify-center rounded-full ${
                     request.status === "in progress"
-                      ? "bg-[#050301]"
-                      : "bg-[#E6E6E6]"
+                      ? "bg-[#699900]"
+                      : "bg-[#EDEDED]"
                   }`}
                   onPress={() => deleteFromQueue(request._id)}
                 >
-                  <Feather
-                    name="navigation-2"
+                  <RemixIcon
+                    name="open-arm-line"
                     size={16}
                     color={request.status === "in progress" ? "white" : "black"}
                   />
@@ -183,11 +184,11 @@ const monitor = () => {
             ))
           ) : (
             <View className="w-full flex flex-col items-center justify-center gap-y-4 pb-6">
-              <View className="p-3 flex items-center justify-center bg-[#050301] rounded-full">
-                <Feather name="cloud-off" size={16} color={"white"} />
+              <View className="p-3 mb-2 rounded-full bg-[#699900]">
+                <RemixIcon name="blur-off-fill" size={16} color="white" />
               </View>
-              <Text className="text-xs font-normal">
-                No Queue at the Moment
+              <Text className="text-xs font-normal text-black/50">
+                No Rewards History Available
               </Text>
             </View>
           )}

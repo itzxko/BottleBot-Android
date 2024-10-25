@@ -2,6 +2,7 @@ import { View, Text, TouchableOpacity, Pressable } from "react-native";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { Feather } from "@expo/vector-icons";
 import { blue } from "react-native-reanimated/lib/typescript/reanimated2/Colors";
+import RemixIcon from "react-native-remix-icon";
 
 export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   return (
@@ -48,27 +49,24 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
             key={route.name}
           >
             {isFocused ? (
-              <Text
-                className="text-[10px] font-extrabold text-[#00674F] capitalize"
-                numberOfLines={1}
-              >
-                {typeof label === "string" ? label : options.title}
-              </Text>
-            ) : (
-              <Feather
-                name={
-                  route.name === "dashboard"
-                    ? "home"
-                    : route.name === "redeem"
-                    ? "shopping-bag"
-                    : route.name === "history"
-                    ? "calendar"
-                    : "user"
-                }
-                size={20}
-                color={"rgba(79, 79, 79, 0.2)"}
-              />
-            )}
+              route.name === "dashboard" ? (
+                <RemixIcon name="home-3-fill" size={20} color="#699900" />
+              ) : route.name === "history" ? (
+                <RemixIcon
+                  name="calendar-event-fill"
+                  size={20}
+                  color="#699900"
+                />
+              ) : route.name === "profile" ? (
+                <RemixIcon name="user-4-fill" size={20} color="#699900" />
+              ) : null
+            ) : route.name === "dashboard" ? (
+              <RemixIcon name="home-3-line" size={20} color="#699900" />
+            ) : route.name === "history" ? (
+              <RemixIcon name="calendar-event-line" size={20} color="#699900" />
+            ) : route.name === "profile" ? (
+              <RemixIcon name="user-4-line" size={20} color="#699900" />
+            ) : null}
           </TouchableOpacity>
         );
       })}

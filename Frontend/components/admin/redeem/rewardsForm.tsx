@@ -16,6 +16,7 @@ import * as ImagePicker from "expo-image-picker";
 import Modal from "@/components/modal";
 import { useAdminHistory } from "@/context/AdminHistoryProvider";
 import { useRewards } from "@/context/RewardsProvider";
+import RemixIcon from "react-native-remix-icon";
 
 const RewardsForm = ({
   onClose,
@@ -184,7 +185,7 @@ const RewardsForm = ({
             onPress={onClose}
           >
             <View className="p-2 bg-[#E1E1E1] rounded-full flex items-center justify-center">
-              <Ionicons name="chevron-back" size={18} />
+              <RemixIcon name="arrow-left-s-line" size={16} color="black" />
             </View>
           </TouchableHighlight>
           <TouchableHighlight
@@ -195,10 +196,10 @@ const RewardsForm = ({
             }}
           >
             <View className="p-2 bg-[#E1E1E1] rounded-full flex items-center justify-center">
-              <Feather name="check" size={18} />
+              <RemixIcon name="check-line" size={16} />
             </View>
           </TouchableHighlight>
-          <Text className="text-xl font-semibold">Reward Form</Text>
+          <Text className="text-sn font-semibold">Reward Form</Text>
         </View>
         <ScrollView
           className="flex-1 w-full"
@@ -229,12 +230,15 @@ const RewardsForm = ({
                       setImageChanged(true);
                     }}
                   >
-                    <Feather name={image ? "x" : "plus"} size={16} />
+                    <RemixIcon
+                      name={image ? "close-line" : "add-line"}
+                      size={16}
+                    />
                   </Pressable>
                 </View>
               </View>
               <View className="w-full flex items-start justify-center pb-4">
-                <Text className="text-lg font-semibold">
+                <Text className="text-sm font-semibold">
                   Reward Information
                 </Text>
                 <Text className="text-xs font-normal text-black/50">
@@ -296,9 +300,9 @@ const RewardsForm = ({
                       {category}
                     </Text>
                     {openCategories ? (
-                      <Feather name="chevron-up" size={16} />
+                      <RemixIcon name="arrow-up-s-line" size={16} />
                     ) : (
-                      <Feather name="chevron-down" size={16} />
+                      <RemixIcon name="arrow-down-s-line" size={16} />
                     )}
                   </View>
                   {openCategories ? (

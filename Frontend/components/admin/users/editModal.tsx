@@ -16,6 +16,7 @@ import Modal from "../../modal";
 import { useUrl } from "@/context/UrlProvider";
 import Loader from "../../loader";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import RemixIcon from "react-native-remix-icon";
 
 interface user {
   _id: string;
@@ -216,7 +217,7 @@ const EditModal = ({
             onPress={onClose}
           >
             <View className="p-2 bg-[#E1E1E1] rounded-full flex items-center justify-center">
-              <Ionicons name="chevron-back" size={18} />
+              <RemixIcon name="arrow-left-s-line" size={16} color="black" />
             </View>
           </TouchableHighlight>
           <TouchableHighlight
@@ -225,10 +226,10 @@ const EditModal = ({
             onPress={updateUser}
           >
             <View className="p-2 bg-[#E1E1E1] rounded-full flex items-center justify-center">
-              <Feather name="check" size={18} />
+              <RemixIcon name="check-line" size={16} />
             </View>
           </TouchableHighlight>
-          <Text className="text-xl font-semibold">Edit User</Text>
+          <Text className="text-sm font-semibold">Edit User</Text>
         </View>
         <ScrollView
           className="flex-1 w-full"
@@ -239,7 +240,7 @@ const EditModal = ({
             <View className="w-full py-4">
               {/* Title */}
               <View className="w-full flex items-start justify-center pb-4">
-                <Text className="text-lg font-semibold">
+                <Text className="text-sm font-semibold">
                   Personal Information
                 </Text>
                 <Text className="text-xs font-normal text-black/50">
@@ -290,7 +291,11 @@ const EditModal = ({
                     onPress={() => setShowDatePicker(true)}
                     className="p-2 bg-black rounded-full"
                   >
-                    <Feather name="calendar" size={12} color={"white"} />
+                    <RemixIcon
+                      name="calendar-event-line"
+                      size={14}
+                      color="white"
+                    />
                   </Pressable>
                 </View>
               </View>
@@ -313,7 +318,7 @@ const EditModal = ({
                     onPress={handleGenderToggle}
                     className="p-2 bg-black rounded-full"
                   >
-                    <Feather name="rotate-cw" size={12} color={"white"} />
+                    <RemixIcon name="refresh-line" size={12} color={"white"} />
                   </Pressable>
                 </View>
               </View>
@@ -328,7 +333,7 @@ const EditModal = ({
                     onPress={handleStatusToggle}
                     className="p-2 bg-black rounded-full"
                   >
-                    <Feather name="rotate-cw" size={12} color={"white"} />
+                    <RemixIcon name="refresh-line" size={12} color={"white"} />
                   </Pressable>
                 </View>
               </View>
@@ -348,7 +353,7 @@ const EditModal = ({
             <View className="w-full py-4">
               {/* Title */}
               <View className="w-full flex items-start justify-center pb-4">
-                <Text className="text-lg font-semibold">
+                <Text className="text-sm font-semibold">
                   Contact Information
                 </Text>
                 <Text className="text-xs font-normal text-black/50">
@@ -421,7 +426,7 @@ const EditModal = ({
             <View className="w-full py-4">
               {/* Title */}
               <View className="w-full flex items-start justify-center pb-4">
-                <Text className="text-lg font-semibold">
+                <Text className="text-sm font-semibold">
                   Economic Information
                 </Text>
                 <Text className="text-xs font-normal text-black/50">
@@ -454,7 +459,7 @@ const EditModal = ({
             <View className="w-full py-4">
               {/* Title */}
               <View className="w-full flex items-start justify-center pb-4">
-                <Text className="text-lg font-semibold">Credentials</Text>
+                <Text className="text-sm font-semibold">Credentials</Text>
                 <Text className="text-xs font-normal text-black/50">
                   email, password & role
                 </Text>
@@ -495,7 +500,11 @@ const EditModal = ({
                       onPress={handleLevelToggle}
                       className="p-2 bg-black rounded-full"
                     >
-                      <Feather name="rotate-cw" size={12} color={"white"} />
+                      <RemixIcon
+                        name="refresh-line"
+                        size={12}
+                        color={"white"}
+                      />
                     </Pressable>
                   </View>
                 ) : (

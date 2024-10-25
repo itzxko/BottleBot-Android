@@ -17,6 +17,7 @@ import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import FieldsEdit from "./FieldsEdit";
 import { useAdminHistory } from "@/context/AdminHistoryProvider";
+import RemixIcon from "react-native-remix-icon";
 
 interface Item {
   _id: string;
@@ -144,7 +145,7 @@ const PointsHistoryEdit = ({
             onPress={onClose}
           >
             <View className="p-2 bg-[#E1E1E1] rounded-full flex items-center justify-center">
-              <Ionicons name="chevron-back" size={18} />
+              <RemixIcon name="arrow-left-s-line" size={16} color="black" />
             </View>
           </TouchableHighlight>
           <Text className="text-xl font-semibold">Choose User</Text>
@@ -207,12 +208,12 @@ const PointsHistoryEdit = ({
                 >
                   <LinearGradient
                     className="flex p-5 rounded-3xl bg-gray-300"
-                    colors={["#00674F", "#06402B"]}
+                    colors={["#699900", "#466600"]}
                   >
-                    <Ionicons
-                      name="return-up-forward"
+                    <RemixIcon
+                      name="arrow-go-forward-line"
                       size={16}
-                      color={"white"}
+                      color="white"
                     />
                   </LinearGradient>
                 </Pressable>

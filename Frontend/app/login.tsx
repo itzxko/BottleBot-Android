@@ -24,6 +24,7 @@ import Modal from "../components/modal";
 import { useAuth } from "@/context/AuthContext";
 import { useUrl } from "@/context/UrlProvider";
 import { useQueue } from "@/context/QueueProvider";
+import RemixIcon from "react-native-remix-icon";
 
 export default function Login() {
   const [hidePass, setHidePass] = useState(true);
@@ -91,7 +92,7 @@ export default function Login() {
           >
             <View className="w-full h-[76vh] bg-[#F6F6F6] rounded-3xl items-center justify-center px-6">
               <View className="w-full flex items-center justify-center pb-6">
-                <Text className="text-xl font-semibold tracking-wider">
+                <Text className="text-sm font-semibold tracking-wider">
                   Account Login.
                 </Text>
                 <Text className="text-xs font-normal text-black/50">
@@ -102,7 +103,7 @@ export default function Login() {
               <View className="w-full flex items-start justify-center py-6">
                 <Text className="font-semibold text-sm pb-2">Username:</Text>
                 <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl">
-                  <Feather name="user" size={16} />
+                  <RemixIcon name="at-line" size={16} />
                   <TextInput
                     className="text-xs font-normal w-[90%] text-left"
                     placeholder="enter username"
@@ -117,7 +118,7 @@ export default function Login() {
               <View className="w-full flex items-start justify-center pb-6">
                 <Text className="font-semibold text-sm pb-2">Password:</Text>
                 <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl">
-                  <Feather name="lock" size={16} />
+                  <RemixIcon name="shield-keyhole-line" size={16} />
                   <TextInput
                     className="text-xs font-normal w-[80%] text-left"
                     numberOfLines={1}
@@ -129,8 +130,8 @@ export default function Login() {
                     spellCheck={false}
                     autoCapitalize="none"
                   />
-                  <Feather
-                    name={hidePass ? "eye" : "eye-off"}
+                  <RemixIcon
+                    name={hidePass ? "eye-line" : "eye-close-line"}
                     size={16}
                     onPress={togglePassword}
                   />
@@ -150,9 +151,7 @@ export default function Login() {
                   underlayColor={"#41917F"}
                 >
                   <LinearGradient
-                    colors={["#00674F", "#06402B"]}
-                    start={{ x: 0, y: 1 }}
-                    end={{ x: 1, y: 0 }}
+                    colors={["#699900", "#466600"]}
                     className="w-full  rounded-xl shadow shadow-[#050301]"
                   >
                     <Text className="flex py-[16px] bg-transparent text-center text-xs text-white font-semibold">

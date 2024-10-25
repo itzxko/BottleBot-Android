@@ -13,6 +13,12 @@ import { Feather, MaterialIcons, Octicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import Loader from "@/components/loader";
 import { useQueue } from "@/context/QueueProvider";
+import { Image } from "expo-image";
+import ConfigForm from "@/components/dashboard/configForm";
+import { useLocation } from "@/context/LocationProvider";
+import { useUrl } from "@/context/UrlProvider";
+import axios from "axios";
+import RemixIcon from "react-native-remix-icon";
 import { useAuth } from "@/context/AuthContext";
 
 const Dashboard = () => {
@@ -20,6 +26,10 @@ const Dashboard = () => {
     useQueue();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [configForm, setConfigForm] = useState(false);
+  const { yourLocation, defaultLocation, getUserLocation } = useLocation();
+  const [config, setConfig] = useState<config | undefined>();
+  const { ipAddress, port } = useUrl();
   const [mapRegion, setMapRegion] = useState({
     latitude: 14.680105493791455,
     longitude: 121.00993905398246,
@@ -27,43 +37,44 @@ const Dashboard = () => {
     longitudeDelta: 0.01,
   });
 
-  const userLocation = async () => {
-    // Request location permission
-    const { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted") {
-      alert("Permission to access location was denied");
-      return;
-    }
-
-    // Get current location
-    try {
-      const location = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.High, // Use high accuracy
-      });
-
-      // Set the map region to the user's current location
-      setMapRegion({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-        latitudeDelta: 0.01, // Adjust this for zoom level
-        longitudeDelta: 0.01, // Adjust this for zoom level
-      });
-    } catch (error) {
-      console.error("Error getting location:", error);
-      alert("Unable to retrieve location. Please try again.");
-    }
-  };
+  interface config {
+    defaultLocation: {
+      lat: number;
+      lon: number;
+      locationName: string;
+    };
+    bottleExchange: {
+      baseWeight: number;
+      baseUnit: string;
+      equivalentInPoints: number;
+    };
+    _id: string;
+  }
 
   useEffect(() => {
-    const getUserLocation = async () => {
+    const getLocation = async () => {
       setLoading(true);
-      await userLocation();
-      await initializeWebSocket();
+      await getUserLocation();
       setLoading(false);
     };
 
-    getUserLocation();
+    getLocation();
+    checkConfig();
   }, []);
+
+  const checkConfig = async () => {
+    try {
+      let url = `http://${ipAddress}:${port}/api/configurations`;
+
+      let response = await axios.get(url);
+
+      if (response.data.success === true) {
+        setConfig(response.data.config);
+      }
+    } catch (error: any) {
+      console.log(error);
+    }
+  };
 
   return (
     <>
@@ -73,9 +84,28 @@ const Dashboard = () => {
             {/* Map Background */}
             <MapView
               style={{ width: "100%", height: "100%" }}
-              region={mapRegion}
+              region={yourLocation}
             >
-              <Marker coordinate={mapRegion} title="Marker" />
+              <Marker coordinate={yourLocation} title="Your Location">
+                <Image
+                  source={require("../../assets/images/Admin-Pin.png")}
+                  className="w-[56px] h-[56px]"
+                />
+              </Marker>
+              {config && (
+                <Marker
+                  coordinate={{
+                    latitude: config.defaultLocation.lat,
+                    longitude: config.defaultLocation.lon,
+                  }}
+                  title="Default Location"
+                >
+                  <Image
+                    source={require("../../assets/images/Default-Pin.png")}
+                    className="w-[56px] h-[56px]"
+                  />
+                </Marker>
+              )}
             </MapView>
 
             <View className="w-full h-full absolute top-0 left-0">
@@ -87,23 +117,27 @@ const Dashboard = () => {
               />
             </View>
 
-            <View className="absolute flex items-center rounded-t-3xl justify-center w-full left-0 bottom-0 bg-[#F0F0F0] ">
+            <View className="absolute flex items-center rounded-t-3xl justify-center w-full left-0 bottom-0 bg-[#FAFAFA] ">
               <View className="w-full flex items-center justify-center px-4 py-8">
                 {/* Header */}
                 <View className="w-full flex items-center justify-center pb-6">
-                  <Text className="font-bold text-lg">Dashboard</Text>
+                  <Text className="font-bold text-sm">Dashboard</Text>
                   <Text className="font-normal text-xs text-black/50">
                     Allow location access to provide accurate data
                   </Text>
                 </View>
                 {/* BottleBot */}
-                <View className="w-full flex flex-row items-center justify-between pl-2 pr-6 py-2 bg-[#E6E6E6] rounded-xl mb-2">
-                  <View className="max-w-[50%] flex flex-row items-center justify-start px-4 py-2.5 rounded-lg bg-[#050301]">
+                <View className="w-full flex flex-row items-center justify-between pl-2 pr-6 py-2 bg-[#E6E6E6] rounded-full mb-2">
+                  <View className="max-w-[50%] flex flex-row items-center justify-start px-4 py-2.5 rounded-full bg-[#050301]">
                     <Pressable>
-                      <Feather name="navigation-2" size={16} color={"white"} />
+                      <RemixIcon
+                        name="map-pin-2-line"
+                        size={16}
+                        color="white"
+                      />
                     </Pressable>
                     <Text
-                      className="text-xs font-semibold text-white pl-2"
+                      className="text-xs font-normal text-white pl-2"
                       numberOfLines={1}
                     >
                       BottleBot Location
@@ -114,17 +148,21 @@ const Dashboard = () => {
                     placeholder="single"
                     numberOfLines={1}
                     readOnly={true}
-                    value={`${mapRegion.latitude.toString()}, ${mapRegion.longitude.toString()}`}
+                    value={`${yourLocation.latitude.toString()}, ${yourLocation.longitude.toString()}`}
                   ></TextInput>
                 </View>
                 {/* User */}
-                <View className="w-full flex flex-row items-center justify-between pl-2 pr-6 py-2 bg-[#E6E6E6] rounded-3xl mb-2">
-                  <View className="max-w-[50%] flex flex-row items-center justify-start px-4 py-2.5 rounded-xl bg-[#050301]">
+                <View className="w-full flex flex-row items-center justify-between pl-2 pr-6 py-2 bg-[#E6E6E6] rounded-full mb-2">
+                  <View className="max-w-[50%] flex flex-row items-center justify-start px-4 py-2.5 rounded-full bg-[#050301]">
                     <Pressable>
-                      <Feather name="navigation-2" size={16} color={"white"} />
+                      <RemixIcon
+                        name="map-pin-2-line"
+                        size={16}
+                        color="white"
+                      />
                     </Pressable>
                     <Text
-                      className="text-xs font-semibold text-white pl-2"
+                      className="text-xs font-normal text-white pl-2"
                       numberOfLines={1}
                     >
                       Your Location
@@ -135,10 +173,9 @@ const Dashboard = () => {
                     placeholder="single"
                     numberOfLines={1}
                     readOnly={true}
-                    value={`${mapRegion.latitude.toString()}, ${mapRegion.longitude.toString()}`}
-                  ></TextInput>
+                    value={`${yourLocation.latitude.toString()}, ${yourLocation.longitude.toString()}`}
+                  />
                 </View>
-
                 <View className="w-full flex items-center justify-center py-4">
                   <TouchableHighlight
                     className="w-full flex items-center justify-center rounded-xl"
@@ -146,17 +183,15 @@ const Dashboard = () => {
                     onPress={() =>
                       addtoQueue({
                         userId: user?._id,
-                        lon: mapRegion.longitude,
-                        lat: mapRegion.latitude,
+                        lon: yourLocation.longitude,
+                        lat: yourLocation.latitude,
                         locationName: "shitty place",
                         status: "pending",
                       })
                     }
                   >
                     <LinearGradient
-                      colors={["#00674F", "#06402B"]}
-                      start={{ x: 0, y: 1 }}
-                      end={{ x: 1, y: 0 }}
+                      colors={["#699900", "#466600"]}
                       className="w-full  rounded-xl shadow shadow-[#050301]"
                     >
                       <Text className="flex py-3.5 bg-transparent text-center text-sm text-white font-semibold">
@@ -166,12 +201,21 @@ const Dashboard = () => {
                   </TouchableHighlight>
                 </View>
               </View>
-              <View className="pb-12"></View>
+              <View className="pb-16"></View>
             </View>
           </View>
         </View>
       </View>
       {loading && <Loader />}
+      {configForm && (
+        <ConfigForm
+          onClose={() => {
+            setConfigForm(false);
+            checkConfig();
+          }}
+          config={config}
+        />
+      )}
     </>
   );
 };

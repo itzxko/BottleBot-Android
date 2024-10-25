@@ -25,6 +25,7 @@ import Modal from "@/components/modal";
 import PointsHistoryAdd from "@/components/admin/history/points/PointsHistoryAdd";
 import PointsHistoryEdit from "@/components/admin/history/points/PointsHistoryEdit";
 import { useRewards } from "@/context/RewardsProvider";
+import RemixIcon from "react-native-remix-icon";
 
 const History = () => {
   const { user } = useAuth();
@@ -213,15 +214,19 @@ const History = () => {
             onPress={() => navigation.goBack()}
           >
             <View className="p-2 bg-[#E1E1E1] rounded-full flex items-center justify-center">
-              <Ionicons name="chevron-back" size={18} />
+              <RemixIcon name="arrow-left-s-line" size={16} color="black" />
             </View>
           </TouchableHighlight>
-          <Text className="text-xl font-semibold">History</Text>
+          <Text className="text-sm font-semibold">History</Text>
         </View>
         <View className="w-full flex flex-row items-center justify-between px-4 py-4">
           <View className="w-full flex flex-row items-center justify-between pl-6 pr-4 py-3 rounded-full bg-[#E6E6E6]">
             <View className="w-6/12 flex-row items-center justify-start">
-              <Feather name="search" size={16} color={"rgba(0, 0, 0, 0.5)"} />
+              <RemixIcon
+                name="search-2-line"
+                size={16}
+                color={"rgba(0, 0, 0, 0.5)"}
+              />
               <TextInput
                 value={userSearch}
                 className="w-full bg-[#E6E6E6] text-xs font-normal pl-2"
@@ -239,7 +244,7 @@ const History = () => {
               >
                 {searchType ? "Rewards" : "Points"}
               </Text>
-              <Feather name="rotate-cw" size={16} color={"white"} />
+              <RemixIcon name="refresh-line" size={16} color="white" />
             </Pressable>
           </View>
         </View>
@@ -251,7 +256,7 @@ const History = () => {
           <View className="w-full flex items-center justify-center pt-4">
             <View className="w-full flex flex-row items-start justify-between px-4 pb-4">
               <View className="w-3/4 flex items-start justify-center">
-                <Text className="text-xl font-semibold" numberOfLines={1}>
+                <Text className="text-sm font-semibold" numberOfLines={1}>
                   Rewards History
                 </Text>
                 <Text
@@ -266,7 +271,7 @@ const History = () => {
                   className="p-2 bg-[#050301] rounded-full"
                   onPress={() => setRewardAdd(true)}
                 >
-                  <Feather name="plus" size={16} color={"white"} />
+                  <RemixIcon name="add-line" size={16} color="white" />
                 </Pressable>
               </View>
             </View>
@@ -333,10 +338,10 @@ const History = () => {
                                         setRewardHistoryId(rewardHistory._id);
                                       }}
                                     >
-                                      <Feather
-                                        name="edit-2"
+                                      <RemixIcon
+                                        name="edit-2-line"
                                         size={16}
-                                        color={"white"}
+                                        color="white"
                                       />
                                     </Pressable>
                                     <Pressable
@@ -344,10 +349,10 @@ const History = () => {
                                         deleteRewardHistory(rewardHistory._id)
                                       }
                                     >
-                                      <Feather
-                                        name="trash"
+                                      <RemixIcon
+                                        name="delete-bin-4-line"
                                         size={16}
-                                        color={"white"}
+                                        color="white"
                                       />
                                     </Pressable>
                                   </View>
@@ -356,7 +361,7 @@ const History = () => {
                               <View className="w-full flex items-start justify-center">
                                 <View className="w-full flex flex-row items-center justify-start pb-4">
                                   <Text
-                                    className="text-xl font-semibold text-white capitalize max-w-[60%]"
+                                    className="text-sm font-semibold text-white capitalize max-w-[60%]"
                                     numberOfLines={1}
                                   >
                                     {reward?.rewardName}
@@ -371,8 +376,8 @@ const History = () => {
                                 </View>
                                 <View className="w-full overflow-hidden flex flex-row justify-start items-center">
                                   <LinearGradient
-                                    className="flex items-center justify-center px-4 py-2 rounded-full mr-1 max-w-[60%]"
-                                    colors={["#D2AF26", "#BE8400"]}
+                                    className="flex items-center justify-center px-4 py-2 rounded-full mr-1 max-w-[50%]"
+                                    colors={["#699900", "#466600"]}
                                   >
                                     <Text
                                       className="text-xs font-normal text-white"
@@ -382,8 +387,8 @@ const History = () => {
                                     </Text>
                                   </LinearGradient>
                                   <LinearGradient
-                                    className="flex items-center justify-center px-4 py-2 rounded-full max-w-[30%]"
-                                    colors={["#00674F", "#06402B"]}
+                                    className="flex items-center justify-center px-4 py-2 rounded-full max-w-[40%]"
+                                    colors={["#699900", "#466600"]}
                                   >
                                     <Text
                                       className="text-xs font-normal text-white"
@@ -410,8 +415,8 @@ const History = () => {
                 )
               ) : (
                 <View className="flex w-[100vw] h-[240px] items-center justify-center">
-                  <View className="p-3 mb-2 rounded-full bg-black">
-                    <Feather name="cloud-off" size={20} color={"white"} />
+                  <View className="p-3 mb-2 rounded-full bg-[#699900]">
+                    <RemixIcon name="blur-off-fill" size={16} color="white" />
                   </View>
                   <Text className="text-xs font-normal text-black/50">
                     No Rewards History Available
@@ -423,7 +428,7 @@ const History = () => {
           <View className="w-full flex items-center justify-center pt-6">
             <View className="w-full flex flex-row items-start justify-between px-4 pb-4">
               <View className="w-3/4 flex items-start justify-center">
-                <Text className="text-xl font-semibold" numberOfLines={1}>
+                <Text className="text-sm font-semibold" numberOfLines={1}>
                   Points History
                 </Text>
                 <Text
@@ -438,7 +443,7 @@ const History = () => {
                   className="p-2 bg-[#050301] rounded-full"
                   onPress={() => setPointsAdd(true)}
                 >
-                  <Feather name="plus" size={16} color={"white"} />
+                  <RemixIcon name="add-line" size={16} color="white" />
                 </Pressable>
               </View>
             </View>
@@ -504,10 +509,10 @@ const History = () => {
                                         setPointHistoryId(pointHistory._id);
                                       }}
                                     >
-                                      <Feather
-                                        name="edit-2"
+                                      <RemixIcon
+                                        name="edit-2-line"
                                         size={16}
-                                        color={"white"}
+                                        color="white"
                                       />
                                     </Pressable>
                                     <Pressable
@@ -515,10 +520,10 @@ const History = () => {
                                         deletePointHistory(pointHistory._id)
                                       }
                                     >
-                                      <Feather
-                                        name="trash"
+                                      <RemixIcon
+                                        name="delete-bin-4-line"
                                         size={16}
-                                        color={"white"}
+                                        color="white"
                                       />
                                     </Pressable>
                                   </View>
@@ -527,7 +532,7 @@ const History = () => {
                               <View className="w-full flex items-start justify-center">
                                 <View className="w-full flex items-start justify-center pb-4">
                                   <Text
-                                    className="text-xl font-semibold text-white capitalize"
+                                    className="text-sm font-semibold text-white capitalize"
                                     numberOfLines={1}
                                   >
                                     {`${pointHistory.userInfo.personalInfo.firstName} ${pointHistory.userInfo.personalInfo.lastName}`}
@@ -535,8 +540,8 @@ const History = () => {
                                 </View>
                                 <View className="w-full overflow-hidden flex flex-row justify-start items-center">
                                   <LinearGradient
-                                    className="flex items-center justify-center px-4 py-2 rounded-full mr-1 max-w-[60%]"
-                                    colors={["#D2AF26", "#BE8400"]}
+                                    className="flex items-center justify-center px-4 py-2 rounded-full mr-1 max-w-[50%]"
+                                    colors={["#699900", "#466600"]}
                                   >
                                     <Text
                                       className="text-xs font-normal text-white"
@@ -551,7 +556,7 @@ const History = () => {
                                   </LinearGradient>
                                   <LinearGradient
                                     className="flex items-center justify-center px-4 py-2 rounded-full max-w-[40%]"
-                                    colors={["#00674F", "#06402B"]}
+                                    colors={["#699900", "#466600"]}
                                   >
                                     <Text
                                       className="text-xs font-normal text-white"
@@ -578,8 +583,8 @@ const History = () => {
                 )
               ) : (
                 <View className="flex w-[100vw] h-[240px] items-center justify-center">
-                  <View className="p-3 mb-2 rounded-full bg-black">
-                    <Feather name="cloud-off" size={20} color={"white"} />
+                  <View className="p-3 mb-2 rounded-full bg-[#699900]">
+                    <RemixIcon name="blur-off-fill" size={16} color="white" />
                   </View>
                   <Text className="text-xs font-normal text-black/50">
                     No Points History Available
