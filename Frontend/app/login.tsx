@@ -25,6 +25,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useUrl } from "@/context/UrlProvider";
 import { useQueue } from "@/context/QueueProvider";
 import RemixIcon from "react-native-remix-icon";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Login() {
   const [hidePass, setHidePass] = useState(true);
@@ -101,7 +102,7 @@ export default function Login() {
             start={{ x: 0, y: 1 }} // Bottom-left corner
             end={{ x: 1, y: 0 }} // Top-right corner
           >
-            <View className="w-full h-[76vh] bg-[#F6F6F6] rounded-3xl items-center justify-center px-6">
+            <SafeAreaView className="w-full flex bg-[#F6F6F6] rounded-3xl items-center justify-center py-20 px-6">
               <View className="w-full flex items-center justify-center pb-6">
                 <Text className="text-sm font-semibold tracking-wider">
                   Account Login.
@@ -113,6 +114,7 @@ export default function Login() {
 
               <View className="w-full flex items-start justify-center py-6">
                 <Text className="font-semibold text-sm pb-2">User Name:</Text>
+                <Text className="font-semibold text-xs pb-2">Username:</Text>
                 <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl">
                   <RemixIcon name="at-line" size={16} />
                   <TextInput
@@ -127,7 +129,7 @@ export default function Login() {
               </View>
 
               <View className="w-full flex items-start justify-center pb-6">
-                <Text className="font-semibold text-sm pb-2">Password:</Text>
+                <Text className="font-semibold text-xs pb-2">Password:</Text>
                 <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl">
                   <RemixIcon name="shield-keyhole-line" size={16} />
                   <TextInput
@@ -150,7 +152,7 @@ export default function Login() {
               </View>
 
               <View className="w-full flex items-end justify-center">
-                <Text className="font-semibold text-xs pb-2">
+                <Text className="font-semibold text-xs pb-2 px-2">
                   Forgot Password?
                 </Text>
               </View>
@@ -171,7 +173,7 @@ export default function Login() {
                   </LinearGradient>
                 </TouchableHighlight>
               </View>
-            </View>
+            </SafeAreaView>
             <View className="w-full flex-1 items-center justify-center ">
               <Image
                 source={require("../assets/images/Bottle_Bot.png")}
