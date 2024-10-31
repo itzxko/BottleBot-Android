@@ -30,58 +30,28 @@ const Users = () => {
   const [userModal, setUserModal] = useState(false);
   const [message, setMessage] = useState("");
   const [visibleModal, setVisibleModal] = useState(false);
-  const { getUsers, users, roles, filterUsers } = useUsers();
+  const {
+    getUsers,
+    users,
+    roles,
+    filterUsers,
+    totalPages,
+    getArchivedUsers,
+    getActiveUsers,
+  } = useUsers();
   const [editModal, setEditModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState<user | null>(null);
   const { ipAddress, port } = useUrl();
-  const [searchType, setSearchType] = useState("All");
+  const [filterStatus, setFilterStatus] = useState("All");
   const [userSearch, setUserSearch] = useState("");
   const { user } = useAuth();
   const [isError, setIsError] = useState(false);
   const { fetchAllHistory } = useAdminHistory();
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      await getUsers();
-      setLoading(false);
-    };
-
-    fetchData();
-  }, []);
-
-  const deleteUser = async (userId: string) => {
-    setLoading(true);
-    try {
-      let url = `http://${ipAddress}:${port}/api/users/${userId}`;
-      let response = await axios.delete(url);
-
-      if (response.status === 200) {
-        setMessage(response.data.message);
-        setVisibleModal(true);
-        clearSearchFilter();
-      } else {
-        setMessage(response.data.message);
-        setVisibleModal(true);
-        setIsError(false);
-      }
-    } catch (error: any) {
-      setMessage(error.response.data.message);
-      setVisibleModal(true);
-      setIsError(true);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const clearSearchFilter = async () => {
-    setUserSearch("");
-    setSearchType("All");
-    await getUsers();
-  };
+  const [currentPage, setCurrentPage] = useState(1);
 
   interface user {
     _id: string;
+    archiveDate: Date;
     personalInfo: {
       firstName: string;
       lastName: string;
@@ -111,22 +81,147 @@ const Users = () => {
     };
   }
 
-  const handleSearchType = () => {
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        if (filterStatus === "active") {
+          await getActiveUsers(currentPage, 3);
+        } else if (filterStatus === "archive") {
+          await getArchivedUsers(currentPage, 3);
+        } else {
+          await getUsers(currentPage, 3);
+        }
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [currentPage, filterStatus]);
+
+  const handlePageChange = async (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+      setLoading(true);
+
+      try {
+        if (filterStatus === "active") {
+          await getActiveUsers(newPage, 3);
+        } else if (filterStatus === "archive") {
+          await getArchivedUsers(newPage, 3);
+        } else {
+          await getUsers(newPage, 3);
+        }
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const archiveUser = async (userId: string) => {
     setLoading(true);
     try {
-      const newType =
-        searchType === "All"
-          ? "admin"
-          : searchType === "admin"
-          ? "staff"
-          : searchType === "staff"
-          ? "citizen"
-          : "All";
-      setSearchType(newType);
+      let url = `http://${ipAddress}:${port}/api/users/${userId}`;
+      let response = await axios.delete(url);
 
-      filterUsers(newType, userSearch);
+      if (response.status === 200) {
+        setMessage(response.data.message);
+        setVisibleModal(true);
+        clearSearchFilter();
+        setIsError(false);
+      } else {
+        setMessage(response.data.message);
+        setVisibleModal(true);
+        setIsError(false);
+      }
     } catch (error: any) {
-      console.log(error.response.data.message);
+      setMessage(error.response.data.message);
+      setVisibleModal(true);
+      setIsError(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const unarchiveUser = async (user: user) => {
+    setLoading(true);
+    try {
+      let url = `http://${ipAddress}:${port}/api/users/${user._id}`;
+
+      let response = await axios.put(url, {
+        archiveDate: null,
+        personalInfo: {
+          firstName: user.personalInfo.firstName,
+          middleName: user.personalInfo.middleName,
+          lastName: user.personalInfo.lastName,
+          dateOfBirth: user.personalInfo.dateOfBirth,
+          gender: user.personalInfo.gender,
+          civilStatus: user.personalInfo.civilStatus,
+          nationality: user.personalInfo.nationality,
+        },
+        contactInfo: {
+          address: {
+            houseNumber: user.contactInfo.address.houseNumber,
+            street: user.contactInfo.address.street,
+            barangay: user.contactInfo.address.barangay,
+            city: user.contactInfo.address.city,
+          },
+          phoneNumbers: user.contactInfo.phoneNumbers,
+        },
+        economicInfo: {
+          employmentStatus: user.economicInfo.employmentStatus,
+          occupation: user.economicInfo.occupation,
+        },
+        credentials: {
+          email: user.credentials.email,
+          password: user.credentials.password,
+          level: user.credentials.level,
+        },
+      });
+
+      if (response.data.success === true) {
+        clearSearchFilter();
+        setMessage(response.data.message);
+        setVisibleModal(true);
+        setIsError(false);
+      }
+    } catch (error: any) {
+      setMessage(error.response.data.message);
+      setIsError(true);
+      setVisibleModal(true);
+    }
+  };
+
+  const clearSearchFilter = async () => {
+    setUserSearch("");
+    setFilterStatus("All");
+    await getUsers(1, 3);
+    setCurrentPage(1);
+  };
+
+  const handleFilterStatus = async () => {
+    setLoading(true);
+    setUserSearch("");
+    setCurrentPage(1);
+
+    try {
+      if (filterStatus === "All") {
+        setFilterStatus("active");
+        await getActiveUsers(currentPage, 3);
+      } else if (filterStatus === "active") {
+        setFilterStatus("archive");
+        await getArchivedUsers(currentPage, 3);
+      } else if (filterStatus === "archive") {
+        setFilterStatus("All");
+        await getUsers(currentPage, 3);
+      }
+    } catch (error) {
+      console.error("Error fetching users:", error);
     } finally {
       setLoading(false);
     }
@@ -135,14 +230,16 @@ const Users = () => {
   const handleSearch = async (text: string) => {
     setUserSearch(text);
     setLoading(true);
+    setCurrentPage(1);
+    setFilterStatus("All");
 
     try {
       if (text.trim() === "") {
         setUserSearch("");
-        setSearchType("All");
-        await getUsers();
+
+        await getUsers(currentPage, 3);
       } else {
-        await filterUsers(searchType, text);
+        await filterUsers(text, currentPage, 3);
       }
     } catch (error: any) {
       console.log(error.response.data.message);
@@ -195,13 +292,13 @@ const Users = () => {
             </View>
             <Pressable
               className="w-4/12 flex flex-row items-center justify-between px-4 py-2 bg-[#050301] rounded-full"
-              onPress={handleSearchType}
+              onPress={handleFilterStatus}
             >
               <Text
-                className="w-2/3 text-xs font-normal text-white"
+                className="w-2/3 text-xs font-normal text-white capitalize"
                 numberOfLines={1}
               >
-                {searchType}
+                {filterStatus}
               </Text>
               <RemixIcon name="refresh-line" size={16} color="white" />
             </Pressable>
@@ -243,7 +340,7 @@ const Users = () => {
                       "rgba(18, 18, 18, 0.4)",
                       "rgba(18, 18, 18, 1)",
                     ]}
-                    start={{ x: 1, y: 0 }} // Start from the upper right corner
+                    start={{ x: 1, y: 0 }}
                     end={{ x: 0, y: 1 }}
                   >
                     <View className="w-full h-full flex flex-col justify-between items-center">
@@ -252,13 +349,26 @@ const Users = () => {
                           {mappedUser.credentials.level}
                         </Text>
                         {user?.credentials.level === "admin" &&
-                        user?._id !== mappedUser._id ? (
+                        user?._id !== mappedUser._id &&
+                        mappedUser.archiveDate === null ? (
                           <Pressable
                             className="p-3 rounded-full bg-[#050301]/50"
-                            onPress={() => deleteUser(mappedUser._id)}
+                            onPress={() => archiveUser(mappedUser._id)}
                           >
                             <RemixIcon
-                              name="delete-bin-4-line"
+                              name="archive-line"
+                              size={16}
+                              color="white"
+                            />
+                          </Pressable>
+                        ) : null}
+                        {mappedUser.archiveDate !== null ? (
+                          <Pressable
+                            className="p-3 rounded-full bg-[#050301]/50"
+                            onPress={() => unarchiveUser(mappedUser)}
+                          >
+                            <RemixIcon
+                              name="user-follow-line"
                               size={16}
                               color="white"
                             />
@@ -320,6 +430,52 @@ const Users = () => {
               </Text>
             </View>
           )}
+          <View className="flex flex-row space-x-2 items-center justify-center">
+            <Pressable
+              disabled={currentPage === 1}
+              onPress={() => handlePageChange(currentPage - 1)}
+            >
+              <RemixIcon name="arrow-left-s-line" size={16} color="black" />
+            </Pressable>
+
+            {Array.from(
+              {
+                length: Math.min(5, totalPages),
+              },
+              (_, index) => {
+                const startPage = Math.max(1, currentPage - 2);
+                const page = startPage + index;
+                return page <= totalPages ? page : null;
+              }
+            ).map(
+              (page) =>
+                page && ( // Only render valid pages
+                  <Pressable
+                    key={page}
+                    onPress={() => handlePageChange(page)}
+                    className="p-2"
+                  >
+                    <Text
+                      className={
+                        currentPage === page
+                          ? "text-lg font-semibold text-[#466600]"
+                          : "text-xs font-semibold text-black"
+                      }
+                    >
+                      {page}
+                    </Text>
+                  </Pressable>
+                )
+            )}
+
+            <Pressable
+              disabled={currentPage === totalPages}
+              onPress={() => handlePageChange(currentPage + 1)}
+            >
+              <RemixIcon name="arrow-right-s-line" size={16} color="black" />
+            </Pressable>
+          </View>
+
           <View className="w-full pb-24"></View>
         </ScrollView>
       </SafeAreaView>
