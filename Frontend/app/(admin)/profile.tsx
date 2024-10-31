@@ -55,7 +55,7 @@ interface user {
   };
 }
 const profile = () => {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [newPassword, setNewPassword] = useState("");
   const [message, setMessage] = useState("");
   const [visibleModal, setVisibleModal] = useState(false);
@@ -91,7 +91,11 @@ const profile = () => {
   const [formattedBirthDate, setFormattedBirthDate] = useState("");
 
   useEffect(() => {
-    fetchUser();
+    const loadData = async () => {
+      await fetchUser();
+      setLoading(false);
+    };
+    loadData();
   }, []);
 
   const setFieldsData = (user: user) => {
@@ -176,23 +180,18 @@ const profile = () => {
   };
 
   const fetchUser = async () => {
-    setLoading(true);
-    if (user) {
-      try {
-        let url = `http://${ipAddress}:${port}/api/users/${user._id}`;
+    try {
+      let url = `http://${ipAddress}:${port}/api/users/${user?._id}`;
 
-        let response = await axios.get(url);
+      let response = await axios.get(url);
 
-        if (response.status === 200) {
-          updateUser(response.data.user);
-          setFieldsData(response.data.user);
-        }
-      } catch (error: any) {
-        setMessage(error.response.data.message);
-        setVisibleModal(true);
-      } finally {
-        setLoading(false);
+      if (response.status === 200) {
+        updateUser(response.data.user);
+        setFieldsData(response.data.user);
       }
+    } catch (error: any) {
+      setMessage(error.response.data.message);
+      setVisibleModal(true);
     }
   };
 

@@ -7,18 +7,12 @@ import {
   Pressable,
   ImageBackground,
   TouchableHighlight,
+  Keyboard,
 } from "react-native";
-import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useRouter } from "expo-router";
-import Animated, {
-  SharedValue,
-  useSharedValue,
-  withTiming,
-} from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import Modal from "../components/modal";
 import { useAuth } from "@/context/AuthContext";
 import { useUrl } from "@/context/UrlProvider";
@@ -26,6 +20,7 @@ import { useQueue } from "@/context/QueueProvider";
 import RemixIcon from "react-native-remix-icon";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Image } from "expo-image";
+import Loader from "@/components/loader";
 
 export default function Login() {
   const [hidePass, setHidePass] = useState(true);
@@ -45,6 +40,7 @@ export default function Login() {
   };
 
   const onLogin = async () => {
+    Keyboard.dismiss();
     setLoading(true);
     try {
       let url = `http://${ipAddress}:${port}/api/auth/login`;
@@ -77,6 +73,13 @@ export default function Login() {
       setLoading(false);
     }
   };
+
+  // const onLogin = () => {
+  //   setLoading(true);
+  //   setTimeout(() => {
+  //     setLoading(false);
+  //   }, 2000);
+  // };
 
   return (
     <>
@@ -172,6 +175,7 @@ export default function Login() {
         </ImageBackground>
         <StatusBar style="auto" />
       </View>
+      {loading && <Loader />}
 
       {visibleModal && (
         <Modal

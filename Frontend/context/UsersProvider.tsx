@@ -8,6 +8,7 @@ export const UsersProvider = ({ children }: any) => {
   const [users, setUsers] = useState([]);
   const [roles, setRoles] = useState([]);
   const { ipAddress, port } = useUrl();
+  const [totalPages, setTotalPages] = useState();
 
   interface user {
     _id: string;
@@ -40,20 +41,49 @@ export const UsersProvider = ({ children }: any) => {
     };
   }
 
-  const getUsers = async () => {
+  const getActiveUsers = async (pageNumber: number, limit: number) => {
     try {
-      let url = `http://${ipAddress}:${port}/api/users/`;
+      let url = `http://${ipAddress}:${port}/api/users?status=active&page=${pageNumber}&limit=${limit}`;
+
       let response = await axios.get(url);
 
-      if (response.status === 200) {
+      if (response.data.success === true) {
         setUsers(response.data.users);
-        setRoles(
-          Array.from(
-            new Set(
-              response.data.users.map((user: any) => user.credentials.level)
-            )
-          )
-        );
+        setTotalPages(response.data.totalPages);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getArchivedUsers = async (pageNumber: number, limit: number) => {
+    try {
+      let url = `http://${ipAddress}:${port}/api/users?status=archived&page=${pageNumber}&limit=${limit}`;
+
+      let response = await axios.get(url);
+
+      if (response.data.success === true) {
+        setUsers(response.data.users);
+        setTotalPages(response.data.totalPages);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const filterUsers = async (
+    user: string,
+    pageNumber: number,
+    limit: number
+  ) => {
+    try {
+      let url = `http://${ipAddress}:${port}/api/users?userName=${user}&page=${pageNumber}&limit=${limit}`;
+
+      let response = await axios.get(url);
+
+      if (response.data.success === true) {
+        setUsers(response.data.users);
+        setTotalPages(response.data.totalPages);
       } else {
         console.log(response.data.message);
       }
@@ -62,33 +92,33 @@ export const UsersProvider = ({ children }: any) => {
     }
   };
 
-  const filterUsers = async (role: string, user: string) => {
+  const getUsers = async (pageNumber: number, limit: number) => {
     try {
-      let url = `http://${ipAddress}:${port}/api/users?`;
-
-      if (role !== "All") {
-        url += `level=${role}`;
-      }
-
-      if (user !== "") {
-        url += `${role !== "All" ? "&" : ""}userName=${user}`;
-      }
+      let url = `http://${ipAddress}:${port}/api/users?page=${pageNumber}&limit=${limit}`;
 
       let response = await axios.get(url);
 
-      if (response.status === 200) {
+      if (response.data.success === true) {
         setUsers(response.data.users);
-      } else {
-        console.log(response.data.message);
+        setTotalPages(response.data.totalPages);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
     }
   };
 
   return (
     <UsersContext.Provider
-      value={{ users, setUsers, roles, getUsers, filterUsers }}
+      value={{
+        users,
+        setUsers,
+        roles,
+        getUsers,
+        filterUsers,
+        totalPages,
+        getArchivedUsers,
+        getActiveUsers,
+      }}
     >
       {children}
     </UsersContext.Provider>

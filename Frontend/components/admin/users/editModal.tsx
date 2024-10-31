@@ -20,6 +20,7 @@ import RemixIcon from "react-native-remix-icon";
 
 interface user {
   _id: string;
+  archiveDate: Date;
   personalInfo: {
     firstName: string;
     lastName: string;
@@ -81,10 +82,13 @@ const EditModal = ({
   const [loading, setLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [changeLevel, setChangeLevel] = useState(true);
+  const [archiveDate, setArchiveDate] = useState(new Date());
 
   //datepicker
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showBirthDatePicker, setShowBirthDatePicker] = useState(false);
+  const [showArchiveDatePicker, setShowArchiveDatePicker] = useState(false);
   const [formattedBirthDate, setFormattedBirthDate] = useState("");
+  const [formattedArchiveDate, setFormattedArchiveDate] = useState("");
 
   useEffect(() => {
     if (user && user._id) {
@@ -93,9 +97,9 @@ const EditModal = ({
       setLastName(user.personalInfo.lastName);
 
       //date
-      const date = new Date(user.personalInfo.dateOfBirth);
-      setBirthDate(date);
-      setFormattedBirthDate(formatDate(date));
+      const birthDate = new Date(user.personalInfo.dateOfBirth);
+      setBirthDate(birthDate);
+      setFormattedBirthDate(formatDate(birthDate));
 
       setGender(user.personalInfo.gender);
       setCivilStatus(user.personalInfo.civilStatus);
@@ -110,6 +114,10 @@ const EditModal = ({
       setEmail(user.credentials.email);
       setPassword(user.credentials.password);
       setLevel(user.credentials.level);
+
+      const archivedDate = new Date(user.archiveDate);
+      setArchiveDate(archivedDate);
+      setFormattedArchiveDate(formatDate(archivedDate));
     }
   }, [user]);
 
@@ -117,11 +125,18 @@ const EditModal = ({
     return date.toLocaleDateString();
   };
 
-  const onDateChange = (event: any, selectedDate?: Date) => {
+  const onBirthDateChange = (event: any, selectedDate?: Date) => {
     const currentDate = selectedDate || birthDate;
-    setShowDatePicker(false);
+    setShowBirthDatePicker(false);
     setBirthDate(currentDate);
     setFormattedBirthDate(formatDate(currentDate));
+  };
+
+  const onArchiveDateChange = (event: any, selectedDate?: Date) => {
+    const currentDate = selectedDate || birthDate;
+    setShowArchiveDatePicker(false);
+    setArchiveDate(currentDate);
+    setFormattedArchiveDate(formatDate(currentDate));
   };
 
   const updateUser = async () => {
@@ -158,6 +173,7 @@ const EditModal = ({
           password: password,
           level: level,
         },
+        archiveDate: archiveDate,
       });
 
       if (response.status === 200) {
@@ -288,7 +304,7 @@ const EditModal = ({
                     {formattedBirthDate || "Select a date"}
                   </Text>
                   <Pressable
-                    onPress={() => setShowDatePicker(true)}
+                    onPress={() => setShowBirthDatePicker(true)}
                     className="p-2 bg-black rounded-full"
                   >
                     <RemixIcon
@@ -299,12 +315,12 @@ const EditModal = ({
                   </Pressable>
                 </View>
               </View>
-              {showDatePicker && (
+              {showBirthDatePicker && (
                 <DateTimePicker
                   value={birthDate}
                   mode="date"
                   display="default"
-                  onChange={onDateChange}
+                  onChange={onBirthDateChange}
                 />
               )}
               {/* Gender */}
@@ -518,6 +534,47 @@ const EditModal = ({
                 )}
               </View>
             </View>
+            {/* ArchiveDate */}
+            {user?.archiveDate !== null ? (
+              <View className="w-full py-4">
+                {/* Title */}
+                <View className="w-full flex items-start justify-center pb-4">
+                  <Text className="text-sm font-semibold">Archive Date</Text>
+                  <Text className="text-xs font-normal text-black/50">
+                    archive date
+                  </Text>
+                </View>
+                <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl mb-2">
+                  <Text className="text-xs font-semibold">Archive Date</Text>
+                  <View className="w-1/2 flex flex-row items-center justify-end ">
+                    <Text
+                      className="text-xs font-normal pr-1"
+                      numberOfLines={1}
+                    >
+                      {formattedArchiveDate || "Select a date"}
+                    </Text>
+                    <Pressable
+                      onPress={() => setShowArchiveDatePicker(true)}
+                      className="p-2 bg-black rounded-full"
+                    >
+                      <RemixIcon
+                        name="calendar-event-line"
+                        size={14}
+                        color="white"
+                      />
+                    </Pressable>
+                  </View>
+                </View>
+                {showArchiveDatePicker && (
+                  <DateTimePicker
+                    value={archiveDate}
+                    mode="date"
+                    display="default"
+                    onChange={onArchiveDateChange}
+                  />
+                )}
+              </View>
+            ) : null}
           </View>
           <View className="w-full pb-24"></View>
         </ScrollView>
