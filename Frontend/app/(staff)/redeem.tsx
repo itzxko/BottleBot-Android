@@ -456,25 +456,43 @@ const redeem = () => {
                         {item.pointsRequired} pt., {item.stocks} avail.
                       </Text>
                     </View>
-                    <TouchableHighlight
-                      className="flex items-center justify-center rounded-full"
-                      underlayColor={"#41917F"}
-                      onPress={() => {
-                        setCheckoutModal(true);
-                        setSelectedReward(item);
-                      }}
-                    >
-                      <LinearGradient
-                        colors={["#699900", "#466600"]}
-                        className="p-2 rounded-full shadow shadow-black"
+                    {item.archiveDate === null ? (
+                      <TouchableHighlight
+                        className="flex items-center justify-center rounded-full"
+                        underlayColor={"#41917F"}
+                        onPress={() => {
+                          setCheckoutModal(true);
+                          setSelectedReward(item);
+                        }}
                       >
-                        <RemixIcon
-                          name="arrow-right-s-line"
-                          size={16}
-                          color="white"
-                        />
-                      </LinearGradient>
-                    </TouchableHighlight>
+                        <LinearGradient
+                          colors={["#699900", "#466600"]}
+                          className="p-2 rounded-full shadow shadow-black"
+                        >
+                          <RemixIcon
+                            name="arrow-right-s-line"
+                            size={16}
+                            color="white"
+                          />
+                        </LinearGradient>
+                      </TouchableHighlight>
+                    ) : (
+                      <TouchableHighlight
+                        className="flex items-center justify-center rounded-full"
+                        underlayColor={"#41917F"}
+                      >
+                        <LinearGradient
+                          colors={["#699900", "#466600"]}
+                          className="p-2 rounded-full shadow shadow-black"
+                        >
+                          <RemixIcon
+                            name="error-warning-line"
+                            size={16}
+                            color="white"
+                          />
+                        </LinearGradient>
+                      </TouchableHighlight>
+                    )}
                   </View>
                 </View>
               ))
