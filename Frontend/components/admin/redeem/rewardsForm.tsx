@@ -17,6 +17,7 @@ import Modal from "@/components/modal";
 import { useAdminHistory } from "@/context/AdminHistoryProvider";
 import { useRewards } from "@/context/RewardsProvider";
 import RemixIcon from "react-native-remix-icon";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 const RewardsForm = ({
   onClose,
@@ -35,7 +36,7 @@ const RewardsForm = ({
   const categories = ["Goods", "Clothing", "Beverage", "Other"];
   const [openCategories, setOpenCategories] = useState(false);
   const { fetchAllRewardsHistory } = useAdminHistory();
-  const { fetchRewards } = useRewards();
+  const { getRewards } = useRewards();
 
   //Data
   const [rewardName, setRewardName] = useState("");
@@ -43,9 +44,18 @@ const RewardsForm = ({
   const [rewardDescription, setRewardDescription] = useState("");
   const [category, setCategory] = useState("");
   const [stocks, setStocks] = useState(0);
+  const [validFrom, setValidFrom] = useState(new Date());
+  const [validUntil, setValidUntil] = useState(new Date());
+  const [archiveDate, setArchiveDate] = useState<Date | null>(null);
   const [image, setImage] = useState<string | null>(null);
   const [imageChanged, setImageChanged] = useState(false);
   const [rewardImageString, setRewardImageString] = useState<string>("");
+
+  //date
+  const [showValidFromDatePicker, setShowValidFromDatePicker] = useState(false);
+  const [showValidUntilDatePicker, setShowValidUntilDatePicker] =
+    useState(false);
+  const [showArchiveDatePicker, setShowArchiveDatePicker] = useState(false);
 
   const fetchReward = async () => {
     setLoading(true);
@@ -61,6 +71,17 @@ const RewardsForm = ({
         setRewardDescription(response.data.reward.rewardDescription);
         setRewardName(response.data.reward.rewardName);
         setStocks(response.data.reward.stocks);
+
+        //date
+        const validFromDate = new Date(response.data.reward.validFrom);
+        setValidFrom(validFromDate);
+        const validUntilDate = new Date(response.data.reward.validUntil);
+        setValidUntil(validUntilDate);
+        const archiveDateDate = response.data.reward.archiveDate
+          ? new Date(response.data.reward.archiveDate)
+          : null;
+        setArchiveDate(archiveDateDate);
+        console.log(archiveDate);
       }
     } catch (error: any) {
       console.log(error);
@@ -68,6 +89,23 @@ const RewardsForm = ({
       setLoading(false);
     }
   };
+
+  const onValidFromChange = (event: any, selectedDate?: Date) => {
+    setShowValidFromDatePicker(false); // Hide date picker after selection
+    if (selectedDate) setValidFrom(selectedDate);
+  };
+
+  const onValidUntilChange = (event: any, selectedDate?: Date) => {
+    setShowValidUntilDatePicker(false); // Hide date picker after selection
+    if (selectedDate) setValidUntil(selectedDate);
+  };
+
+  const onArchiveDateChange = (event: any, selectedDate?: Date) => {
+    setShowArchiveDatePicker(false); // Hide date picker after selection
+    if (selectedDate) setArchiveDate(selectedDate);
+  };
+
+  const formatDate = (date: Date) => date.toLocaleDateString();
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -89,6 +127,9 @@ const RewardsForm = ({
 
   const addReward = async () => {
     setLoading(true);
+    const formatDate = (value: Date | null): string => {
+      return value ? value.toISOString() : "";
+    };
 
     const formData = new FormData();
     formData.append("rewardName", rewardName);
@@ -103,6 +144,9 @@ const RewardsForm = ({
         type: "image/jpeg",
       } as any);
     }
+    formData.append("archiveDate", formatDate(archiveDate));
+    formData.append("validFrom", formatDate(validFrom));
+    formData.append("validUntil", formatDate(validUntil));
 
     try {
       let url = `http://${ipAddress}:${8080}/api/rewards/`;
@@ -129,6 +173,9 @@ const RewardsForm = ({
 
   const updateReward = async () => {
     setLoading(true);
+    const formatDate = (value: Date | null): string => {
+      return value ? value.toISOString() : "";
+    };
 
     const formData = new FormData();
     formData.append("rewardName", rewardName);
@@ -143,6 +190,9 @@ const RewardsForm = ({
         type: "image/jpeg",
       } as any);
     }
+    formData.append("archiveDate", formatDate(archiveDate));
+    formData.append("validFrom", formatDate(validFrom));
+    formData.append("validUntil", formatDate(validUntil));
 
     if (image !== null) {
       formData.append("imageChanged", "true");
@@ -289,6 +339,95 @@ const RewardsForm = ({
                   onChangeText={(text) => setStocks(Number(text))}
                 />
               </View>
+
+              <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl mb-2">
+                <Text className="text-xs font-semibold">Valid From</Text>
+                <View className="w-1/2 flex flex-row items-center justify-end ">
+                  <Text className="text-xs font-normal pr-1" numberOfLines={1}>
+                    {formatDate(validFrom) || "Select a date"}
+                  </Text>
+                  <Pressable
+                    onPress={() => setShowValidFromDatePicker(true)}
+                    className="p-2 bg-black rounded-full"
+                  >
+                    <RemixIcon
+                      name="calendar-event-line"
+                      size={14}
+                      color="white"
+                    />
+                  </Pressable>
+                </View>
+              </View>
+              {showValidFromDatePicker && (
+                <DateTimePicker
+                  value={validFrom}
+                  mode="date"
+                  display="default"
+                  onChange={onValidFromChange}
+                />
+              )}
+
+              <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl mb-2">
+                <Text className="text-xs font-semibold">Valid Until</Text>
+                <View className="w-1/2 flex flex-row items-center justify-end ">
+                  <Text className="text-xs font-normal pr-1" numberOfLines={1}>
+                    {formatDate(validUntil) || "Select a date"}
+                  </Text>
+                  <Pressable
+                    onPress={() => setShowValidUntilDatePicker(true)}
+                    className="p-2 bg-black rounded-full"
+                  >
+                    <RemixIcon
+                      name="calendar-event-line"
+                      size={14}
+                      color="white"
+                    />
+                  </Pressable>
+                </View>
+              </View>
+              {showValidUntilDatePicker && (
+                <DateTimePicker
+                  value={validUntil}
+                  mode="date"
+                  display="default"
+                  onChange={onValidUntilChange}
+                />
+              )}
+
+              {type === "edit" && archiveDate ? (
+                <>
+                  <View className="w-full flex flex-row items-center justify-between px-6 py-3 bg-[#E6E6E6] rounded-xl mb-2">
+                    <Text className="text-xs font-semibold">Aechive Date</Text>
+                    <View className="w-1/2 flex flex-row items-center justify-end ">
+                      <Text
+                        className="text-xs font-normal pr-1"
+                        numberOfLines={1}
+                      >
+                        {formatDate(archiveDate) || "Select a date"}
+                      </Text>
+                      <Pressable
+                        onPress={() => setShowArchiveDatePicker(true)}
+                        className="p-2 bg-black rounded-full"
+                      >
+                        <RemixIcon
+                          name="calendar-event-line"
+                          size={14}
+                          color="white"
+                        />
+                      </Pressable>
+                    </View>
+                  </View>
+                  {showArchiveDatePicker && (
+                    <DateTimePicker
+                      value={archiveDate}
+                      mode="date"
+                      display="default"
+                      onChange={onArchiveDateChange}
+                    />
+                  )}
+                </>
+              ) : null}
+
               <View className="w-full flex flex-row items-center justify-between px-6 py-[17px] bg-[#E6E6E6] rounded-xl mb-2">
                 <Text className="text-xs font-semibold">Category</Text>
                 <Pressable
@@ -345,7 +484,6 @@ const RewardsForm = ({
             setVisibleModal(false);
             if (!isError) {
               fetchAllRewardsHistory();
-              fetchRewards();
               onClose();
             }
           }}

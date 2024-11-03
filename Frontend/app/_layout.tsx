@@ -5,6 +5,7 @@ import { Stack } from "expo-router";
 import { UrlProvider } from "@/context/UrlProvider";
 import { QueueProvider } from "@/context/QueueProvider";
 import { LocationProvider } from "@/context/LocationProvider";
+import { PaginationProvider } from "@/context/PaginationProvider";
 
 const _layout = () => {
   return (
@@ -12,13 +13,15 @@ const _layout = () => {
       <AuthProvider>
         <QueueProvider>
           <LocationProvider>
-            <Stack>
-              <Stack.Screen name="index" options={{ headerShown: false }} />
-              <Stack.Screen name="login" options={{ headerShown: false }} />
-              <Stack.Screen name="(user)" options={{ headerShown: false }} />
-              <Stack.Screen name="(staff)" options={{ headerShown: false }} />
-              <Stack.Screen name="(admin)" options={{ headerShown: false }} />
-            </Stack>
+            <PaginationProvider>
+              <Stack>
+                <Stack.Screen name="index" options={{ headerShown: false }} />
+                <Stack.Screen name="login" options={{ headerShown: false }} />
+                <Stack.Screen name="(user)" options={{ headerShown: false }} />
+                <Stack.Screen name="(staff)" options={{ headerShown: false }} />
+                <Stack.Screen name="(admin)" options={{ headerShown: false }} />
+              </Stack>
+            </PaginationProvider>
           </LocationProvider>
         </QueueProvider>
       </AuthProvider>
