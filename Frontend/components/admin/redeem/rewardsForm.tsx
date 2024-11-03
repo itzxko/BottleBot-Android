@@ -166,6 +166,7 @@ const RewardsForm = ({
       setVisibleModal(true);
       setIsError(true);
       setMessage(error.response.data.message);
+      console.log(error.response.data);
     } finally {
       setLoading(false);
     }
