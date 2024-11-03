@@ -96,8 +96,14 @@ const RewardsForm = ({
   };
 
   const onValidUntilChange = (event: any, selectedDate?: Date) => {
-    setShowValidUntilDatePicker(false); // Hide date picker after selection
-    if (selectedDate) setValidUntil(selectedDate);
+    setShowValidUntilDatePicker(false);
+    if (selectedDate && selectedDate > validFrom) {
+      setValidUntil(selectedDate);
+    } else {
+      setVisibleModal(true);
+      setMessage("Must be later than the Valid From date");
+      setIsError(true);
+    }
   };
 
   const onArchiveDateChange = (event: any, selectedDate?: Date) => {
@@ -166,6 +172,7 @@ const RewardsForm = ({
       setVisibleModal(true);
       setIsError(true);
       setMessage(error.response.data.message);
+      console.log(error.response.data);
     } finally {
       setLoading(false);
     }

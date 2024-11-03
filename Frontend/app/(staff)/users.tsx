@@ -22,68 +22,43 @@ import { ImageBackground } from "expo-image";
 import { useAuth } from "@/context/AuthContext";
 import { useAdminHistory } from "@/context/AdminHistoryProvider";
 import RemixIcon from "react-native-remix-icon";
+import { usePagination } from "@/context/PaginationProvider";
 import ViewModal from "@/components/staff/users/viewModal";
 
 const Users = () => {
+  const { userLimit } = usePagination();
   const [loading, setLoading] = useState(false);
   const [openFilter, setOpenFilter] = useState(false);
-  const [filter, setFilter] = useState("All");
   const [userModal, setUserModal] = useState(false);
   const [message, setMessage] = useState("");
   const [visibleModal, setVisibleModal] = useState(false);
-  const { getUsers, users, roles, filterUsers } = useUsers();
+  const [viewModal, setViewModal] = useState(false);
+  const {
+    users,
+    citizens,
+    setUsers,
+    roles,
+    getUsers,
+    searchUsers,
+    totalPages,
+    getArchivedUsers,
+    getCitizens,
+    searchCitizens,
+    searchArchivedUsers,
+  } = useUsers();
   const [editModal, setEditModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState<user | null>(null);
   const { ipAddress, port } = useUrl();
-  const [searchType, setSearchType] = useState("All");
+  const [filterStatus, setFilterStatus] = useState("active");
   const [userSearch, setUserSearch] = useState("");
   const { user } = useAuth();
   const [isError, setIsError] = useState(false);
   const { fetchAllHistory } = useAdminHistory();
-  const [viewModal, setViewModal] = useState(false);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      await getUsers();
-      setLoading(false);
-    };
-
-    fetchData();
-  }, []);
-
-  const deleteUser = async (userId: string) => {
-    setLoading(true);
-    try {
-      let url = `http://${ipAddress}:${port}/api/users/${userId}`;
-      let response = await axios.delete(url);
-
-      if (response.status === 200) {
-        setMessage(response.data.message);
-        setVisibleModal(true);
-        clearSearchFilter();
-      } else {
-        setMessage(response.data.message);
-        setVisibleModal(true);
-        setIsError(false);
-      }
-    } catch (error: any) {
-      setMessage(error.response.data.message);
-      setVisibleModal(true);
-      setIsError(true);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const clearSearchFilter = async () => {
-    setUserSearch("");
-    setSearchType("All");
-    await getUsers();
-  };
+  const [currentPage, setCurrentPage] = useState(1);
 
   interface user {
     _id: string;
+    archiveDate: Date;
     personalInfo: {
       firstName: string;
       lastName: string;
@@ -113,43 +88,154 @@ const Users = () => {
     };
   }
 
-  const handleSearchType = () => {
+  const fetchData = async () => {
     setLoading(true);
-    try {
-      const newType =
-        searchType === "All"
-          ? "admin"
-          : searchType === "admin"
-          ? "staff"
-          : searchType === "staff"
-          ? "citizen"
-          : "All";
-      setSearchType(newType);
 
-      filterUsers(newType, userSearch);
-    } catch (error: any) {
-      console.log(error.response.data.message);
+    try {
+      if (userSearch.trim()) {
+        // Check if there's an active search
+        if (filterStatus === "active") {
+          await searchUsers(userSearch, currentPage, userLimit);
+        } else {
+          await searchArchivedUsers(userSearch, currentPage, userLimit);
+        }
+      } else {
+        // No search; just fetch based on filter status
+        if (filterStatus === "active") {
+          await getUsers(currentPage, userLimit);
+        } else {
+          await getArchivedUsers(currentPage, userLimit);
+        }
+      }
+    } catch (error) {
+      console.log(error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSearch = async (text: string) => {
-    setUserSearch(text);
+  useEffect(() => {
+    fetchData();
+  }, [filterStatus, currentPage]);
+
+  const handleFilterStatus = async () => {
+    setFilterStatus((prevStatus) =>
+      prevStatus === "active" ? "archive" : "active"
+    );
+    setUserSearch("");
+    setCurrentPage(1);
+  };
+
+  const handleSearch = async (reward: string) => {
+    setUserSearch(reward);
     setLoading(true);
+    setCurrentPage(1);
 
     try {
-      if (text.trim() === "") {
+      if (reward.trim() === "") {
         setUserSearch("");
-        setSearchType("All");
-        await getUsers();
+
+        if (filterStatus === "active") {
+          await getUsers(1, userLimit);
+        } else {
+          await getArchivedUsers(1, userLimit);
+        }
       } else {
-        await filterUsers(searchType, text);
+        if (filterStatus === "active") {
+          await searchUsers(reward, 1, userLimit);
+        } else {
+          await searchArchivedUsers(reward, 1, userLimit);
+        }
       }
     } catch (error: any) {
-      console.log(error.response.data.message);
+      console.log(error.response?.data?.message || error.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePageChange = async (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+      setLoading(true);
+
+      try {
+        if (userSearch.trim() !== "") {
+          // Apply search or filter on page change
+          if (filterStatus === "active") {
+            await searchUsers(userSearch, newPage, userLimit);
+          } else {
+            await searchArchivedUsers(userSearch, newPage, userLimit);
+          }
+        } else {
+          // Default pagination without search or filter
+          if (filterStatus === "active") {
+            await getUsers(newPage, userLimit);
+          } else if (filterStatus === "archive") {
+            await getArchivedUsers(newPage, userLimit);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching rewards:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const clearFilters = () => {
+    setUserSearch("");
+    setFilterStatus("active");
+  };
+
+  const archiveUser = async (userId: string) => {
+    setLoading(true);
+    try {
+      let url = `http://${ipAddress}:${port}/api/users/${userId}`;
+      let response = await axios.delete(url);
+
+      if (response.data.success === true) {
+        setMessage(response.data.message);
+        setVisibleModal(true);
+        setIsError(false);
+        clearFilters();
+      }
+    } catch (error: any) {
+      setMessage(error.response.data.message);
+      setVisibleModal(true);
+      setIsError(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const unarchiveUser = async (user: user) => {
+    setLoading(true);
+    try {
+      let url = `http://${ipAddress}:${port}/api/users/${user._id}`;
+
+      let response = await axios.put(url, {
+        archiveDate: null,
+        personalInfo: user.personalInfo,
+        contactInfo: user.contactInfo,
+        economicInfo: user.economicInfo,
+        credentials: user.credentials,
+      });
+
+      if (response.data.success === true) {
+        setMessage(response.data.message);
+        setVisibleModal(true);
+        setIsError(false);
+
+        // Clear filters and refresh user data
+        clearFilters(); // Optional: if you want to reset to active users only
+      }
+    } catch (error: any) {
+      setMessage(error.response?.data?.message || "An error occurred");
+      setIsError(true);
+      setVisibleModal(true);
+    } finally {
+      setLoading(false); // Ensure the loader stops even if there's an error
     }
   };
 
@@ -197,13 +283,13 @@ const Users = () => {
             </View>
             <Pressable
               className="w-4/12 flex flex-row items-center justify-between px-4 py-2 bg-[#050301] rounded-full"
-              onPress={handleSearchType}
+              onPress={handleFilterStatus}
             >
               <Text
-                className="w-2/3 text-xs font-normal text-white"
+                className="w-2/3 text-xs font-normal text-white capitalize"
                 numberOfLines={1}
               >
-                {searchType}
+                {filterStatus}
               </Text>
               <RemixIcon name="refresh-line" size={16} color="white" />
             </Pressable>
@@ -245,7 +331,7 @@ const Users = () => {
                       "rgba(18, 18, 18, 0.4)",
                       "rgba(18, 18, 18, 1)",
                     ]}
-                    start={{ x: 1, y: 0 }} // Start from the upper right corner
+                    start={{ x: 1, y: 0 }}
                     end={{ x: 0, y: 1 }}
                   >
                     <View className="w-full h-full flex flex-col justify-between items-center">
@@ -309,6 +395,55 @@ const Users = () => {
               </Text>
             </View>
           )}
+
+          {totalPages ? (
+            <View className="flex flex-row space-x-2 items-center justify-center">
+              <Pressable
+                disabled={currentPage === 1}
+                onPress={() => handlePageChange(currentPage - 1)}
+              >
+                <RemixIcon name="arrow-left-s-line" size={16} color="black" />
+              </Pressable>
+
+              {Array.from(
+                {
+                  length: Math.min(5, totalPages),
+                },
+                (_, index) => {
+                  const startPage = Math.max(1, currentPage - 2);
+                  const page = startPage + index;
+                  return page <= totalPages ? page : null;
+                }
+              ).map(
+                (page) =>
+                  page && ( // Only render valid pages
+                    <Pressable
+                      key={page}
+                      onPress={() => handlePageChange(page)}
+                      className="p-2"
+                    >
+                      <Text
+                        className={
+                          currentPage === page
+                            ? "text-lg font-semibold text-[#466600]"
+                            : "text-xs font-semibold text-black"
+                        }
+                      >
+                        {page}
+                      </Text>
+                    </Pressable>
+                  )
+              )}
+
+              <Pressable
+                disabled={currentPage === totalPages}
+                onPress={() => handlePageChange(currentPage + 1)}
+              >
+                <RemixIcon name="arrow-right-s-line" size={16} color="black" />
+              </Pressable>
+            </View>
+          ) : null}
+
           <View className="w-full pb-24"></View>
         </ScrollView>
       </SafeAreaView>
@@ -333,7 +468,7 @@ const Users = () => {
           accountLevel={user ? user.credentials.level : ""}
           onClose={() => {
             setUserModal(false);
-            clearSearchFilter();
+            clearFilters();
           }}
         />
       )}
@@ -342,7 +477,7 @@ const Users = () => {
           user={selectedUser}
           onClose={() => {
             setViewModal(false);
-            clearSearchFilter();
+            clearFilters();
           }}
         />
       )}
