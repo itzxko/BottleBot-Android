@@ -4,6 +4,7 @@ import {
   TouchableHighlight,
   ScrollView,
   Pressable,
+  TextInput,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useUsers } from "@/context/UsersProvider";
@@ -15,9 +16,10 @@ import Modal from "@/components/modal";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
-import FieldsAdd from "./FieldsAdd";
-import { useAdminHistory } from "@/context/AdminHistoryProvider";
 import RemixIcon from "react-native-remix-icon";
+import { usePagination } from "@/context/PaginationProvider";
+import { useAdminHistory } from "@/context/AdminHistoryProvider";
+import FieldsAdd from "./FieldsAdd";
 
 interface Item {
   _id: string;
@@ -31,6 +33,7 @@ interface Item {
 
 interface user {
   _id: string;
+  archiveDate: Date;
   personalInfo: {
     firstName: string;
     lastName: string;
@@ -61,7 +64,8 @@ interface user {
 }
 
 const PointsHistoryAdd = ({ onClose }: { onClose: () => void }) => {
-  const { getUsers, users } = useUsers();
+  const { getCitizens, searchCitizens, citizens, totalPages } = useUsers();
+  const { userLimit } = usePagination();
   const [loading, setLoading] = useState(false);
   const { ipAddress, port } = useUrl();
   const [userPoints, setUserPoints] = useState<{ [key: string]: number }>({});
@@ -69,11 +73,13 @@ const PointsHistoryAdd = ({ onClose }: { onClose: () => void }) => {
   const [isError, setIsError] = useState(false);
   const [fieldsModal, setFieldsModal] = useState(false);
   const { fetchAllPointsHistory } = useAdminHistory();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [userSearch, setUserSearch] = useState("");
 
   const fetchData = async () => {
     setLoading(true);
     try {
-      await getUsers();
+      await getCitizens(currentPage, userLimit);
     } catch (error) {
       console.log(error);
     } finally {
@@ -84,7 +90,7 @@ const PointsHistoryAdd = ({ onClose }: { onClose: () => void }) => {
   const fetchPointsForAllUsers = async () => {
     setLoading(true);
     try {
-      const pointsPromises = users.map(async (user: user) => {
+      const pointsPromises = citizens.map(async (user: user) => {
         try {
           const response = await axios.get(
             `http://${ipAddress}:${port}/api/history/claim/points/${user._id}`
@@ -119,13 +125,52 @@ const PointsHistoryAdd = ({ onClose }: { onClose: () => void }) => {
   }, []);
 
   useEffect(() => {
-    if (users.length > 0) {
+    if (citizens.length > 0) {
       fetchPointsForAllUsers();
     }
-  }, [users]);
+  }, [citizens]);
 
   const getUserPoints = (userId: string) => {
     return userPoints[userId] !== undefined ? userPoints[userId] : 0;
+  };
+
+  const handlePageChange = async (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+      setLoading(true);
+
+      try {
+        if (userSearch.trim() === "") {
+          setUserSearch("");
+          await getCitizens(newPage, userLimit);
+        } else {
+          await searchCitizens(userSearch, newPage, userLimit);
+        }
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const handleSearch = async (user: string) => {
+    setLoading(true);
+    setCurrentPage(1);
+    setUserSearch(user);
+
+    try {
+      if (user.trim() === "") {
+        setUserSearch("");
+        await getCitizens(1, userLimit);
+      } else {
+        await searchCitizens(user, 1, userLimit);
+      }
+    } catch (error: any) {
+      console.log(error.response.data.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -144,27 +189,45 @@ const PointsHistoryAdd = ({ onClose }: { onClose: () => void }) => {
           </TouchableHighlight>
           <Text className="text-sm font-semibold">Choose User</Text>
         </View>
+        <View className="w-full flex flex-row items-center justify-between pt-4">
+          <View className="w-full flex flex-row items-center justify-between pl-6 pr-4 py-3 rounded-full bg-[#E6E6E6]">
+            <View className="w-full flex-row items-center justify-start">
+              <RemixIcon
+                name="search-2-line"
+                size={16}
+                color={"rgba(0, 0, 0, 0.5)"}
+              />
+              <TextInput
+                className="w-3/4 bg-[#E6E6E6] text-xs font-normal px-2"
+                placeholder={"search citizens via username"}
+                numberOfLines={1}
+                value={userSearch}
+                onChangeText={handleSearch}
+              />
+            </View>
+          </View>
+        </View>
         {/* Header */}
         <View className="w-full flex items-start justify-center py-4">
           <Text className="text-sm font-semibold" numberOfLines={1}>
             Select User
           </Text>
           <Text className="text-xs font-normal text-black/50" numberOfLines={1}>
-            please select a user to continue
+            please select a user to continue the checkout
           </Text>
         </View>
         <ScrollView
           showsVerticalScrollIndicator={false}
           className="flex-1 w-full"
         >
-          {users.map((user: user) => (
+          {citizens.map((user: user) => (
             <View
-              className="w-full flex flex-row justify-between p-2 bg-[#E6E6E6] rounded-3xl mb-4"
+              className="w-full flex flex-row justify-between p-4 bg-[#E6E6E6] rounded-3xl mb-4"
               key={user._id}
             >
-              <View className="flex flex-row items-center justify-start w-9/12 ">
+              <View className="flex flex-row items-center justify-start w-3/4 ">
                 {/* Image */}
-                <View className="h-[60px] w-[60px] rounded-3xl bg-black overflow-hidden">
+                <View className="h-[50px] w-[50px] rounded-full bg-black overflow-hidden">
                   <Image
                     source={require("../../../../assets/images/Man.jpg")}
                     className="w-full h-full"
@@ -175,7 +238,7 @@ const PointsHistoryAdd = ({ onClose }: { onClose: () => void }) => {
                     numberOfLines={1}
                     className="text-sm font-semibold capitalize"
                   >{`${user.personalInfo.firstName} ${user.personalInfo.lastName}`}</Text>
-                  <View className="flex-row items-center justify-start">
+                  <View className="flex-row items-center justify-start space-x-1">
                     <Text
                       className="text-xs font-normal text-black/50 uppercase pr-1 w-19/12"
                       numberOfLines={1}
@@ -184,16 +247,15 @@ const PointsHistoryAdd = ({ onClose }: { onClose: () => void }) => {
                         getUserPoints(user._id) > 1 ? "pts." : "pt."
                       }`}
                     </Text>
-                    <Text
-                      className="text-xs font-normal text-black/50 uppercase w-10/12"
-                      numberOfLines={1}
-                    >
-                      {user._id}
-                    </Text>
+                    {user.archiveDate !== null ? (
+                      <Text className="text-xs font-normal text-[#B32624]">
+                        Archived
+                      </Text>
+                    ) : null}
                   </View>
                 </View>
               </View>
-              <View className="w-2/12 flex items-center justify-center">
+              <View className="flex items-center justify-center">
                 <Pressable
                   onPress={() => {
                     setSelectedUser(user);
@@ -201,19 +263,64 @@ const PointsHistoryAdd = ({ onClose }: { onClose: () => void }) => {
                   }}
                 >
                   <LinearGradient
-                    className="flex p-5 rounded-3xl bg-gray-300"
+                    className="flex p-3 rounded-full bg-gray-300"
                     colors={["#699900", "#466600"]}
                   >
                     <RemixIcon
-                      name="arrow-go-forward-line"
+                      name="arrow-right-s-line"
                       size={16}
-                      color="white"
+                      color={"white"}
                     />
                   </LinearGradient>
                 </Pressable>
               </View>
             </View>
           ))}
+          <View className="flex flex-row space-x-2 items-center justify-center">
+            <Pressable
+              disabled={currentPage === 1}
+              onPress={() => handlePageChange(currentPage - 1)}
+            >
+              <RemixIcon name="arrow-left-s-line" size={16} color="black" />
+            </Pressable>
+
+            {Array.from(
+              {
+                length: Math.min(5, totalPages),
+              },
+              (_, index) => {
+                const startPage = Math.max(1, currentPage - 2);
+                const page = startPage + index;
+                return page <= totalPages ? page : null;
+              }
+            ).map(
+              (page) =>
+                page && ( // Only render valid pages
+                  <Pressable
+                    key={page}
+                    onPress={() => handlePageChange(page)}
+                    className="p-2"
+                  >
+                    <Text
+                      className={
+                        currentPage === page
+                          ? "text-lg font-semibold text-[#466600]"
+                          : "text-xs font-semibold text-black"
+                      }
+                    >
+                      {page}
+                    </Text>
+                  </Pressable>
+                )
+            )}
+
+            <Pressable
+              disabled={currentPage === totalPages}
+              onPress={() => handlePageChange(currentPage + 1)}
+            >
+              <RemixIcon name="arrow-right-s-line" size={16} color="black" />
+            </Pressable>
+          </View>
           <View className="w-full pb-24"></View>
         </ScrollView>
       </SafeAreaView>

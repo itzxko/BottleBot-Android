@@ -133,7 +133,7 @@ const EditModal = ({
   };
 
   const onArchiveDateChange = (event: any, selectedDate?: Date) => {
-    const currentDate = selectedDate || birthDate;
+    const currentDate = selectedDate || archiveDate;
     setShowArchiveDatePicker(false);
     setArchiveDate(currentDate);
     setFormattedArchiveDate(formatDate(currentDate));

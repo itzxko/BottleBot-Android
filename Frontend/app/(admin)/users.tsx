@@ -22,27 +22,32 @@ import { ImageBackground } from "expo-image";
 import { useAuth } from "@/context/AuthContext";
 import { useAdminHistory } from "@/context/AdminHistoryProvider";
 import RemixIcon from "react-native-remix-icon";
+import { usePagination } from "@/context/PaginationProvider";
 
 const Users = () => {
+  const { userLimit } = usePagination();
   const [loading, setLoading] = useState(false);
   const [openFilter, setOpenFilter] = useState(false);
-  const [filter, setFilter] = useState("All");
   const [userModal, setUserModal] = useState(false);
   const [message, setMessage] = useState("");
   const [visibleModal, setVisibleModal] = useState(false);
   const {
-    getUsers,
     users,
+    citizens,
+    setUsers,
     roles,
-    filterUsers,
+    getUsers,
+    searchUsers,
     totalPages,
     getArchivedUsers,
-    getActiveUsers,
+    getCitizens,
+    searchCitizens,
+    searchArchivedUsers,
   } = useUsers();
   const [editModal, setEditModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState<user | null>(null);
   const { ipAddress, port } = useUrl();
-  const [filterStatus, setFilterStatus] = useState("All");
+  const [filterStatus, setFilterStatus] = useState("active");
   const [userSearch, setUserSearch] = useState("");
   const { user } = useAuth();
   const [isError, setIsError] = useState(false);
@@ -81,26 +86,71 @@ const Users = () => {
     };
   }
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        if (filterStatus === "active") {
-          await getActiveUsers(currentPage, 3);
-        } else if (filterStatus === "archive") {
-          await getArchivedUsers(currentPage, 3);
-        } else {
-          await getUsers(currentPage, 3);
-        }
-      } catch (error) {
-        console.error("Error fetching users:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchData = async () => {
+    setLoading(true);
 
+    try {
+      if (userSearch.trim()) {
+        // Check if there's an active search
+        if (filterStatus === "active") {
+          await searchUsers(userSearch, currentPage, userLimit);
+        } else {
+          await searchArchivedUsers(userSearch, currentPage, userLimit);
+        }
+      } else {
+        // No search; just fetch based on filter status
+        if (filterStatus === "active") {
+          await getUsers(currentPage, userLimit);
+        } else {
+          await getArchivedUsers(currentPage, userLimit);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchData();
-  }, [currentPage, filterStatus]);
+  }, [filterStatus, currentPage]);
+
+  const handleFilterStatus = async () => {
+    setFilterStatus((prevStatus) =>
+      prevStatus === "active" ? "archive" : "active"
+    );
+    setUserSearch("");
+    setCurrentPage(1);
+  };
+
+  const handleSearch = async (reward: string) => {
+    setUserSearch(reward);
+    setLoading(true);
+    setCurrentPage(1);
+
+    try {
+      if (reward.trim() === "") {
+        setUserSearch("");
+
+        if (filterStatus === "active") {
+          await getUsers(1, userLimit);
+        } else {
+          await getArchivedUsers(1, userLimit);
+        }
+      } else {
+        if (filterStatus === "active") {
+          await searchUsers(reward, 1, userLimit);
+        } else {
+          await searchArchivedUsers(reward, 1, userLimit);
+        }
+      }
+    } catch (error: any) {
+      console.log(error.response?.data?.message || error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handlePageChange = async (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
@@ -108,19 +158,32 @@ const Users = () => {
       setLoading(true);
 
       try {
-        if (filterStatus === "active") {
-          await getActiveUsers(newPage, 3);
-        } else if (filterStatus === "archive") {
-          await getArchivedUsers(newPage, 3);
+        if (userSearch.trim() !== "") {
+          // Apply search or filter on page change
+          if (filterStatus === "active") {
+            await searchUsers(userSearch, newPage, userLimit);
+          } else {
+            await searchArchivedUsers(userSearch, newPage, userLimit);
+          }
         } else {
-          await getUsers(newPage, 3);
+          // Default pagination without search or filter
+          if (filterStatus === "active") {
+            await getUsers(newPage, userLimit);
+          } else if (filterStatus === "archive") {
+            await getArchivedUsers(newPage, userLimit);
+          }
         }
       } catch (error) {
-        console.error("Error fetching users:", error);
+        console.error("Error fetching rewards:", error);
       } finally {
         setLoading(false);
       }
     }
+  };
+
+  const clearFilters = () => {
+    setUserSearch("");
+    setFilterStatus("active");
   };
 
   const archiveUser = async (userId: string) => {
@@ -129,15 +192,11 @@ const Users = () => {
       let url = `http://${ipAddress}:${port}/api/users/${userId}`;
       let response = await axios.delete(url);
 
-      if (response.status === 200) {
-        setMessage(response.data.message);
-        setVisibleModal(true);
-        clearSearchFilter();
-        setIsError(false);
-      } else {
+      if (response.data.success === true) {
         setMessage(response.data.message);
         setVisibleModal(true);
         setIsError(false);
+        clearFilters();
       }
     } catch (error: any) {
       setMessage(error.response.data.message);
@@ -155,96 +214,26 @@ const Users = () => {
 
       let response = await axios.put(url, {
         archiveDate: null,
-        personalInfo: {
-          firstName: user.personalInfo.firstName,
-          middleName: user.personalInfo.middleName,
-          lastName: user.personalInfo.lastName,
-          dateOfBirth: user.personalInfo.dateOfBirth,
-          gender: user.personalInfo.gender,
-          civilStatus: user.personalInfo.civilStatus,
-          nationality: user.personalInfo.nationality,
-        },
-        contactInfo: {
-          address: {
-            houseNumber: user.contactInfo.address.houseNumber,
-            street: user.contactInfo.address.street,
-            barangay: user.contactInfo.address.barangay,
-            city: user.contactInfo.address.city,
-          },
-          phoneNumbers: user.contactInfo.phoneNumbers,
-        },
-        economicInfo: {
-          employmentStatus: user.economicInfo.employmentStatus,
-          occupation: user.economicInfo.occupation,
-        },
-        credentials: {
-          email: user.credentials.email,
-          password: user.credentials.password,
-          level: user.credentials.level,
-        },
+        personalInfo: user.personalInfo,
+        contactInfo: user.contactInfo,
+        economicInfo: user.economicInfo,
+        credentials: user.credentials,
       });
 
       if (response.data.success === true) {
-        clearSearchFilter();
         setMessage(response.data.message);
         setVisibleModal(true);
         setIsError(false);
+
+        // Clear filters and refresh user data
+        clearFilters(); // Optional: if you want to reset to active users only
       }
     } catch (error: any) {
-      setMessage(error.response.data.message);
+      setMessage(error.response?.data?.message || "An error occurred");
       setIsError(true);
       setVisibleModal(true);
-    }
-  };
-
-  const clearSearchFilter = async () => {
-    setUserSearch("");
-    setFilterStatus("All");
-    await getUsers(1, 3);
-    setCurrentPage(1);
-  };
-
-  const handleFilterStatus = async () => {
-    setLoading(true);
-    setUserSearch("");
-    setCurrentPage(1);
-
-    try {
-      if (filterStatus === "All") {
-        setFilterStatus("active");
-        await getActiveUsers(currentPage, 3);
-      } else if (filterStatus === "active") {
-        setFilterStatus("archive");
-        await getArchivedUsers(currentPage, 3);
-      } else if (filterStatus === "archive") {
-        setFilterStatus("All");
-        await getUsers(currentPage, 3);
-      }
-    } catch (error) {
-      console.error("Error fetching users:", error);
     } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSearch = async (text: string) => {
-    setUserSearch(text);
-    setLoading(true);
-    setCurrentPage(1);
-    setFilterStatus("All");
-
-    try {
-      if (text.trim() === "") {
-        setUserSearch("");
-
-        await getUsers(currentPage, 3);
-      } else {
-        await filterUsers(text, currentPage, 3);
-      }
-    } catch (error: any) {
-      console.log(error.response.data.message);
-    } finally {
-      setLoading(false);
+      setLoading(false); // Ensure the loader stops even if there's an error
     }
   };
 
@@ -430,51 +419,54 @@ const Users = () => {
               </Text>
             </View>
           )}
-          <View className="flex flex-row space-x-2 items-center justify-center">
-            <Pressable
-              disabled={currentPage === 1}
-              onPress={() => handlePageChange(currentPage - 1)}
-            >
-              <RemixIcon name="arrow-left-s-line" size={16} color="black" />
-            </Pressable>
 
-            {Array.from(
-              {
-                length: Math.min(5, totalPages),
-              },
-              (_, index) => {
-                const startPage = Math.max(1, currentPage - 2);
-                const page = startPage + index;
-                return page <= totalPages ? page : null;
-              }
-            ).map(
-              (page) =>
-                page && ( // Only render valid pages
-                  <Pressable
-                    key={page}
-                    onPress={() => handlePageChange(page)}
-                    className="p-2"
-                  >
-                    <Text
-                      className={
-                        currentPage === page
-                          ? "text-lg font-semibold text-[#466600]"
-                          : "text-xs font-semibold text-black"
-                      }
+          {totalPages ? (
+            <View className="flex flex-row space-x-2 items-center justify-center">
+              <Pressable
+                disabled={currentPage === 1}
+                onPress={() => handlePageChange(currentPage - 1)}
+              >
+                <RemixIcon name="arrow-left-s-line" size={16} color="black" />
+              </Pressable>
+
+              {Array.from(
+                {
+                  length: Math.min(5, totalPages),
+                },
+                (_, index) => {
+                  const startPage = Math.max(1, currentPage - 2);
+                  const page = startPage + index;
+                  return page <= totalPages ? page : null;
+                }
+              ).map(
+                (page) =>
+                  page && ( // Only render valid pages
+                    <Pressable
+                      key={page}
+                      onPress={() => handlePageChange(page)}
+                      className="p-2"
                     >
-                      {page}
-                    </Text>
-                  </Pressable>
-                )
-            )}
+                      <Text
+                        className={
+                          currentPage === page
+                            ? "text-lg font-semibold text-[#466600]"
+                            : "text-xs font-semibold text-black"
+                        }
+                      >
+                        {page}
+                      </Text>
+                    </Pressable>
+                  )
+              )}
 
-            <Pressable
-              disabled={currentPage === totalPages}
-              onPress={() => handlePageChange(currentPage + 1)}
-            >
-              <RemixIcon name="arrow-right-s-line" size={16} color="black" />
-            </Pressable>
-          </View>
+              <Pressable
+                disabled={currentPage === totalPages}
+                onPress={() => handlePageChange(currentPage + 1)}
+              >
+                <RemixIcon name="arrow-right-s-line" size={16} color="black" />
+              </Pressable>
+            </View>
+          ) : null}
 
           <View className="w-full pb-24"></View>
         </ScrollView>
@@ -489,7 +481,8 @@ const Users = () => {
           onClose={() => {
             setVisibleModal(false);
             if (!isError) {
-              fetchAllHistory();
+              clearFilters();
+              fetchData();
             }
           }}
           icon="profile"
@@ -500,7 +493,8 @@ const Users = () => {
           accountLevel={user ? user.credentials.level : ""}
           onClose={() => {
             setUserModal(false);
-            clearSearchFilter();
+            clearFilters();
+            fetchData();
           }}
         />
       )}
@@ -510,7 +504,8 @@ const Users = () => {
           accountLevel={user ? user.credentials.level : ""}
           onClose={() => {
             setEditModal(false);
-            clearSearchFilter();
+            clearFilters();
+            fetchData();
           }}
         />
       )}
