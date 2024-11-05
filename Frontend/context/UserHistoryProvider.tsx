@@ -40,7 +40,7 @@ export const UserHistoryProvider = ({ children }: any) => {
     limit: number
   ) => {
     try {
-      let url = `http://${ipAddress}:${port}/api/history/claim/${user._id}?status=active&page=${pageNumber}&limit=${limit}`;
+      let url = `http://${ipAddress}:${port}/api/history/claim/user/${user._id}?status=active&page=${pageNumber}&limit=${limit}`;
       let response = await axios.get(url);
       if (response.data.success === true) {
         setRewardsHistory(response.data.userrewardclaimhistory);

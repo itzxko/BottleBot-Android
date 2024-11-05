@@ -41,15 +41,11 @@ const ArchiveDateForm = ({
         let url = `http://${ipAddress}:${port}/api/history/claim/${data}`;
         let response = await axios.get(url);
 
-        if (
-          response.data.success === true &&
-          response.data.rewardclaimhistory.length > 0
-        ) {
-          const archiveDateValue =
-            response.data.rewardclaimhistory[0].archiveDate;
+        if (response.data.success === true) {
+          const archiveDateValue = response.data.rewardclaimhistory.archiveDate;
           // Assuming archiveDateValue is in ISO string format
           setArchiveDate(new Date(archiveDateValue));
-          setHistoryData(response.data.rewardclaimhistory[0]);
+          setHistoryData(response.data.rewardclaimhistory);
           console.log(archiveDateValue); // Should now log the correct archive date
         }
       } catch (error: any) {
