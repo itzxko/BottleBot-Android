@@ -330,7 +330,6 @@ const PointsHistoryAdd = ({ onClose }: { onClose: () => void }) => {
           onClose={() => {
             setFieldsModal(false);
             onClose();
-            fetchAllPointsHistory();
           }}
           user={selectedUser}
         />

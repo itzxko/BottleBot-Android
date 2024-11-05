@@ -24,7 +24,8 @@ const Dashboard = () => {
   const { queue, initializeWebSocket, deleteFromQueue } = useQueue();
   const [loading, setLoading] = useState(false);
   const [configForm, setConfigForm] = useState(false);
-  const { yourLocation, defaultLocation, getUserLocation } = useLocation();
+  const { yourLocation, defaultLocation, getUserLocation, botLocation } =
+    useLocation();
   const [config, setConfig] = useState<config | undefined>();
   const { ipAddress, port } = useUrl();
 
@@ -94,6 +95,20 @@ const Dashboard = () => {
                     />
                   </Marker>
                 ))}
+              {botLocation ? (
+                <Marker
+                  coordinate={{
+                    latitude: botLocation.lat,
+                    longitude: botLocation.lon,
+                  }}
+                  title="Bot Location"
+                >
+                  <Image
+                    source={require("../../assets/images/Bot-Pin.png")}
+                    className="w-[56px] h-[56px]"
+                  />
+                </Marker>
+              ) : null}
               <Marker coordinate={yourLocation} title="Your Location">
                 <Image
                   source={require("../../assets/images/Admin-Pin.png")}
@@ -156,7 +171,11 @@ const Dashboard = () => {
                     placeholder="single"
                     numberOfLines={1}
                     readOnly={true}
-                    value={`${yourLocation.latitude.toString()}, ${yourLocation.longitude.toString()}`}
+                    value={
+                      botLocation
+                        ? `${botLocation.lat.toString()}, ${botLocation.lon.toString()}`
+                        : "No Location"
+                    }
                   ></TextInput>
                 </View>
                 {/* User */}

@@ -364,7 +364,6 @@ const RewardHistoryAdd = ({ onClose }: { onClose: () => void }) => {
           onClose={() => {
             setChooseModal(false);
             onClose();
-            fetchAllRewardsHistory();
           }}
           reward={selectedReward}
         />

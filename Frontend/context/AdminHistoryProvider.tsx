@@ -9,15 +9,18 @@ export const AdminHistoryProvider = ({ children }: any) => {
   const [rewardsHistory, setRewardsHistory] = useState([]);
   const [pointsHistory, setPointsHistory] = useState([]);
   const { ipAddress, port } = useUrl();
+  const [rewardTotalPages, setRewardTotalPages] = useState(0);
+  const [pointTotalPages, setPointTotalPages] = useState(0);
 
-  const fetchAllRewardsHistory = async () => {
+  const getRewardsHistory = async (pageNumber: number, limit: number) => {
     try {
-      let url = `http://${ipAddress}:${port}/api/history/claim`;
+      let url = `http://${ipAddress}:${port}/api/history/claim?status=active&page=${pageNumber}&limit=${limit}`;
 
       let response = await axios.get(url);
 
-      if (response.status === 200) {
+      if (response.data.success === true) {
         setRewardsHistory(response.data.allusersrewardclaimhistory);
+        setRewardTotalPages(response.data.totalPages);
       } else {
         console.log(response.data.message);
       }
@@ -25,14 +28,78 @@ export const AdminHistoryProvider = ({ children }: any) => {
       console.log(error);
     }
   };
-  const fetchAllPointsHistory = async () => {
+
+  const searchActiveRewardHistory = async (
+    user: string,
+    pageNumber: number,
+    limit: number
+  ) => {
     try {
-      let url = `http://${ipAddress}:${port}/api/history/dispose`;
+      let url = `http://${ipAddress}:${port}/api/history/claim?userName=${user}&status=active&page=${pageNumber}&limit=${limit}`;
+
+      let response = await axios.get(url);
+
+      if (response.data.success === true) {
+        setRewardsHistory(response.data.allusersrewardclaimhistory);
+        setRewardTotalPages(response.data.totalPages);
+      } else {
+        console.log(response.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const searchArchivedRewardHistory = async (
+    user: string,
+    pageNumber: number,
+    limit: number
+  ) => {
+    try {
+      let url = `http://${ipAddress}:${port}/api/history/claim?userName=${user}&status=archived&page=${pageNumber}&limit=${limit}`;
+
+      let response = await axios.get(url);
+
+      if (response.data.success === true) {
+        setRewardsHistory(response.data.allusersrewardclaimhistory);
+        setRewardTotalPages(response.data.totalPages);
+      } else {
+        console.log(response.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getArchivedRewardHistory = async (
+    pageNumber: number,
+    limit: string
+  ) => {
+    try {
+      let url = `http://${ipAddress}:${port}/api/history/claim?status=archived&page=${pageNumber}&limit=${limit}`;
+
+      let response = await axios.get(url);
+
+      if (response.data.success === true) {
+        setRewardsHistory(response.data.allusersrewardclaimhistory);
+        setRewardTotalPages(response.data.totalPages);
+      } else {
+        console.log(response.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getPointsHistory = async (pageNumber: number, limit: number) => {
+    try {
+      let url = `http://${ipAddress}:${port}/api/history/dispose?status=active&page=${pageNumber}&limit=${limit}`;
 
       let response = await axios.get(url);
 
       if (response.status === 200) {
         setPointsHistory(response.data.allusersdisposalhistory);
+        setPointTotalPages(response.data.totalPages);
       } else {
         console.log(response.data.message);
       }
@@ -41,39 +108,57 @@ export const AdminHistoryProvider = ({ children }: any) => {
     }
   };
 
-  const fetchAllHistory = async () => {
+  const searchActivePointHistory = async (
+    user: string,
+    pageNumber: number,
+    limit: number
+  ) => {
     try {
-      await fetchAllRewardsHistory();
-      await fetchAllPointsHistory();
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const searchRewardHistory = async (user: string) => {
-    try {
-      let url = `http://${ipAddress}:${port}/api/history/claim?userName=${user}`;
-
-      let response = await axios.get(url);
-
-      if (response.status === 200) {
-        setRewardsHistory(response.data.allusersrewardclaimhistory);
-      } else {
-        console.log(response.data.message);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const searchPointHistory = async (user: string) => {
-    try {
-      let url = `http://${ipAddress}:${port}/api/history/dispose?userName=${user}`;
+      let url = `http://${ipAddress}:${port}/api/history/dispose?userName=${user}&status=active&page=${pageNumber}&limit=${limit}`;
 
       let response = await axios.get(url);
 
       if (response.status === 200) {
         setPointsHistory(response.data.allusersdisposalhistory);
+        setPointTotalPages(response.data.totalPages);
+      } else {
+        console.log(response.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getArchivedPointHistory = async (pageNumber: number, limit: number) => {
+    try {
+      let url = `http://${ipAddress}:${port}/api/history/dispose?status=archived&page=${pageNumber}&limit=${limit}`;
+
+      let response = await axios.get(url);
+
+      if (response.status === 200) {
+        setPointsHistory(response.data.allusersdisposalhistory);
+        setPointTotalPages(response.data.totalPages);
+      } else {
+        console.log(response.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const searchArchivedPointHistory = async (
+    user: string,
+    pageNumber: number,
+    limit: number
+  ) => {
+    try {
+      let url = `http://${ipAddress}:${port}/api/history/dispose?userName=${user}&status=archived&page=${pageNumber}&limit=${limit}`;
+
+      let response = await axios.get(url);
+
+      if (response.status === 200) {
+        setPointsHistory(response.data.allusersdisposalhistory);
+        setPointTotalPages(response.data.totalPages);
       } else {
         console.log(response.data.message);
       }
@@ -85,13 +170,18 @@ export const AdminHistoryProvider = ({ children }: any) => {
   return (
     <AdminHistoryContext.Provider
       value={{
-        fetchAllRewardsHistory,
-        fetchAllPointsHistory,
+        getRewardsHistory,
         rewardsHistory,
+        searchActiveRewardHistory,
+        searchArchivedRewardHistory,
+        getArchivedRewardHistory,
+        rewardTotalPages,
+        getPointsHistory,
         pointsHistory,
-        searchRewardHistory,
-        searchPointHistory,
-        fetchAllHistory,
+        searchActivePointHistory,
+        getArchivedPointHistory,
+        searchArchivedPointHistory,
+        pointTotalPages,
       }}
     >
       {children}

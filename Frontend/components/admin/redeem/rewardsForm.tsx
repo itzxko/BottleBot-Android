@@ -81,7 +81,6 @@ const RewardsForm = ({
           ? new Date(response.data.reward.archiveDate)
           : null;
         setArchiveDate(archiveDateDate);
-        console.log(archiveDate);
       }
     } catch (error: any) {
       console.log(error);
@@ -91,7 +90,7 @@ const RewardsForm = ({
   };
 
   const onValidFromChange = (event: any, selectedDate?: Date) => {
-    setShowValidFromDatePicker(false); // Hide date picker after selection
+    setShowValidFromDatePicker(false);
     if (selectedDate) setValidFrom(selectedDate);
   };
 
@@ -107,7 +106,7 @@ const RewardsForm = ({
   };
 
   const onArchiveDateChange = (event: any, selectedDate?: Date) => {
-    setShowArchiveDatePicker(false); // Hide date picker after selection
+    setShowArchiveDatePicker(false);
     if (selectedDate) setArchiveDate(selectedDate);
   };
 
@@ -490,7 +489,6 @@ const RewardsForm = ({
           onClose={() => {
             setVisibleModal(false);
             if (!isError) {
-              fetchAllRewardsHistory();
               onClose();
             }
           }}
