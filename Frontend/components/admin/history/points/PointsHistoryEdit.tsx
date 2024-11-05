@@ -337,7 +337,6 @@ const PointsHistoryEdit = ({
           onClose={() => {
             setFieldsModal(false);
             onClose();
-            fetchAllPointsHistory();
           }}
           historyId={historyId}
           user={selectedUser}

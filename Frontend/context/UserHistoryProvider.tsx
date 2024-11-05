@@ -8,17 +8,24 @@ const HistoryContext = createContext<any>(null);
 export const UserHistoryProvider = ({ children }: any) => {
   const [pointsHistory, setPointsHistory] = useState([]);
   const [rewardsHistory, setRewardsHistory] = useState([]);
+  const [pointsTotalPages, setPointsTotalPages] = useState(0);
+  const [rewardTotalPages, setRewardTotalPages] = useState(0);
   const { ipAddress, port } = useUrl();
   interface user {
     _id: string;
   }
 
-  const fetchPointsHistory = async (user: user) => {
+  const getPointsHistory = async (
+    user: user,
+    pageNumber: number,
+    limit: number
+  ) => {
     try {
-      let url = `http://${ipAddress}:${port}/api/history/dispose/${user._id}`;
+      let url = `http://${ipAddress}:${port}/api/history/dispose/user/${user._id}?status=active&page=${pageNumber}&limit=${limit}`;
       let response = await axios.get(url);
-      if (response.status === 200) {
+      if (response.data.success === true) {
         setPointsHistory(response.data.userdisposalhistory);
+        setPointsTotalPages(response.data.totalPages);
       } else {
         console.log(response.data.message);
       }
@@ -27,12 +34,17 @@ export const UserHistoryProvider = ({ children }: any) => {
     }
   };
 
-  const fetchRewardsHistory = async (user: user) => {
+  const getRewardsHistory = async (
+    user: user,
+    pageNumber: number,
+    limit: number
+  ) => {
     try {
-      let url = `http://${ipAddress}:${port}/api/history/claim/${user._id}`;
+      let url = `http://${ipAddress}:${port}/api/history/claim/${user._id}?status=active&page=${pageNumber}&limit=${limit}`;
       let response = await axios.get(url);
-      if (response.status === 200) {
+      if (response.data.success === true) {
         setRewardsHistory(response.data.userrewardclaimhistory);
+        setRewardTotalPages(response.data.totalPages);
       } else {
         console.log(response.data.message);
       }
@@ -46,8 +58,10 @@ export const UserHistoryProvider = ({ children }: any) => {
       value={{
         pointsHistory,
         rewardsHistory,
-        fetchPointsHistory,
-        fetchRewardsHistory,
+        getPointsHistory,
+        getRewardsHistory,
+        pointsTotalPages,
+        rewardTotalPages,
       }}
     >
       {children}

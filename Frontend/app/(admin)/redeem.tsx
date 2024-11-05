@@ -28,7 +28,6 @@ const redeem = () => {
     getRewards,
     filterRewards,
     rewards,
-    categories,
     searchRewards,
     totalPages,
     getArchivedRewards,
@@ -53,6 +52,7 @@ const redeem = () => {
   const [userSearch, setUserSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [filterStatus, setFilterStatus] = useState("active");
+  const categories = ["Goods", "Clothing", "Beverage", "Other"];
 
   interface Item {
     _id: string;
@@ -368,7 +368,7 @@ const redeem = () => {
                         ? ["#E1E1E1", "#d9d9d9"]
                         : ["#699900", "#466600"]
                     }
-                    className="px-6 py-3 flex items-center justify-center rounded-full"
+                    className="px-8 py-3 flex items-center justify-center rounded-full"
                   >
                     <Text
                       className={

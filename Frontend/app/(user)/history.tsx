@@ -1,4 +1,10 @@
-import { View, Text, ScrollView, TouchableHighlight } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableHighlight,
+  Pressable,
+} from "react-native";
 import React, { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
@@ -11,6 +17,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useHistory } from "@/context/UserHistoryProvider";
 import { ImageBackground } from "expo-image";
 import { useUrl } from "@/context/UrlProvider";
+import { usePagination } from "@/context/PaginationProvider";
+import RemixIcon from "react-native-remix-icon";
 
 // Define the interfaces
 interface User {
@@ -49,10 +57,15 @@ const History: React.FC = () => {
   const {
     pointsHistory,
     rewardsHistory,
-    fetchPointsHistory,
-    fetchRewardsHistory,
+    getPointsHistory,
+    getRewardsHistory,
+    pointsTotalPages,
+    rewardTotalPages,
   } = useHistory();
   const { ipAddress, port } = useUrl();
+  const [rewardCurrentPage, setRewardCurrentPage] = useState(1);
+  const [pointCurrentPage, setPointCurrentPage] = useState(1);
+  const { historyLimit } = usePagination();
 
   useEffect(() => {
     const fetchRewards = async () => {
@@ -67,12 +80,14 @@ const History: React.FC = () => {
     fetchRewards();
   }, []);
 
+  console.log(user);
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        await fetchRewardsHistory(user);
-        await fetchPointsHistory(user);
+        await getRewardsHistory(user, rewardCurrentPage, historyLimit);
+        await getPointsHistory(user, pointCurrentPage, historyLimit);
       } catch (error: any) {
         console.log(error.response.data.message);
       } finally {
@@ -81,6 +96,36 @@ const History: React.FC = () => {
     };
     fetchData();
   }, []);
+
+  const handlePointPageChange = async (newPage: number) => {
+    if (newPage >= 1 && newPage <= pointsTotalPages) {
+      setPointCurrentPage(newPage);
+      setLoading(true);
+
+      try {
+        getPointsHistory(user, newPage, historyLimit);
+      } catch (error) {
+        console.error("Error fetching rewards:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const handleRewardPageChange = async (newPage: number) => {
+    if (newPage >= 1 && newPage <= rewardTotalPages) {
+      setRewardCurrentPage(newPage);
+      setLoading(true);
+
+      try {
+        getRewardsHistory(user, newPage, historyLimit);
+      } catch (error) {
+        console.error("Error fetching rewards:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-[#F0F0F0]">
@@ -238,6 +283,57 @@ const History: React.FC = () => {
                 </View>
               )}
             </ScrollView>
+            {rewardTotalPages ? (
+              <View className="flex flex-row space-x-2 items-center justify-center py-4">
+                <Pressable
+                  disabled={rewardCurrentPage === 1}
+                  onPress={() => handleRewardPageChange(rewardCurrentPage - 1)}
+                >
+                  <RemixIcon name="arrow-left-s-line" size={16} color="black" />
+                </Pressable>
+
+                {Array.from(
+                  {
+                    length: Math.min(5, rewardTotalPages),
+                  },
+                  (_, index) => {
+                    const startPage = Math.max(1, rewardCurrentPage - 2);
+                    const page = startPage + index;
+                    return page <= rewardTotalPages ? page : null;
+                  }
+                ).map(
+                  (page) =>
+                    page && ( // Only render valid pages
+                      <Pressable
+                        key={page}
+                        onPress={() => handleRewardPageChange(page)}
+                        className="p-2"
+                      >
+                        <Text
+                          className={
+                            rewardCurrentPage === page
+                              ? "text-lg font-semibold text-[#466600]"
+                              : "text-xs font-semibold text-black"
+                          }
+                        >
+                          {page}
+                        </Text>
+                      </Pressable>
+                    )
+                )}
+
+                <Pressable
+                  disabled={rewardCurrentPage === rewardTotalPages}
+                  onPress={() => handleRewardPageChange(rewardCurrentPage + 1)}
+                >
+                  <RemixIcon
+                    name="arrow-right-s-line"
+                    size={16}
+                    color="black"
+                  />
+                </Pressable>
+              </View>
+            ) : null}
           </View>
           <View className="w-full flex items-center justify-center pt-6">
             <View className="w-full flex flex-row items-start justify-between px-4 pb-4">
@@ -372,6 +468,57 @@ const History: React.FC = () => {
                 </View>
               )}
             </ScrollView>
+            {pointsTotalPages ? (
+              <View className="flex flex-row space-x-2 items-center justify-center py-4">
+                <Pressable
+                  disabled={pointCurrentPage === 1}
+                  onPress={() => handlePointPageChange(pointCurrentPage - 1)}
+                >
+                  <RemixIcon name="arrow-left-s-line" size={16} color="black" />
+                </Pressable>
+
+                {Array.from(
+                  {
+                    length: Math.min(5, pointsTotalPages),
+                  },
+                  (_, index) => {
+                    const startPage = Math.max(1, pointCurrentPage - 2);
+                    const page = startPage + index;
+                    return page <= pointsTotalPages ? page : null;
+                  }
+                ).map(
+                  (page) =>
+                    page && ( // Only render valid pages
+                      <Pressable
+                        key={page}
+                        onPress={() => handlePointPageChange(page)}
+                        className="p-2"
+                      >
+                        <Text
+                          className={
+                            pointCurrentPage === page
+                              ? "text-lg font-semibold text-[#466600]"
+                              : "text-xs font-semibold text-black"
+                          }
+                        >
+                          {page}
+                        </Text>
+                      </Pressable>
+                    )
+                )}
+
+                <Pressable
+                  disabled={pointCurrentPage === pointsTotalPages}
+                  onPress={() => handlePointPageChange(pointCurrentPage + 1)}
+                >
+                  <RemixIcon
+                    name="arrow-right-s-line"
+                    size={16}
+                    color="black"
+                  />
+                </Pressable>
+              </View>
+            ) : null}
           </View>
           <View className="pb-32"></View>
         </ScrollView>

@@ -26,28 +26,38 @@ import PointsHistoryAdd from "@/components/admin/history/points/PointsHistoryAdd
 import PointsHistoryEdit from "@/components/admin/history/points/PointsHistoryEdit";
 import { useRewards } from "@/context/RewardsProvider";
 import RemixIcon from "react-native-remix-icon";
+import { usePagination } from "@/context/PaginationProvider";
+import { Point } from "react-native-maps";
+import ArchiveDateEdit from "@/components/admin/history/points/ArchiveDateEdit";
+import ArchiveDateForm from "@/components/admin/history/rewards/ArchiveDateForm";
 
 const History = () => {
   const { user } = useAuth();
-  const { fetchRewards, rewards } = useRewards();
+  const { getRewards, rewards } = useRewards();
   const [pointsPage, setPointsPage] = useState(false);
   const navigation = useNavigation();
   const [message, setMessage] = useState("");
   const [redeemables, setRedeemables] = useState<RedeemableItem[]>([]);
   const [loading, setLoading] = useState(false);
   const {
-    pointsHistory,
+    getRewardsHistory,
     rewardsHistory,
-    fetchAllPointsHistory,
-    fetchAllRewardsHistory,
-    searchRewardHistory,
-    searchPointHistory,
-    fetchAllHistory,
+    searchActiveRewardHistory,
+    searchArchivedRewardHistory,
+    getArchivedRewardHistory,
+    rewardTotalPages,
+    getPointsHistory,
+    pointsHistory,
+    searchActivePointHistory,
+    getArchivedPointHistory,
+    searchArchivedPointHistory,
+    pointTotalPages,
   } = useAdminHistory();
+  const { historyLimit } = usePagination();
   const { users, getUsers } = useUsers();
   const { ipAddress, port } = useUrl();
-  const [userSearch, setUserSearch] = useState("");
-  const [searchType, setSearchType] = useState(true);
+  const [rewardSearch, setRewardSearch] = useState("");
+  const [pointSearch, setPointSearch] = useState("");
   const [rewardAdd, setRewardAdd] = useState(false);
   const [rewardEdit, setRewardEdit] = useState(false);
   const [pointsAdd, setPointsAdd] = useState(false);
@@ -55,6 +65,14 @@ const History = () => {
   const [visibleModal, setVisibleModal] = useState(false);
   const [rewardHistoryId, setRewardHistoryId] = useState("");
   const [pointHistoryId, setPointHistoryId] = useState("");
+  const [rewardsFilterStatus, setRewardsFilterStatus] = useState("active");
+  const [pointsFilterStatus, setPointsFilterStatus] = useState("active");
+  const [rewardCurrentPage, setRewardCurrentPage] = useState(1);
+  const [pointCurrentPage, setPointCurrentPage] = useState(1);
+  const [isError, setIsError] = useState(false);
+  const [pointsArchiveForm, setPointsArchiveForm] = useState(false);
+  const [rewardsArchiveForm, setRewardsArchiveForm] = useState(false);
+  const [historyData, setHistoryData] = useState("");
 
   interface user {
     _id: string;
@@ -67,6 +85,7 @@ const History = () => {
   interface RewardsHistory {
     dateClaimed: Date;
     _id: string;
+    archiveDate: Date;
     pointsSpent: number;
     userId: string;
     rewardId: string;
@@ -74,6 +93,7 @@ const History = () => {
       personalInfo: {
         firstName: string;
         lastName: string;
+        middleName: string;
       };
     };
   }
@@ -84,10 +104,12 @@ const History = () => {
     dateDisposed: Date;
     pointsAccumulated: number;
     bottleCount: number;
+    archiveDate: Date;
     userInfo: {
       personalInfo: {
         firstName: string;
         lastName: string;
+        middleName: string;
       };
     };
   }
@@ -102,43 +124,6 @@ const History = () => {
     _id: string;
   }
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-
-      try {
-        await fetchAllHistory();
-        await getUsers();
-      } catch (error) {
-        console.error("Error fetching data: ", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  const handleSearchType = async () => {
-    setLoading(true);
-
-    try {
-      setSearchType(!searchType);
-
-      if (searchType) {
-        await fetchAllRewardsHistory();
-        await searchPointHistory(userSearch);
-      } else {
-        await fetchAllPointsHistory();
-        await searchRewardHistory(userSearch);
-      }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const deleteRewardHistory = async (historyId: string) => {
     setLoading(true);
     try {
@@ -149,8 +134,8 @@ const History = () => {
       if (response.status === 200) {
         setMessage(response.data.message);
         setVisibleModal(true);
-        await fetchAllRewardsHistory();
-        setUserSearch("");
+        clearRewardFilters();
+        fetchRewardHistoryData();
       }
     } catch (error: any) {
       setMessage(error.response.data.message);
@@ -160,7 +145,7 @@ const History = () => {
     }
   };
 
-  const deletePointHistory = async (historyId: string) => {
+  const archivePointHistory = async (historyId: string) => {
     setLoading(true);
 
     try {
@@ -171,30 +156,122 @@ const History = () => {
       if (response.status === 200) {
         setMessage(response.data.message);
         setVisibleModal(true);
-        await fetchAllPointsHistory();
-        setUserSearch("");
+        setIsError(false);
+        fetchPointHistoryData();
       }
     } catch (error: any) {
       setMessage(error.response.data.message);
       setVisibleModal(true);
+      setIsError(true);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSearch = async (text: string) => {
-    setUserSearch(text);
+  const unarchivePointHistory = async (history: PointsHistory) => {
+    setLoading(true);
+    console.log(history);
+
+    try {
+      let url = `http://${ipAddress}:${port}/api/history/dispose/${history._id}`;
+
+      let response = await axios.put(url, {
+        userId: history.userId,
+        bottleCount: history.bottleCount,
+        pointsAccumulated: history.pointsAccumulated,
+        archiveDate: null,
+      });
+
+      if (response.status === 200) {
+        setMessage(response.data.message);
+        setVisibleModal(true);
+        setIsError(false);
+        fetchPointHistoryData();
+      }
+    } catch (error: any) {
+      setMessage(error.response.data.message);
+      setVisibleModal(true);
+      setIsError(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const archiveRewardHistory = async (historyId: string) => {
     setLoading(true);
 
     try {
-      if (text.trim() === "") {
-        await fetchAllPointsHistory();
-        await fetchAllRewardsHistory();
-      } else {
-        if (searchType) {
-          await searchRewardHistory(text);
+      let url = `http://${ipAddress}:${port}/api/history/claim/${historyId}`;
+
+      let response = await axios.delete(url);
+
+      if (response.data.success === true) {
+        setMessage(response.data.message);
+        setIsError(false);
+        setVisibleModal(true);
+        fetchRewardHistoryData();
+      }
+    } catch (error: any) {
+      setVisibleModal(true);
+      setIsError(true);
+      setMessage(error.response.data.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const unarchiveRewardHistory = async (history: RewardsHistory) => {
+    setLoading(true);
+
+    try {
+      let url = `http://${ipAddress}:${port}/api/history/claim/${history._id}`;
+
+      let response = await axios.put(url, {
+        archiveDate: null,
+        userId: history.userId,
+        rewardId: history.rewardId,
+        pointsSpent: history.pointsSpent,
+      });
+
+      if (response.data.success === true) {
+        setMessage(response.data.message);
+        setIsError(false);
+        setVisibleModal(true);
+        fetchRewardHistoryData();
+      }
+    } catch (error: any) {
+      setVisibleModal(true);
+      setIsError(true);
+      setMessage(error.response.data.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchRewardHistoryData = async () => {
+    setLoading(true);
+    getRewards();
+
+    try {
+      if (rewardSearch.trim()) {
+        if (rewardsFilterStatus === "active") {
+          await searchActiveRewardHistory(
+            rewardSearch,
+            rewardCurrentPage,
+            historyLimit
+          );
         } else {
-          await searchPointHistory(text);
+          await searchArchivedRewardHistory(
+            rewardSearch,
+            rewardCurrentPage,
+            historyLimit
+          );
+        }
+      } else {
+        if (rewardsFilterStatus === "active") {
+          await getRewardsHistory(rewardCurrentPage, historyLimit);
+        } else {
+          await getArchivedRewardHistory(rewardCurrentPage, historyLimit);
         }
       }
     } catch (error) {
@@ -202,6 +279,195 @@ const History = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    fetchRewardHistoryData();
+  }, [rewardsFilterStatus, rewardCurrentPage]);
+
+  const handleRewardFilterStatus = async () => {
+    setRewardsFilterStatus((prevStatus) =>
+      prevStatus === "active" ? "archive" : "active"
+    );
+    setRewardSearch("");
+    setRewardCurrentPage(1);
+  };
+
+  const handleRewardSearch = async (reward: string) => {
+    setRewardSearch(reward);
+    setLoading(true);
+    setRewardCurrentPage(1);
+
+    try {
+      if (reward.trim() === "") {
+        setRewardSearch("");
+
+        if (rewardsFilterStatus === "active") {
+          await getRewardsHistory(1, historyLimit);
+        } else {
+          await getArchivedRewardHistory(1, historyLimit);
+        }
+      } else {
+        if (rewardsFilterStatus === "active") {
+          await searchActiveRewardHistory(reward, 1, historyLimit);
+        } else {
+          await searchArchivedRewardHistory(reward, 1, historyLimit);
+        }
+      }
+    } catch (error: any) {
+      console.log(error.response?.data?.message || error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRewardPageChange = async (newPage: number) => {
+    if (newPage >= 1 && newPage <= rewardTotalPages) {
+      setRewardCurrentPage(newPage);
+      setLoading(true);
+
+      try {
+        if (rewardSearch.trim() !== "") {
+          // Apply search or filter on page change
+          if (rewardsFilterStatus === "active") {
+            await searchActiveRewardHistory(
+              rewardSearch,
+              newPage,
+              historyLimit
+            );
+          } else {
+            await searchArchivedRewardHistory(
+              rewardSearch,
+              newPage,
+              historyLimit
+            );
+          }
+        } else {
+          // Default pagination without search or filter
+          if (rewardsFilterStatus === "active") {
+            await getRewardsHistory(newPage, historyLimit);
+          } else if (rewardsFilterStatus === "archive") {
+            await getArchivedRewardHistory(newPage, historyLimit);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching rewards:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const clearRewardFilters = () => {
+    setRewardSearch("");
+    setRewardsFilterStatus("active");
+  };
+
+  //points
+  const fetchPointHistoryData = async () => {
+    setLoading(true);
+
+    try {
+      if (pointSearch.trim()) {
+        if (pointsFilterStatus === "active") {
+          await searchActivePointHistory(
+            pointSearch,
+            pointCurrentPage,
+            historyLimit
+          );
+        } else {
+          await searchArchivedPointHistory(
+            pointSearch,
+            pointCurrentPage,
+            historyLimit
+          );
+        }
+      } else {
+        if (pointsFilterStatus === "active") {
+          await getPointsHistory(pointCurrentPage, historyLimit);
+        } else {
+          await getArchivedPointHistory(pointCurrentPage, historyLimit);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPointHistoryData();
+  }, [pointsFilterStatus, pointCurrentPage]);
+
+  const handlePointFilterStatus = async () => {
+    setPointsFilterStatus((prevStatus) =>
+      prevStatus === "active" ? "archive" : "active"
+    );
+    setPointSearch("");
+    setPointCurrentPage(1);
+  };
+
+  const handlePointSearch = async (point: string) => {
+    setPointSearch(point);
+    setLoading(true);
+    setPointCurrentPage(1);
+
+    try {
+      if (point.trim() === "") {
+        setPointSearch("");
+
+        if (pointsFilterStatus === "active") {
+          await getPointsHistory(1, historyLimit);
+        } else {
+          await getArchivedPointHistory(1, historyLimit);
+        }
+      } else {
+        if (pointsFilterStatus === "active") {
+          await searchActivePointHistory(point, 1, historyLimit);
+        } else {
+          await searchArchivedPointHistory(point, 1, historyLimit);
+        }
+      }
+    } catch (error: any) {
+      console.log(error.response?.data?.message || error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePointPageChange = async (newPage: number) => {
+    if (newPage >= 1 && newPage <= pointTotalPages) {
+      setPointCurrentPage(newPage);
+      setLoading(true);
+
+      try {
+        if (rewardSearch.trim() !== "") {
+          // Apply search or filter on page change
+          if (pointsFilterStatus === "active") {
+            await searchActivePointHistory(pointSearch, newPage, historyLimit);
+          } else {
+            await searchActivePointHistory(pointSearch, newPage, historyLimit);
+          }
+        } else {
+          // Default pagination without search or filter
+          if (pointsFilterStatus === "active") {
+            await getPointsHistory(newPage, historyLimit);
+          } else if (pointsFilterStatus === "archive") {
+            await getArchivedPointHistory(newPage, historyLimit);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching rewards:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const clearPointFilters = () => {
+    setPointSearch("");
+    setPointsFilterStatus("active");
   };
 
   return (
@@ -219,60 +485,61 @@ const History = () => {
           </TouchableHighlight>
           <Text className="text-sm font-semibold">History</Text>
         </View>
-        <View className="w-full flex flex-row items-center justify-between px-4 py-4">
-          <View className="w-full flex flex-row items-center justify-between pl-6 pr-4 py-3 rounded-full bg-[#E6E6E6]">
-            <View className="w-6/12 flex-row items-center justify-start">
-              <RemixIcon
-                name="search-2-line"
-                size={16}
-                color={"rgba(0, 0, 0, 0.5)"}
-              />
-              <TextInput
-                value={userSearch}
-                className="w-full bg-[#E6E6E6] text-xs font-normal pl-2"
-                placeholder="search for a user's history"
-                onChangeText={handleSearch}
-              />
-            </View>
-            <Pressable
-              className="w-4/12 px-4 py-2 flex flex-row items-center justify-between rounded-full bg-[#050301]"
-              onPress={handleSearchType}
-            >
-              <Text
-                className="text-xs font-normal text-white"
-                numberOfLines={1}
-              >
-                {searchType ? "Rewards" : "Points"}
-              </Text>
-              <RemixIcon name="refresh-line" size={16} color="white" />
-            </Pressable>
-          </View>
-        </View>
+
         <ScrollView
           className="flex-1 w-full"
           showsVerticalScrollIndicator={false}
         >
           {/* Titlebar */}
-          <View className="w-full flex items-center justify-center pt-4">
-            <View className="w-full flex flex-row items-start justify-between px-4 pb-4">
-              <View className="w-3/4 flex items-start justify-center">
-                <Text className="text-sm font-semibold" numberOfLines={1}>
-                  Rewards History
-                </Text>
+          <View className="w-full flex flex-row items-center justify-between px-4 py-4">
+            <View className="w-full flex flex-row items-center justify-between pl-6 pr-4 py-3 rounded-full bg-[#E6E6E6]">
+              <View className="w-6/12 flex-row items-center justify-start">
+                <RemixIcon
+                  name="search-2-line"
+                  size={16}
+                  color={"rgba(0, 0, 0, 0.5)"}
+                />
+                <TextInput
+                  value={rewardSearch}
+                  className="w-full bg-[#E6E6E6] text-xs font-normal pl-2"
+                  placeholder="search rewards history"
+                  onChangeText={handleRewardSearch}
+                />
+              </View>
+              <Pressable
+                className="w-4/12 px-4 py-2 flex flex-row items-center justify-between rounded-full bg-[#050301]"
+                onPress={handleRewardFilterStatus}
+              >
                 <Text
-                  className="text-xs font-normal text-black/50"
+                  className="text-xs font-normal text-white"
                   numberOfLines={1}
                 >
-                  all records of redeemed rewards
+                  {rewardsFilterStatus}
                 </Text>
-              </View>
-              <View className="w-1/4 flex items-end justify-center">
+                <RemixIcon name="refresh-line" size={16} color="white" />
+              </Pressable>
+            </View>
+          </View>
+          <View className="w-full flex items-center justify-center pt-4">
+            <View className="w-full flex flex-row items-start justify-between px-4 pb-4">
+              <View className="w-full flex flex-row items-center justify-start space-x-2">
                 <Pressable
                   className="p-2 bg-[#050301] rounded-full"
                   onPress={() => setRewardAdd(true)}
                 >
                   <RemixIcon name="add-line" size={16} color="white" />
                 </Pressable>
+                <View className="w-3/4 flex flex-col items-start justify-center">
+                  <Text className="text-sm font-semibold" numberOfLines={1}>
+                    Rewards History
+                  </Text>
+                  <Text
+                    className="text-xs font-normal text-black/50"
+                    numberOfLines={1}
+                  >
+                    all records of redeemed rewards
+                  </Text>
+                </View>
               </View>
             </View>
             <ScrollView
@@ -316,7 +583,7 @@ const History = () => {
                             className="w-full h-full p-5"
                             colors={[
                               "rgba(18, 18, 18, 0)",
-                              "rgba(18, 18, 18, 0.6)",
+                              "rgba(18, 18, 18, 1)",
                             ]}
                             start={{ x: 0, y: 0 }}
                             end={{ x: 0, y: 1 }}
@@ -331,35 +598,72 @@ const History = () => {
                                 </Text>
                                 <View className="max-w-[40%] flex flex-row items-center justify-end">
                                   <View className="py-3 px-4 rounded-full flex flex-row bg-[#050301]/50">
-                                    <Pressable
-                                      className="mr-4"
-                                      onPress={() => {
-                                        setRewardEdit(true);
-                                        setRewardHistoryId(rewardHistory._id);
-                                      }}
-                                    >
-                                      <RemixIcon
-                                        name="edit-2-line"
-                                        size={16}
-                                        color="white"
-                                      />
-                                    </Pressable>
-                                    <Pressable
-                                      onPress={() =>
-                                        deleteRewardHistory(rewardHistory._id)
-                                      }
-                                    >
-                                      <RemixIcon
-                                        name="delete-bin-4-line"
-                                        size={16}
-                                        color="white"
-                                      />
-                                    </Pressable>
+                                    {rewardHistory.archiveDate === null ? (
+                                      <>
+                                        <Pressable
+                                          className="mr-4"
+                                          onPress={() => {
+                                            setRewardEdit(true);
+                                            setRewardHistoryId(
+                                              rewardHistory._id
+                                            );
+                                          }}
+                                        >
+                                          <RemixIcon
+                                            name="edit-2-line"
+                                            size={16}
+                                            color="white"
+                                          />
+                                        </Pressable>
+                                        <Pressable
+                                          onPress={() =>
+                                            archiveRewardHistory(
+                                              rewardHistory._id
+                                            )
+                                          }
+                                        >
+                                          <RemixIcon
+                                            name="archive-line"
+                                            size={16}
+                                            color="white"
+                                          />
+                                        </Pressable>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <Pressable
+                                          className="mr-4"
+                                          onPress={() => {
+                                            setHistoryData(rewardHistory._id);
+                                            setRewardsArchiveForm(true);
+                                          }}
+                                        >
+                                          <RemixIcon
+                                            name="edit-2-line"
+                                            size={16}
+                                            color="white"
+                                          />
+                                        </Pressable>
+                                        <Pressable
+                                          onPress={() =>
+                                            unarchiveRewardHistory(
+                                              rewardHistory
+                                            )
+                                          }
+                                        >
+                                          <RemixIcon
+                                            name="inbox-unarchive-line"
+                                            size={16}
+                                            color="white"
+                                          />
+                                        </Pressable>
+                                      </>
+                                    )}
                                   </View>
                                 </View>
                               </View>
                               <View className="w-full flex items-start justify-center">
-                                <View className="w-full flex flex-row items-center justify-start pb-4">
+                                <View className="w-full flex flex-row items-center justify-start pb-2">
                                   <Text
                                     className="text-sm font-semibold text-white capitalize max-w-[60%]"
                                     numberOfLines={1}
@@ -424,27 +728,108 @@ const History = () => {
                 </View>
               )}
             </ScrollView>
+            {rewardTotalPages ? (
+              <View className="flex flex-row space-x-2 items-center justify-center py-4">
+                <Pressable
+                  disabled={rewardCurrentPage === 1}
+                  onPress={() => handleRewardPageChange(rewardCurrentPage - 1)}
+                >
+                  <RemixIcon name="arrow-left-s-line" size={16} color="black" />
+                </Pressable>
+
+                {Array.from(
+                  {
+                    length: Math.min(5, rewardTotalPages),
+                  },
+                  (_, index) => {
+                    const startPage = Math.max(1, rewardCurrentPage - 2);
+                    const page = startPage + index;
+                    return page <= rewardTotalPages ? page : null;
+                  }
+                ).map(
+                  (page) =>
+                    page && ( // Only render valid pages
+                      <Pressable
+                        key={page}
+                        onPress={() => handleRewardPageChange(page)}
+                        className="p-2"
+                      >
+                        <Text
+                          className={
+                            rewardCurrentPage === page
+                              ? "text-lg font-semibold text-[#466600]"
+                              : "text-xs font-semibold text-black"
+                          }
+                        >
+                          {page}
+                        </Text>
+                      </Pressable>
+                    )
+                )}
+
+                <Pressable
+                  disabled={rewardCurrentPage === rewardTotalPages}
+                  onPress={() => handleRewardPageChange(rewardCurrentPage + 1)}
+                >
+                  <RemixIcon
+                    name="arrow-right-s-line"
+                    size={16}
+                    color="black"
+                  />
+                </Pressable>
+              </View>
+            ) : null}
           </View>
-          <View className="w-full flex items-center justify-center pt-6">
-            <View className="w-full flex flex-row items-start justify-between px-4 pb-4">
-              <View className="w-3/4 flex items-start justify-center">
-                <Text className="text-sm font-semibold" numberOfLines={1}>
-                  Points History
-                </Text>
+          <View className="w-full flex flex-row items-center justify-between px-4 py-4">
+            <View className="w-full flex flex-row items-center justify-between pl-6 pr-4 py-3 rounded-full bg-[#E6E6E6]">
+              <View className="w-6/12 flex-row items-center justify-start">
+                <RemixIcon
+                  name="search-2-line"
+                  size={16}
+                  color={"rgba(0, 0, 0, 0.5)"}
+                />
+                <TextInput
+                  className="w-full bg-[#E6E6E6] text-xs font-normal pl-2"
+                  placeholder="search points history"
+                  value={pointSearch}
+                  onChangeText={handlePointSearch}
+                  numberOfLines={1}
+                />
+              </View>
+              <Pressable
+                className="w-4/12 px-4 py-2 flex flex-row items-center justify-between rounded-full bg-[#050301]"
+                onPress={handlePointFilterStatus}
+              >
                 <Text
-                  className="text-xs font-normal text-black/50"
+                  className="text-xs font-normal text-white"
                   numberOfLines={1}
                 >
-                  all records of collected points
+                  {pointsFilterStatus}
                 </Text>
-              </View>
-              <View className="w-1/4 flex items-end justify-center">
+                <RemixIcon name="refresh-line" size={16} color="white" />
+              </Pressable>
+            </View>
+          </View>
+          <View className="w-full flex items-center justify-center pt-4">
+            <View className="w-full flex flex-row items-start justify-between px-4 pb-4">
+              <View className="w-full flex flex-row items-center justify-start space-x-2">
                 <Pressable
                   className="p-2 bg-[#050301] rounded-full"
                   onPress={() => setPointsAdd(true)}
                 >
                   <RemixIcon name="add-line" size={16} color="white" />
                 </Pressable>
+                <View className="w-3/4 flex flex-col items-start justify-center">
+                  <Text className="text-sm font-semibold" numberOfLines={1}>
+                    Points History
+                  </Text>
+                  <Text
+                    className="text-xs font-normal text-black/50"
+                    numberOfLines={1}
+                  >
+                    all records of collected points
+                  </Text>
+                </View>
               </View>
             </View>
             <ScrollView
@@ -502,30 +887,63 @@ const History = () => {
                                 </Text>
                                 <View className="max-w-[40%] flex flex-row items-center justify-end">
                                   <View className="py-3 px-4 rounded-full flex flex-row bg-[#050301]/50">
-                                    <Pressable
-                                      className="pr-4"
-                                      onPress={() => {
-                                        setPointsEdit(true);
-                                        setPointHistoryId(pointHistory._id);
-                                      }}
-                                    >
-                                      <RemixIcon
-                                        name="edit-2-line"
-                                        size={16}
-                                        color="white"
-                                      />
-                                    </Pressable>
-                                    <Pressable
-                                      onPress={() =>
-                                        deletePointHistory(pointHistory._id)
-                                      }
-                                    >
-                                      <RemixIcon
-                                        name="delete-bin-4-line"
-                                        size={16}
-                                        color="white"
-                                      />
-                                    </Pressable>
+                                    {pointHistory.archiveDate === null ? (
+                                      <>
+                                        <Pressable
+                                          className="pr-4"
+                                          onPress={() => {
+                                            setPointsEdit(true);
+                                            setPointHistoryId(pointHistory._id);
+                                          }}
+                                        >
+                                          <RemixIcon
+                                            name="edit-2-line"
+                                            size={16}
+                                            color="white"
+                                          />
+                                        </Pressable>
+                                        <Pressable
+                                          onPress={() =>
+                                            archivePointHistory(
+                                              pointHistory._id
+                                            )
+                                          }
+                                        >
+                                          <RemixIcon
+                                            name="archive-line"
+                                            size={16}
+                                            color="white"
+                                          />
+                                        </Pressable>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <Pressable
+                                          className="pr-4"
+                                          onPress={() => {
+                                            setPointsArchiveForm(true);
+                                            setPointHistoryId(pointHistory._id);
+                                          }}
+                                        >
+                                          <RemixIcon
+                                            name="folder-history-line"
+                                            size={16}
+                                            color="white"
+                                          />
+                                        </Pressable>
+                                        <Pressable
+                                          onPress={() =>
+                                            unarchivePointHistory(pointHistory)
+                                          }
+                                        >
+                                          <RemixIcon
+                                            name="inbox-unarchive-line"
+                                            size={16}
+                                            color="white"
+                                          />
+                                        </Pressable>
+                                      </>
+                                    )}
                                   </View>
                                 </View>
                               </View>
@@ -592,6 +1010,57 @@ const History = () => {
                 </View>
               )}
             </ScrollView>
+            {pointTotalPages ? (
+              <View className="flex flex-row space-x-2 items-center justify-center py-4">
+                <Pressable
+                  disabled={pointCurrentPage === 1}
+                  onPress={() => handlePointPageChange(pointCurrentPage - 1)}
+                >
+                  <RemixIcon name="arrow-left-s-line" size={16} color="black" />
+                </Pressable>
+
+                {Array.from(
+                  {
+                    length: Math.min(5, pointTotalPages),
+                  },
+                  (_, index) => {
+                    const startPage = Math.max(1, pointCurrentPage - 2);
+                    const page = startPage + index;
+                    return page <= pointTotalPages ? page : null;
+                  }
+                ).map(
+                  (page) =>
+                    page && ( // Only render valid pages
+                      <Pressable
+                        key={page}
+                        onPress={() => handlePointPageChange(page)}
+                        className="p-2"
+                      >
+                        <Text
+                          className={
+                            pointCurrentPage === page
+                              ? "text-lg font-semibold text-[#466600]"
+                              : "text-xs font-semibold text-black"
+                          }
+                        >
+                          {page}
+                        </Text>
+                      </Pressable>
+                    )
+                )}
+
+                <Pressable
+                  disabled={pointCurrentPage === pointTotalPages}
+                  onPress={() => handlePointPageChange(pointCurrentPage + 1)}
+                >
+                  <RemixIcon
+                    name="arrow-right-s-line"
+                    size={16}
+                    color="black"
+                  />
+                </Pressable>
+              </View>
+            ) : null}
           </View>
           <View className="pb-32"></View>
         </ScrollView>
@@ -601,7 +1070,8 @@ const History = () => {
         <RewardHistoryAdd
           onClose={() => {
             setRewardAdd(false);
-            setUserSearch("");
+            clearRewardFilters();
+            fetchRewardHistoryData();
           }}
         />
       )}
@@ -609,7 +1079,8 @@ const History = () => {
         <PointsHistoryAdd
           onClose={() => {
             setPointsAdd(false);
-            setUserSearch("");
+            clearRewardFilters();
+            fetchPointHistoryData();
           }}
         />
       )}
@@ -617,7 +1088,8 @@ const History = () => {
         <RewardHistoryEdit
           onClose={() => {
             setRewardEdit(false);
-            setUserSearch("");
+            clearRewardFilters();
+            fetchRewardHistoryData();
           }}
           historyId={rewardHistoryId}
         />
@@ -626,7 +1098,8 @@ const History = () => {
         <PointsHistoryEdit
           onClose={() => {
             setPointsEdit(false);
-            setUserSearch("");
+            clearRewardFilters();
+            fetchPointHistoryData();
           }}
           historyId={pointHistoryId}
         />
@@ -638,6 +1111,18 @@ const History = () => {
           message={message}
           isVisible={visibleModal}
           onClose={() => setVisibleModal(false)}
+        />
+      )}
+      {pointsArchiveForm && (
+        <ArchiveDateEdit
+          data={pointHistoryId}
+          onClose={() => setPointsArchiveForm(false)}
+        />
+      )}
+      {rewardsArchiveForm && (
+        <ArchiveDateForm
+          data={historyData}
+          onClose={() => setRewardsArchiveForm(false)}
         />
       )}
       <StatusBar style="auto" />

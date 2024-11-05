@@ -21,6 +21,7 @@ import RemixIcon from "react-native-remix-icon";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Image } from "expo-image";
 import Loader from "@/components/loader";
+import { useLocation } from "@/context/LocationProvider";
 
 export default function Login() {
   const [hidePass, setHidePass] = useState(true);
@@ -33,7 +34,8 @@ export default function Login() {
   const [userLevel, setUserLevel] = useState(null);
   const { ipAddress, port } = useUrl();
   const [loading, setLoading] = useState(false);
-  const { initializeWebSocket } = useQueue();
+  const { queueWebSocket } = useQueue();
+  const { botLocationWebSocket } = useLocation();
 
   const togglePassword = () => {
     setHidePass(!hidePass);
@@ -53,7 +55,8 @@ export default function Login() {
       if (response.data.success === true) {
         setToken(response.data.token);
         setUser(response.data.user);
-        initializeWebSocket();
+        queueWebSocket();
+        botLocationWebSocket();
 
         if (response.data.user.credentials.level === "citizen") {
           route.push("/(user)/dashboard");

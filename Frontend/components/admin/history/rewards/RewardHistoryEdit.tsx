@@ -372,7 +372,6 @@ const RewardHistoryEdit = ({
           onClose={() => {
             setChooseModal(false);
             onClose();
-            fetchAllRewardsHistory();
           }}
           reward={selectedReward}
         />

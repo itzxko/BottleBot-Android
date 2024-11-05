@@ -1,17 +1,45 @@
 import { View, Text } from "react-native";
 import React, { createContext, useContext, useState } from "react";
 import * as Location from "expo-location";
+import { useUrl } from "./UrlProvider";
 
 const LocationContext = createContext<any>(null);
 
 export const LocationProvider = ({ children }: any) => {
   const [defaultLocation, setDefaultLocation] = useState();
+  const [botLocation, setBotLocation] = useState(null);
+  const { ipAddress, port } = useUrl();
   const [yourLocation, setYourLocation] = useState({
     latitude: 14.680105493791455,
     longitude: 121.00993905398246,
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
   });
+
+  const botLocationWebSocket = () => {
+    const socket = new WebSocket(`ws://${ipAddress}:${port}/api/monitor`);
+
+    socket.onopen = () => {
+      console.log("WebSocket connection opened");
+    };
+
+    socket.onerror = (error) => {
+      console.error("WebSocket error: ", error);
+    };
+
+    socket.onclose = () => {
+      console.log("WebSocket connection closed");
+    };
+
+    socket.onmessage = (event) => {
+      const response = JSON.parse(event.data);
+
+      if (response.success && response.realTimeType === "botstate") {
+        console.log(response.data);
+        setBotLocation(response.data);
+      }
+    };
+  };
 
   const getUserLocation = async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
@@ -47,7 +75,13 @@ export const LocationProvider = ({ children }: any) => {
 
   return (
     <LocationContext.Provider
-      value={{ yourLocation, defaultLocation, getUserLocation }}
+      value={{
+        yourLocation,
+        defaultLocation,
+        getUserLocation,
+        botLocationWebSocket,
+        botLocation,
+      }}
     >
       {children}
     </LocationContext.Provider>
