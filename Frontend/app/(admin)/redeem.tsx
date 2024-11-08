@@ -601,8 +601,7 @@ const redeem = () => {
           onClose={() => {
             setCheckoutModal(false);
             clearFilters();
-            fetchData;
-            fetchAllHistory();
+            fetchData();
           }}
           reward={selectedReward}
         />

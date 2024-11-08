@@ -12,8 +12,8 @@ export const LocationProvider = ({ children }: any) => {
   const [yourLocation, setYourLocation] = useState({
     latitude: 14.680105493791455,
     longitude: 121.00993905398246,
-    latitudeDelta: 0.0922,
-    longitudeDelta: 0.0421,
+    latitudeDelta: 0.0005,
+    longitudeDelta: 0.0005,
   });
 
   const botLocationWebSocket = () => {
@@ -56,8 +56,8 @@ export const LocationProvider = ({ children }: any) => {
       setYourLocation({
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
-        latitudeDelta: 0.0922,
-        longitudeDelta: 0.0421,
+        latitudeDelta: 0.0005,
+        longitudeDelta: 0.0005,
       });
     } catch (error) {
       console.error("Error getting location:", error);
