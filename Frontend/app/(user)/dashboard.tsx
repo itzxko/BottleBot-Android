@@ -55,11 +55,11 @@ const Dashboard = () => {
     const getLocation = async () => {
       setLoading(true);
       await getUserLocation();
+      await checkConfig();
       setLoading(false);
     };
 
     getLocation();
-    checkConfig();
   }, []);
 
   const checkConfig = async () => {

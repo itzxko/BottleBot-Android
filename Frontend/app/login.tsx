@@ -22,6 +22,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Image } from "expo-image";
 import Loader from "@/components/loader";
 import { useLocation } from "@/context/LocationProvider";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Login() {
   const [hidePass, setHidePass] = useState(true);
@@ -53,17 +54,27 @@ export default function Login() {
       });
 
       if (response.data.success === true) {
-        setToken(response.data.token);
-        setUser(response.data.user);
         queueWebSocket();
         botLocationWebSocket();
 
         if (response.data.user.credentials.level === "citizen") {
           route.push("/(user)/dashboard");
+          setUser(response.data.user);
+          setToken(response.data.token);
+          AsyncStorage.setItem("user", JSON.stringify(response.data.user));
+          AsyncStorage.setItem("token", response.data.token);
         } else if (response.data.user.credentials.level === "admin") {
           route.push("/(admin)/dashboard");
+          setUser(response.data.user);
+          setToken(response.data.token);
+          AsyncStorage.setItem("user", JSON.stringify(response.data.user));
+          AsyncStorage.setItem("token", response.data.token);
         } else {
           route.push("/(staff)/dashboard");
+          setUser(response.data.user);
+          setToken(response.data.token);
+          AsyncStorage.setItem("user", JSON.stringify(response.data.user));
+          AsyncStorage.setItem("token", response.data.token);
         }
       } else {
         setVisibleModal(true);
