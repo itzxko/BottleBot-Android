@@ -174,7 +174,7 @@ const Dashboard = () => {
                 className="p-2 rounded-full bg-white shadow-xl shadow-black"
                 onPress={handleZoomToLocations}
               >
-                <RemixIcon name="align-center" size={16} color="black" />
+                <RemixIcon name="compass-3-line" size={16} color="black" />
               </Pressable>
 
               <Pressable
@@ -198,7 +198,11 @@ const Dashboard = () => {
                 <View className="w-full flex flex-row items-center justify-between pl-2 pr-6 py-2 bg-[#E6E6E6] rounded-2xl mb-2">
                   <View className="max-w-[50%] flex flex-row items-center justify-start px-4 py-2.5 rounded-xl bg-[#050301]">
                     <Pressable>
-                      <RemixIcon name="robot-line" size={16} color="white" />
+                      <RemixIcon
+                        name="direction-line"
+                        size={16}
+                        color="white"
+                      />
                     </Pressable>
                     <Text
                       className="text-xs font-normal text-white pl-2"
@@ -223,7 +227,11 @@ const Dashboard = () => {
                 <View className="w-full flex flex-row items-center justify-between pl-2 pr-6 py-2 bg-[#E6E6E6] rounded-2xl mb-2">
                   <View className="max-w-[50%] flex flex-row items-center justify-start px-4 py-2.5 rounded-xl bg-[#050301]">
                     <Pressable>
-                      <RemixIcon name="user-4-line" size={16} color="white" />
+                      <RemixIcon
+                        name="direction-line"
+                        size={16}
+                        color="white"
+                      />
                     </Pressable>
                     <Text
                       className="text-xs font-normal text-white pl-2"
@@ -244,7 +252,11 @@ const Dashboard = () => {
                 <View className="w-full flex flex-row items-center justify-between pl-2 pr-6 py-2 bg-[#E6E6E6] rounded-2xl mb-2">
                   <View className="max-w-[50%] flex flex-row items-center justify-start px-4 py-2.5 rounded-xl bg-[#050301]">
                     <Pressable>
-                      <RemixIcon name="bookmark-line" size={16} color="white" />
+                      <RemixIcon
+                        name="direction-line"
+                        size={16}
+                        color="white"
+                      />
                     </Pressable>
                     <Text
                       className="text-xs font-normal text-white pl-2"

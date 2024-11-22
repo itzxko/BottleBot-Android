@@ -1,5 +1,12 @@
-import React, { createContext, useState, useContext, ReactNode } from "react";
-import { useRouter } from "expo-router";
+import React, {
+  createContext,
+  useState,
+  useContext,
+  ReactNode,
+  useEffect,
+} from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter, useSegments } from "expo-router";
 
 interface User {
   _id: string;
@@ -50,13 +57,55 @@ interface AuthProviderProps {
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
+  const router = useRouter();
+  const segments = useSegments();
 
-  const updateUser = (updatedUser: User) => {
+  useEffect(() => {
+    if (segments.length > 0) {
+      setIsMounted(true);
+    }
+  }, [segments]);
+
+  useEffect(() => {
+    const loadAuthData = async () => {
+      if (!isMounted) return;
+
+      try {
+        const storedToken = await AsyncStorage.getItem("token");
+        const storedUser = await AsyncStorage.getItem("user");
+
+        if (storedToken && storedUser) {
+          const parsedUser = JSON.parse(storedUser) as User;
+          setToken(storedToken);
+          setUser(parsedUser);
+
+          if (parsedUser.credentials.level === "admin") {
+            router.replace("/(admin)/dashboard");
+          } else if (parsedUser.credentials.level === "staff") {
+            router.replace("/(staff)/dashboard");
+          } else {
+            router.replace("/(user)/dashboard");
+          }
+        }
+      } catch (error) {
+        console.error("Failed to load auth data:", error);
+      }
+    };
+
+    loadAuthData();
+  }, [isMounted]);
+
+  const updateUser = async (updatedUser: User) => {
     setUser(updatedUser);
+    await AsyncStorage.setItem("user", JSON.stringify(updatedUser));
   };
-  const logout = () => {
+
+  const logout = async () => {
     setToken(null);
     setUser(null);
+    await AsyncStorage.removeItem("token");
+    await AsyncStorage.removeItem("user");
   };
 
   return (

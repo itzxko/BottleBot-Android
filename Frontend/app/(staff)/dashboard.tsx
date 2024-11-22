@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -19,14 +19,25 @@ import { useLocation } from "@/context/LocationProvider";
 import { useUrl } from "@/context/UrlProvider";
 import axios from "axios";
 import RemixIcon from "react-native-remix-icon";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const Dashboard = () => {
   const { queue, initializeWebSocket, deleteFromQueue } = useQueue();
   const [loading, setLoading] = useState(false);
   const [configForm, setConfigForm] = useState(false);
-  const { yourLocation, defaultLocation, getUserLocation } = useLocation();
+  const { yourLocation, defaultLocation, getUserLocation, botLocation } =
+    useLocation();
   const [config, setConfig] = useState<config | undefined>();
   const { ipAddress, port } = useUrl();
+  const mapViewRef = useRef<MapView | null>(null);
+  const [region, setRegion] = useState<Region | null>(null);
+
+  interface Region {
+    latitude: number;
+    longitude: number;
+    latitudeDelta: number;
+    longitudeDelta: number;
+  }
 
   interface config {
     defaultLocation: {
@@ -48,7 +59,6 @@ const Dashboard = () => {
       await getUserLocation();
       setLoading(false);
     };
-
     getLocation();
     checkConfig();
   }, []);
@@ -67,16 +77,36 @@ const Dashboard = () => {
     }
   };
 
+  useEffect(() => {
+    if (yourLocation && config?.defaultLocation) {
+      handleZoomToLocations();
+    }
+  }, [yourLocation, config]);
+
+  const handleZoomToLocations = () => {
+    if (mapViewRef.current && yourLocation && config?.defaultLocation) {
+      const locations = [
+        { latitude: yourLocation.latitude, longitude: yourLocation.longitude },
+        {
+          latitude: config.defaultLocation.lat,
+          longitude: config.defaultLocation.lon,
+        },
+      ];
+
+      mapViewRef.current.fitToCoordinates(locations, {
+        edgePadding: { top: 100, right: 100, bottom: 100, left: 100 },
+        animated: true,
+      });
+    }
+  };
+
   return (
     <>
       <View className="flex-1 w-full flex items-center justify-center">
         <View className="flex-1 w-full">
           <View className="w-full flex-1 relative">
             {/* Map Background */}
-            <MapView
-              style={{ width: "100%", height: "100%" }}
-              region={yourLocation}
-            >
+            <MapView style={{ width: "100%", height: "60%" }} ref={mapViewRef}>
               {queue &&
                 queue.map((queue: any) => (
                   <Marker
@@ -94,6 +124,20 @@ const Dashboard = () => {
                     />
                   </Marker>
                 ))}
+              {botLocation ? (
+                <Marker
+                  coordinate={{
+                    latitude: botLocation.lat,
+                    longitude: botLocation.lon,
+                  }}
+                  title="Bot Location"
+                >
+                  <Image
+                    source={require("../../assets/images/Bot-Pin.png")}
+                    className="w-[56px] h-[56px]"
+                  />
+                </Marker>
+              ) : null}
               <Marker coordinate={yourLocation} title="Your Location">
                 <Image
                   source={require("../../assets/images/Admin-Pin.png")}
@@ -116,13 +160,22 @@ const Dashboard = () => {
               )}
             </MapView>
 
-            <View className="w-full h-full absolute top-0 left-0">
+            <View className="w-full h-[80vh] absolute top-0 left-0">
               <LinearGradient
                 colors={["rgba(0, 0, 0, 0.1)", "rgba(0, 0, 0, 1)"]}
                 start={{ x: 0, y: 0.5 }}
                 end={{ x: 0, y: 1 }}
                 className="flex-1"
               />
+            </View>
+
+            <View className="absolute top-[6%] left-[4%] flex flex-col space-y-2">
+              <Pressable
+                className="p-2 rounded-full bg-white shadow-xl shadow-black"
+                onPress={handleZoomToLocations}
+              >
+                <RemixIcon name="align-center" size={16} color="black" />
+              </Pressable>
             </View>
 
             <View className="absolute flex items-center rounded-t-3xl justify-center w-full left-0 bottom-0 bg-[#FAFAFA] ">
@@ -135,14 +188,10 @@ const Dashboard = () => {
                   </Text>
                 </View>
                 {/* BottleBot */}
-                <View className="w-full flex flex-row items-center justify-between pl-2 pr-6 py-2 bg-[#E6E6E6] rounded-full mb-2">
-                  <View className="max-w-[50%] flex flex-row items-center justify-start px-4 py-2.5 rounded-full bg-[#050301]">
+                <View className="w-full flex flex-row items-center justify-between pl-2 pr-6 py-2 bg-[#E6E6E6] rounded-2xl mb-2">
+                  <View className="max-w-[50%] flex flex-row items-center justify-start px-4 py-2.5 rounded-xl bg-[#050301]">
                     <Pressable>
-                      <RemixIcon
-                        name="map-pin-2-line"
-                        size={16}
-                        color="white"
-                      />
+                      <RemixIcon name="robot-line" size={16} color="white" />
                     </Pressable>
                     <Text
                       className="text-xs font-normal text-white pl-2"
@@ -156,18 +205,18 @@ const Dashboard = () => {
                     placeholder="single"
                     numberOfLines={1}
                     readOnly={true}
-                    value={`${yourLocation.latitude.toString()}, ${yourLocation.longitude.toString()}`}
+                    value={
+                      botLocation
+                        ? `${botLocation.lat.toString()}, ${botLocation.lon.toString()}`
+                        : "No Location"
+                    }
                   ></TextInput>
                 </View>
                 {/* User */}
-                <View className="w-full flex flex-row items-center justify-between pl-2 pr-6 py-2 bg-[#E6E6E6] rounded-full mb-2">
-                  <View className="max-w-[50%] flex flex-row items-center justify-start px-4 py-2.5 rounded-full bg-[#050301]">
+                <View className="w-full flex flex-row items-center justify-between pl-2 pr-6 py-2 bg-[#E6E6E6] rounded-2xl mb-2">
+                  <View className="max-w-[50%] flex flex-row items-center justify-start px-4 py-2.5 rounded-xl bg-[#050301]">
                     <Pressable>
-                      <RemixIcon
-                        name="map-pin-2-line"
-                        size={16}
-                        color="white"
-                      />
+                      <RemixIcon name="user-4-line" size={16} color="white" />
                     </Pressable>
                     <Text
                       className="text-xs font-normal text-white pl-2"
@@ -185,10 +234,10 @@ const Dashboard = () => {
                   ></TextInput>
                 </View>
                 {/* Default */}
-                <View className="w-full flex flex-row items-center justify-between pl-2 pr-6 py-2 bg-[#E6E6E6] rounded-full mb-2">
-                  <View className="max-w-[50%] flex flex-row items-center justify-start px-4 py-2.5 rounded-full bg-[#050301]">
+                <View className="w-full flex flex-row items-center justify-between pl-2 pr-6 py-2 bg-[#E6E6E6] rounded-2xl mb-2">
+                  <View className="max-w-[50%] flex flex-row items-center justify-start px-4 py-2.5 rounded-xl bg-[#050301]">
                     <Pressable>
-                      <RemixIcon name="edit-2-line" size={16} color="white" />
+                      <RemixIcon name="bookmark-line" size={16} color="white" />
                     </Pressable>
                     <Text
                       className="text-xs font-normal text-white pl-2"
@@ -213,15 +262,6 @@ const Dashboard = () => {
         </View>
       </View>
       {loading && <Loader />}
-      {configForm && (
-        <ConfigForm
-          onClose={() => {
-            setConfigForm(false);
-            checkConfig();
-          }}
-          config={config}
-        />
-      )}
     </>
   );
 };

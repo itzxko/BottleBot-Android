@@ -1,3 +1,4 @@
+// Import additional hooks and modules if needed
 import { View, Text, ScrollView, Pressable, TextInput } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -36,19 +37,24 @@ const ConfigForm = ({
   const [baseWeight, setBaseWeight] = useState<number | null>(null);
   const [baseUnit, setBaseUnit] = useState("kg");
   const [equivalentPoints, setEquivalentPoints] = useState<number | null>(null);
+  const [addressChanged, setAddressChanged] = useState(false);
 
-  //loaders
+  // Loaders and states
   const [loading, setLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [message, setMessage] = useState("");
   const [modal, setModal] = useState(false);
   const { ipAddress, port } = useUrl();
 
-  const getAddress = async (latitude: number, longitude: number) => {
-    const apiKey = "72d5a1df72ec497ea48fbb7f2842a176"; // Replace with your OpenCage API key
+  const geocodeAddress = async (address: string) => {
+    const apiKey = "72d5a1df72ec497ea48fbb7f2842a176";
+    setLoading(true);
+
     try {
       const response = await fetch(
-        `https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=${apiKey}`
+        `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
+          address
+        )}&key=${apiKey}`
       );
 
       if (!response.ok) {
@@ -57,57 +63,28 @@ const ConfigForm = ({
 
       const data = await response.json();
       if (data.results.length > 0) {
-        setLocationName(data.results[0].formatted); // Use the formatted address
+        const { lat, lng } = data.results[0].geometry;
+        setLat(lat.toString());
+        setLon(lng.toString());
       } else {
-        setLocationName("Address not found");
+        setLat("Coordinates not Found");
+        setLon("Coordinates not Found");
+        console.log("Coordinates not found for this address");
       }
     } catch (error) {
-      console.error("Error fetching address:", error);
-      setLocationName("Error fetching address");
+      console.error("Error fetching coordinates:", error);
+      setLat("");
+      setLon("");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleLatChange = (text: string) => {
-    setLat(text);
-    const parsedLat = parseFloat(text);
-    if (!isNaN(parsedLat) && lon) {
-      getAddress(parsedLat, parseFloat(lon));
-    }
-  };
-
-  const handleLonChange = (text: string) => {
-    setLon(text);
-    const parsedLon = parseFloat(text);
-    if (!isNaN(parsedLon) && lat) {
-      getAddress(parseFloat(lat), parsedLon);
-    }
-  };
-
-  const handleUnitToggle = () => {
-    if (baseUnit === "kg") {
-      setBaseUnit("g");
-    } else if (baseUnit === "g") {
-      setBaseUnit("lb");
-    } else if (baseUnit === "lb") {
-      setBaseUnit("kg");
-    }
-  };
-
-  const checkConfig = async () => {
-    try {
-      let url = `http://${ipAddress}:${port}/api/configurations`;
-
-      let response = await axios.get(url);
-
-      if (
-        response.data.message === "There are already existing configurations"
-      ) {
-        updateBotConfig();
-      } else {
-        addBotConfig();
-      }
-    } catch (error: any) {
-      console.log(error);
+  const handleAddressChange = (text: string) => {
+    setLocationName(text);
+    if (text) {
+      geocodeAddress(text);
+      setAddressChanged(false);
     }
   };
 
@@ -120,43 +97,45 @@ const ConfigForm = ({
       setBaseWeight(config.bottleExchange.baseWeight);
       setEquivalentPoints(config.bottleExchange.equivalentInPoints);
     }
-  }, []);
 
-  const addBotConfig = async () => {
-    setLoading(true);
-    try {
-      let url = `http://${ipAddress}:${port}/api/configurations`;
+    console.log(config?._id);
+  }, [config]);
 
-      let response = await axios.post(url, {
-        defaultLocation: {
-          locationName: locationName,
-          lat: lat,
-          lon: lon,
-        },
-        bottleExchange: {
-          baseWeight: baseWeight,
-          baseUnit: baseUnit,
-          equivalentInPoints: equivalentPoints,
-        },
-      });
-
-      if (response.data.success === true) {
-        setIsError(false);
-        setModal(true);
-        setMessage(response.data.message);
-      }
-    } catch (error: any) {
-      setIsError(true);
-      setModal(true);
-      setMessage(error.response.data.message);
-    } finally {
-      setLoading(false);
+  const handleUnitToggle = () => {
+    if (baseUnit === "kg") {
+      setBaseUnit("lb");
+    } else if (baseUnit === "lb") {
+      setBaseUnit("g");
+    } else if (baseUnit === "g") {
+      setBaseUnit("kg");
     }
   };
 
+  const addBotConfig = async () => {};
+
   const updateBotConfig = async () => {
     setLoading(true);
+
     try {
+      if (locationName) {
+        if (addressChanged === true) {
+          setIsError(true);
+          setModal(true);
+          setMessage("Get the Coordinates First");
+          return;
+        } else if (
+          lat === "" ||
+          lon === "" ||
+          lat === "Coordinates not Found" ||
+          lon === "Coordinates not Found"
+        ) {
+          setIsError(true);
+          setModal(true);
+          setMessage("Invalid Coordinates");
+          return;
+        }
+      }
+
       let url = `http://${ipAddress}:${port}/api/configurations/${config?._id}`;
 
       let response = await axios.put(url, {
@@ -173,14 +152,14 @@ const ConfigForm = ({
       });
 
       if (response.data.success === true) {
-        setIsError(false);
         setModal(true);
         setMessage(response.data.message);
+        setIsError(false);
       }
     } catch (error: any) {
-      setIsError(true);
       setModal(true);
       setMessage(error.response.data.message);
+      setIsError(true);
     } finally {
       setLoading(false);
     }
@@ -194,144 +173,143 @@ const ConfigForm = ({
       >
         <SafeAreaView className="flex-1">
           <View className="flex-1 justify-center items-center">
-            {/* Use flex-1 to take full height */}
+            {/* Input form */}
             <View className="flex p-4 justify-center items-center bg-[#F0F0F0] rounded-3xl w-4/5">
-              {/* Inner View for padding */}
-              <View className="flex flex-row items-start justify-between w-full pb-6">
-                <View className="w-2/3 flex items-start justify-center">
-                  <Text className="text-sm font-semibold" numberOfLines={1}>
-                    Input Fields
-                  </Text>
-                  <Text
-                    className="text-xs font-normal text-black/50"
-                    numberOfLines={1}
-                  >
-                    fill out all fields to continue
-                  </Text>
-                </View>
+              <View className="w-full flex flex-row items-center justify-end">
                 <Pressable onPress={onClose}>
-                  <RemixIcon name="close-line" size={16} color="black" />
+                  <RemixIcon name="close-line" size={16} />
                 </Pressable>
               </View>
-              <View className="w-full flex flex-col  items-center justify-center pb-6">
-                <View className="w-full flex flex-row items-center justify-between">
-                  <View className="w-[48%] flex items-start justify-center py-2">
-                    <Text className="text-xs font-semibold pb-2">Latitude</Text>
-                    <TextInput
-                      className="w-full bg-[#E6E6E6] rounded-xl text-xs font-normal py-2 px-4"
-                      numberOfLines={1}
-                      placeholder="latitude"
-                      keyboardType="numeric"
-                      value={lat ? lat.toString() : ""}
-                      onChangeText={handleLatChange}
-                    />
-                  </View>
-                  <View className="w-[48%] flex items-start justify-center py-2">
-                    <Text className="text-xs font-semibold pb-2">
-                      Longitude
+              <View className="w-full flex flex-col  items-center justify-center space-y-6">
+                <View className="w-full flex flex-col items-center justify-center space-y-4">
+                  <View className="w-full flex flex-col items-start justify-center px-1">
+                    <Text className="text-xs font-semibold">
+                      Points Configuration
                     </Text>
-                    <TextInput
-                      className="w-full bg-[#E6E6E6] rounded-xl text-xs font-normal py-2 px-4"
-                      numberOfLines={1}
-                      keyboardType="numeric"
-                      placeholder="longitude"
-                      value={lon ? lon.toString() : ""}
-                      onChangeText={handleLonChange}
-                    />
-                  </View>
-                </View>
-                <View className="w-full flex items-start justify-center py-2">
-                  <Text className="text-xs font-semibold pb-2">Address</Text>
-                  <View className="w-full flex items-center justify-center bg-[#E6E6E6] rounded-xl px-4 py-[15px]">
-                    <Text
-                      className="text-xs font-normal w-full text-left"
-                      numberOfLines={1}
-                    >
-                      {locationName}
+                    <Text className="text-xs font-normal text-[#6E6E6E]">
+                      configure bottle exchange
                     </Text>
                   </View>
-                </View>
-              </View>
-              <View className="w-full flex flex-col  items-center justify-center">
-                <View className="w-full flex flex-row items-center justify-between">
-                  <View className="w-[48%] flex items-start justify-center py-2">
-                    <Text className="text-xs font-semibold pb-2">
-                      Base Weight
-                    </Text>
+
+                  <View className="w-full flex flex-col items-center justify-center space-y-2">
+                    <View className="w-full flex flex-row items-center justify-between py-2.5 px-4 rounded-xl bg-[#E6E6E6]">
+                      <Text
+                        className="w-3/4 text-xs font-normal"
+                        numberOfLines={1}
+                      >
+                        {baseUnit}
+                      </Text>
+                      <Pressable
+                        className="p-2 rounded-full bg-[#050301]"
+                        onPress={handleUnitToggle}
+                      >
+                        <RemixIcon
+                          name="refresh-line"
+                          size={12}
+                          color="white"
+                        />
+                      </Pressable>
+                    </View>
                     <TextInput
-                      className="w-full bg-[#E6E6E6] rounded-xl text-xs font-normal py-2 px-4"
-                      numberOfLines={1}
-                      placeholder="base weight"
-                      value={baseWeight ? baseWeight.toString() : ""}
-                      onChangeText={(text) => setBaseWeight(Number(text))}
-                      keyboardType="numeric"
-                    />
-                  </View>
-                  <View className="w-[48%] flex items-start justify-center py-2">
-                    <Text className="text-xs font-semibold pb-2">
-                      Equivalent Points
-                    </Text>
-                    <TextInput
-                      className="w-full bg-[#E6E6E6] rounded-xl text-xs font-normal py-2 px-4"
-                      numberOfLines={1}
-                      keyboardType="numeric"
-                      value={
-                        equivalentPoints ? equivalentPoints.toString() : ""
-                      }
+                      className="w-full text-xs font-normal py-2 px-4 rounded-xl bg-[#E6E6E6]"
+                      placeholder="equivalent points"
+                      value={equivalentPoints?.toString()}
                       onChangeText={(text) => setEquivalentPoints(Number(text))}
-                      placeholder="equivalent"
+                    />
+                    <TextInput
+                      className="w-full text-xs font-normal py-2 px-4 rounded-xl bg-[#E6E6E6]"
+                      placeholder="base weight"
+                      value={baseWeight?.toString()}
+                      onChangeText={(text) => setBaseWeight(Number(text))}
                     />
                   </View>
                 </View>
-                <View className="w-full flex items-start justify-center py-2">
-                  <Text className="text-xs font-semibold pb-2">Base Unit</Text>
-                  <View className="w-full flex flex-row items-center justify-between bg-[#E6E6E6] rounded-xl px-4 py-2">
-                    <Text
-                      className="text-xs font-normal w-1/2 text-left"
-                      numberOfLines={1}
-                    >
-                      {baseUnit}
+                <View className="w-full flex flex-col items-center justify-center space-y-4">
+                  <View className="w-full flex flex-col items-start justify-center px-1">
+                    <Text className="text-xs font-semibold">
+                      Default Location
                     </Text>
-                    <Pressable
-                      onPress={handleUnitToggle}
-                      className="p-2 bg-black rounded-full"
-                    >
-                      <RemixIcon name="refresh-line" size={12} color="white" />
-                    </Pressable>
+                    <Text className="text-xs font-normal text-[#6E6E6E]">
+                      configure default location
+                    </Text>
+                  </View>
+                  <View className="w-full flex flex-col items-center justify-center space-y-2">
+                    <View className="w-full flex flex-row justify-between items-center bg-[#E6E6E6] py-2.5 rounded-xl px-4">
+                      <TextInput
+                        className="w-4/5 flex items-center justify-center text-xs font-normal "
+                        placeholder="enter address"
+                        value={locationName}
+                        onChangeText={(text) => {
+                          setLocationName(text);
+                          setAddressChanged(true);
+                        }}
+                      />
+                      <Pressable
+                        className="p-2 rounded-full bg-[#050301]"
+                        onPress={() => handleAddressChange(locationName)}
+                      >
+                        <RemixIcon
+                          name="search-2-line"
+                          color="white"
+                          size={12}
+                        />
+                      </Pressable>
+                    </View>
+                    <TextInput
+                      className="w-full bg-[#E6E6E6] rounded-xl text-xs font-normal py-2 px-4"
+                      placeholder="Latitude"
+                      value={lat}
+                      editable={false}
+                    />
+                    <TextInput
+                      className="w-full bg-[#E6E6E6] rounded-xl text-xs font-normal py-2 px-4"
+                      placeholder="Longitude"
+                      value={lon}
+                      editable={false}
+                    />
                   </View>
                 </View>
+                {config ? (
+                  <Pressable className="w-full" onPress={updateBotConfig}>
+                    <LinearGradient
+                      colors={["#699900", "#466600"]}
+                      className="w-full flex items-center justify-center py-3 rounded-xl"
+                    >
+                      <Text className="text-xs font-semibold text-white">
+                        Update
+                      </Text>
+                    </LinearGradient>
+                  </Pressable>
+                ) : (
+                  <Pressable className="w-full" onPress={addBotConfig}>
+                    <LinearGradient
+                      colors={["#699900", "#466600"]}
+                      className="w-full flex items-center justify-center py-3 rounded-xl"
+                    >
+                      <Text className="text-xs font-semibold text-white">
+                        Configure
+                      </Text>
+                    </LinearGradient>
+                  </Pressable>
+                )}
               </View>
-              <Pressable
-                className="w-full pt-4"
-                onPress={config ? updateBotConfig : addBotConfig}
-              >
-                <LinearGradient
-                  colors={["#699900", "#466600"]}
-                  className="flex items-center justify-center w-full px-4 py-[14px] rounded-xl"
-                >
-                  <Text className="text-xs font-semibold text-white">
-                    Proceed
-                  </Text>
-                </LinearGradient>
-              </Pressable>
             </View>
           </View>
-          <View className="w-full pb-32"></View>
         </SafeAreaView>
       </ScrollView>
       {loading && <Loader />}
       {modal && (
         <Modal
-          header="location"
           message={message}
+          header="Configurations"
+          icon="location"
+          isVisible={modal}
           onClose={() => {
-            setModal(false);
             if (!isError) {
               onClose();
             }
+            setModal(false);
           }}
-          isVisible={modal}
-          icon="redeem"
         />
       )}
     </>

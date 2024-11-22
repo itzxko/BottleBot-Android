@@ -18,6 +18,7 @@ import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import RemixIcon from "react-native-remix-icon";
 import { usePagination } from "@/context/PaginationProvider";
+import ScannerCheckout from "./ScannerCheckout";
 
 interface Item {
   _id: string;
@@ -85,6 +86,7 @@ const CheckoutModal = ({
   const [visibleModal, setVisibleModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [userSearch, setUserSearch] = useState("");
+  const [showScanner, setShowScanner] = useState(false);
 
   const fetchData = async () => {
     setLoading(true);
@@ -243,13 +245,24 @@ const CheckoutModal = ({
           </View>
         </View>
         {/* Header */}
-        <View className="w-full flex items-start justify-center py-4">
-          <Text className="text-sm font-semibold" numberOfLines={1}>
-            Select User
-          </Text>
-          <Text className="text-xs font-normal text-black/50" numberOfLines={1}>
-            please select a user to continue the checkout
-          </Text>
+        <View className="w-full flex flex-row items-center justify-between py-4 px-2">
+          <View className="w-2/3 flex flex-col items-start justify-center">
+            <Text className="text-sm font-semibold" numberOfLines={1}>
+              Select User
+            </Text>
+            <Text
+              className="text-xs font-normal text-black/50"
+              numberOfLines={1}
+            >
+              please select a user to continue the checkout
+            </Text>
+          </View>
+          <Pressable
+            className="flex items-center justify-center p-2 rounded-full bg-[#050301]"
+            onPress={() => setShowScanner(true)}
+          >
+            <RemixIcon name="qr-code-line" size={16} color="white" />
+          </Pressable>
         </View>
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -362,6 +375,7 @@ const CheckoutModal = ({
         </ScrollView>
       </SafeAreaView>
       {loading && <Loader />}
+      {showScanner && <ScannerCheckout onClose={() => setShowScanner(false)} />}
       {visibleModal && (
         <Modal
           icon="redeem"

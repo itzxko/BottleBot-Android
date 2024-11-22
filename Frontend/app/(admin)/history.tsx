@@ -30,6 +30,7 @@ import { usePagination } from "@/context/PaginationProvider";
 import { Point } from "react-native-maps";
 import ArchiveDateEdit from "@/components/admin/history/points/ArchiveDateEdit";
 import ArchiveDateForm from "@/components/admin/history/rewards/ArchiveDateForm";
+import ScannerModal from "@/components/admin/history/points/ScannerModal";
 
 const History = () => {
   const { user } = useAuth();
@@ -73,6 +74,7 @@ const History = () => {
   const [pointsArchiveForm, setPointsArchiveForm] = useState(false);
   const [rewardsArchiveForm, setRewardsArchiveForm] = useState(false);
   const [historyData, setHistoryData] = useState("");
+  const [openScanner, setOpenScanner] = useState(false);
 
   interface user {
     _id: string;
@@ -815,7 +817,7 @@ const History = () => {
               <View className="w-full flex flex-row items-center justify-start space-x-2">
                 <Pressable
                   className="p-2 bg-[#050301] rounded-full"
-                  onPress={() => setPointsAdd(true)}
+                  onPress={() => setOpenScanner(true)}
                 >
                   <RemixIcon name="add-line" size={16} color="white" />
                 </Pressable>
@@ -889,19 +891,6 @@ const History = () => {
                                   <View className="py-3 px-4 rounded-full flex flex-row bg-[#050301]/50">
                                     {pointHistory.archiveDate === null ? (
                                       <>
-                                        <Pressable
-                                          className="pr-4"
-                                          onPress={() => {
-                                            setPointsEdit(true);
-                                            setPointHistoryId(pointHistory._id);
-                                          }}
-                                        >
-                                          <RemixIcon
-                                            name="edit-2-line"
-                                            size={16}
-                                            color="white"
-                                          />
-                                        </Pressable>
                                         <Pressable
                                           onPress={() =>
                                             archivePointHistory(
@@ -1075,15 +1064,7 @@ const History = () => {
           }}
         />
       )}
-      {pointsAdd && (
-        <PointsHistoryAdd
-          onClose={() => {
-            setPointsAdd(false);
-            clearRewardFilters();
-            fetchPointHistoryData();
-          }}
-        />
-      )}
+
       {rewardEdit && (
         <RewardHistoryEdit
           onClose={() => {
@@ -1125,6 +1106,16 @@ const History = () => {
           onClose={() => setRewardsArchiveForm(false)}
         />
       )}
+      {openScanner && (
+        <ScannerModal
+          onClose={() => {
+            setOpenScanner(false);
+            clearRewardFilters();
+            fetchPointHistoryData();
+          }}
+        />
+      )}
+
       <StatusBar style="auto" />
     </SafeAreaView>
   );
